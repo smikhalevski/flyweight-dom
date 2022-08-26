@@ -1,8 +1,9 @@
-import { createPrototype, defineProperty } from './utils';
+import { createPrototype, defineProperty, PropertyDescriptor } from './utils';
 import { Node } from './Node';
-import { ChildNode } from './extendChildNode';
+import { constructNonDocumentTypeChildNode, NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
+import { ChildNode, extendsChildNode } from './ChildNode';
 
-export interface CharacterData extends Node, ChildNode {
+export interface CharacterData extends Node, ChildNode, NonDocumentTypeChildNode {
   readonly length: number;
 
   data: string;
@@ -19,8 +20,9 @@ export interface CharacterData extends Node, ChildNode {
 }
 
 export class CharacterData {
-  constructor(nodeType: number, data = '') {
-    Node.call(this, nodeType);
+  constructor(nodeType: number, nodeName: string, data = '') {
+    Node.call(this, nodeType, nodeName);
+    constructNonDocumentTypeChildNode(this);
 
     this.data = data;
   }
@@ -28,20 +30,26 @@ export class CharacterData {
 
 const prototype: CharacterData = (CharacterData.prototype = createPrototype(Node.prototype));
 
+extendsChildNode(prototype);
+
+const dataDescriptor: PropertyDescriptor<CharacterData, string | null> = {
+  get() {
+    return this.data;
+  },
+  set(value) {
+    this.data = value != null ? value : '';
+  },
+};
+
 defineProperty(prototype, 'length', {
-  get(this: CharacterData): CharacterData['length'] {
+  get() {
     return this.data.length;
   },
 });
 
-defineProperty(prototype, 'nodeValue', {
-  get(this: CharacterData): CharacterData['nodeValue'] {
-    return this.data;
-  },
-  set(this: CharacterData, value: CharacterData['nodeValue']): void {
-    this.data = value !== null ? value : '';
-  },
-});
+defineProperty(prototype, 'nodeValue', dataDescriptor);
+
+defineProperty(prototype, 'textContent', dataDescriptor);
 
 prototype.appendData = function (data) {
   this.data += data;

@@ -10,10 +10,7 @@ import {
   uncheckedRemove,
 } from './node-utils';
 
-// readonly nextElementSibling: Element | null;
-// readonly previousElementSibling: Element | null;
-
-export function extendNode(prototype: Node): void {
+export function extendContainer(prototype: Node): void {
   prototype.hasChildNodes = hasChildNodes;
   prototype.appendChild = appendChild;
   prototype.insertBefore = insertBefore;
@@ -83,11 +80,11 @@ function replaceChild<T extends Node>(this: Node, node: Node, child: T): T {
   assertNode(child);
   assertParent(this, child, 'The node to be replaced is not a child of this node');
 
-  if (managesChildNodes(this)) {
-    const { childNodes } = this;
-
-    childNodes[childNodes.indexOf(child)] = node;
-  }
+  // if (managesChildNodes(this)) {
+  //   const { _childNodes } = this;
+  //
+  //   _childNodes[_childNodes.indexOf(child)] = node;
+  // }
   uncheckedRemove(node);
   uncheckedInsertBefore(this, node, child);
   uncheckedRemove(child);

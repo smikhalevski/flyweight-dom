@@ -7,7 +7,7 @@ export interface CDATASection extends Text {}
 
 export class CDATASection {
   constructor(data?: string) {
-    CharacterData.call(this, NodeType.CDATA_SECTION_NODE, data);
+    CharacterData.call(this, NodeType.CDATA_SECTION_NODE, '#cdata-section', data);
   }
 }
 

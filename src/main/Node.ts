@@ -1,10 +1,13 @@
 import { Element } from './Element';
-import { die } from './utils';
-import { defineProperty } from './utils';
-import { NodeType } from './NodeType';
+import { defineProperty, die } from './utils';
+import { ChildNode } from './ChildNode';
+import { ParentNode } from './ParentNode';
 
 export interface Node {
-  readonly childNodes: readonly Node[];
+  readonly childNodes: readonly ChildNode[];
+
+  nodeValue: string | null;
+  textContent: string | null;
 
   hasChildNodes(): boolean;
 
@@ -20,30 +23,23 @@ export interface Node {
 }
 
 export class Node {
-  static ELEMENT_NODE: number = NodeType.ELEMENT_NODE;
-  static ATTRIBUTE_NODE: number = NodeType.ATTRIBUTE_NODE;
-  static TEXT_NODE: number = NodeType.TEXT_NODE;
-  static CDATA_SECTION_NODE: number = NodeType.CDATA_SECTION_NODE;
-  static PROCESSING_INSTRUCTION_NODE: number = NodeType.PROCESSING_INSTRUCTION_NODE;
-  static COMMENT_NODE: number = NodeType.COMMENT_NODE;
-
-  readonly parentNode: Node | null;
+  readonly parentNode: ParentNode | null;
   readonly parentElement: Element | null;
-  readonly previousSibling: Node | null;
-  readonly nextSibling: Node | null;
-  readonly firstChild: Node | null;
-  readonly lastChild: Node | null;
+  readonly previousSibling: ChildNode | null;
+  readonly nextSibling: ChildNode | null;
+  readonly firstChild: ChildNode | null;
+  readonly lastChild: ChildNode | null;
 
-  nodeValue: string | null;
+  protected _childNodes: ChildNode[] | null;
 
-  constructor(readonly nodeType: number) {
+  constructor(readonly nodeType: number, readonly nodeName: string) {
     this.parentNode =
       this.parentElement =
       this.previousSibling =
       this.nextSibling =
       this.firstChild =
       this.lastChild =
-      this.nodeValue =
+      this._childNodes =
         null;
   }
 }
@@ -51,8 +47,8 @@ export class Node {
 const prototype = Node.prototype;
 
 defineProperty(prototype, 'childNodes', {
-  get(this: Node): Node['childNodes'] {
-    const nodes = [];
+  get(this: Node) {
+    const nodes: ChildNode[] = (this._childNodes = []);
 
     for (let child = this.firstChild; child; child = child.nextSibling) {
       nodes.push(child);
@@ -63,12 +59,16 @@ defineProperty(prototype, 'childNodes', {
   },
 });
 
-prototype.hasChildNodes =
-  prototype.appendChild =
+prototype.hasChildNodes = () => false;
+
+prototype.appendChild =
   prototype.insertBefore =
   prototype.removeChild =
   prototype.replaceChild =
-  prototype.cloneNode =
     () => {
       die('This node type does not support this method');
     };
+
+prototype.cloneNode = () => {
+  die('Abstract method');
+};

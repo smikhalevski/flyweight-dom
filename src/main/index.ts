@@ -6,7 +6,7 @@ export * from './NamedNodeMap';
 export * from './Node';
 export * from './ProcessingInstruction';
 export * from './Text';
-export * from './extendChildNode';
-export * from './extendParentNode';
+export * from './ChildNode';
+export * from './ParentNode';
 
-type a = NamedNodeMap;
+type a = ProcessingInstruction;

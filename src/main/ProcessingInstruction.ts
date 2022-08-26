@@ -6,7 +6,7 @@ export interface ProcessingInstruction extends CharacterData {}
 
 export class ProcessingInstruction {
   constructor(readonly target: string, data?: string) {
-    CharacterData.call(this, NodeType.PROCESSING_INSTRUCTION_NODE, data);
+    CharacterData.call(this, NodeType.PROCESSING_INSTRUCTION_NODE, target, data);
   }
 }
 

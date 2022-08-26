@@ -11,14 +11,14 @@ export interface Text extends CharacterData {
 
 export class Text {
   constructor(data?: string) {
-    CharacterData.call(this, NodeType.TEXT_NODE, data);
+    CharacterData.call(this, NodeType.TEXT_NODE, '#text', data);
   }
 }
 
 const prototype: Text = (Text.prototype = createPrototype(CharacterData.prototype));
 
 defineProperty(prototype, 'wholeText', {
-  get(this: Text): Text['wholeText'] {
+  get() {
     let text = this;
 
     for (let node = text.previousSibling; node && node.nodeType === NodeType.TEXT_NODE; node = node.previousSibling) {

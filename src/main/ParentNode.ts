@@ -25,7 +25,7 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: Array<Node | string>): void;
 }
 
-export function constructParentNode(node: Mutable<ParentNode>): void {
+export function applyParentNode(node: Mutable<ParentNode>): void {
   node.childElementCount = 0;
   node.firstElementChild = null;
   node.lastElementChild = null;

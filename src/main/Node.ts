@@ -1,10 +1,13 @@
 import { Element } from './Element';
 import { defineProperty, die } from './utils';
-import { ChildNode } from './ChildNode';
-import { ParentNode } from './ParentNode';
+import { ChildNode } from './extendsChildNode';
+import { ParentNode } from './extendsParentNode';
 
+/**
+ * @internal
+ */
 export interface Node {
-  readonly childNodes: readonly ChildNode[];
+  /*readonly*/ childNodes: readonly ChildNode[];
 
   nodeValue: string | null;
   textContent: string | null;
@@ -15,6 +18,8 @@ export interface Node {
 
   insertBefore<T extends Node>(node: T, child: Node | null): T;
 
+  contains(node: Node | null): boolean;
+
   removeChild<T extends Node>(child: T): T;
 
   replaceChild<T extends Node>(node: Node, child: T): T;
@@ -22,17 +27,24 @@ export interface Node {
   cloneNode(deep?: boolean): Node;
 }
 
+/**
+ * @internal
+ */
 export class Node {
-  readonly parentNode: ParentNode | null;
-  readonly parentElement: Element | null;
-  readonly previousSibling: ChildNode | null;
-  readonly nextSibling: ChildNode | null;
-  readonly firstChild: ChildNode | null;
-  readonly lastChild: ChildNode | null;
+  /*readonly*/ nodeType: number;
+  /*readonly*/ nodeName: string;
+  /*readonly*/ parentNode: ParentNode | null;
+  /*readonly*/ parentElement: Element | null;
+  /*readonly*/ previousSibling: ChildNode | null;
+  /*readonly*/ nextSibling: ChildNode | null;
+  /*readonly*/ firstChild: ChildNode | null;
+  /*readonly*/ lastChild: ChildNode | null;
 
-  protected _childNodes: ChildNode[] | null;
+  /*private*/ _childNodes: ChildNode[] | null;
 
-  constructor(readonly nodeType: number, readonly nodeName: string) {
+  constructor(nodeType: number, nodeName: string) {
+    this.nodeType = nodeType;
+    this.nodeName = nodeName;
     this.parentNode =
       this.parentElement =
       this.previousSibling =
@@ -63,6 +75,7 @@ prototype.hasChildNodes = () => false;
 
 prototype.appendChild =
   prototype.insertBefore =
+  prototype.contains =
   prototype.removeChild =
   prototype.replaceChild =
     () => {

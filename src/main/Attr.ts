@@ -1,13 +1,19 @@
 import { Node } from './Node';
 import { Element } from './Element';
 import { NodeType } from './NodeType';
-import { createPrototype } from './utils';
+import { createPrototype, defineProperty } from './utils';
 
+/**
+ * @internal
+ */
 export interface Attr extends Node {}
 
+/**
+ * @internal
+ */
 export class Attr {
-  readonly ownerElement: Element | null;
-  readonly name: string;
+  /*readonly*/ ownerElement: Element | null;
+  /*readonly*/ name: string;
 
   value: string;
 
@@ -20,13 +26,13 @@ export class Attr {
   }
 }
 
-// Attr.prototype = createPrototype(Node.prototype, {
-//   nodeValue: {
-//     get(this: Attr): Attr['nodeValue'] {
-//       return this.value;
-//     },
-//     set(this: Attr, value: Attr['nodeValue']): void {
-//       this.value = value !== null ? value : '';
-//     },
-//   }
-// });
+const prototype: Attr = (Attr.prototype = createPrototype(Node.prototype));
+
+defineProperty(prototype, 'nodeValue', {
+  get() {
+    return this.value;
+  },
+  set(value) {
+    this.value = value !== null ? value : '';
+  },
+});

@@ -1,6 +1,4 @@
-import { die } from './utils';
 import { Attr } from './Attr';
-import { Mutable } from './node-utils';
 import { Element } from './Element';
 
 export interface NamedNodeMap {

@@ -1,15 +1,16 @@
 import { Node } from './Node';
-import { Attr } from './Attr';
-import { extendContainer } from './extendContainer';
-import { uncheckedCloneChildNodes } from './node-utils';
-import { createPrototype, defineProperty, isString } from './utils';
-import { NamedNodeMap } from './NamedNodeMap';
+import { extendsContainer } from './extendContainer';
+import { uncheckedCloneChildNodes } from './utils-unchecked';
+import { createPrototype } from './utils';
 import { NodeType } from './NodeType';
-import { ChildNode } from './ChildNode';
-import { ParentNode } from './ParentNode';
+import { ChildNode, extendsChildNode } from './extendsChildNode';
+import { extendsParentNode, ParentNode } from './extendsParentNode';
+import { NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
 
+/**
+ * @internal
+ */
 export interface Element extends Node, ChildNode, NonDocumentTypeChildNode, ParentNode {
-  // readonly rawAttributes: { [name: string]: string };
   // readonly attributes: NamedNodeMap;
   //
   // className: string;
@@ -34,15 +35,28 @@ export interface Element extends Node, ChildNode, NonDocumentTypeChildNode, Pare
   // setAttributeNode(attr: Attr): Attr | null;
 }
 
+/**
+ * @internal
+ */
 export class Element {
   constructor(readonly tagName: string) {
     Node.call(this, NodeType.ELEMENT_NODE, tagName);
+
+    this.childElementCount = 0;
+    this.firstElementChild =
+      this.lastElementChild =
+      this.nextElementSibling =
+      this.previousElementSibling =
+      this._children =
+        null;
   }
 }
 
 const prototype: Element = (Element.prototype = createPrototype(Node.prototype));
 
-extendContainer(prototype);
+extendsChildNode(prototype);
+extendsContainer(prototype);
+extendsParentNode(prototype);
 
 prototype.cloneNode = function (deep?: boolean): Node {
   const node = new Element(this.tagName);

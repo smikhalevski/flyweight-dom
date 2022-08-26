@@ -1,10 +1,10 @@
-import { Mutable } from './node-utils';
+import { Element } from './Element';
+import { ChildNode } from './extendsChildNode';
 
-export interface NonDocumentTypeChildNode {
-  readonly nextElementSibling: Element | null;
-  readonly previousElementSibling: Element | null;
-}
-
-export function constructNonDocumentTypeChildNode(node: Mutable<NonDocumentTypeChildNode>): void {
-  node.nextElementSibling = node.previousElementSibling = null;
+/**
+ * @internal
+ */
+export interface NonDocumentTypeChildNode extends ChildNode {
+  /*readonly*/ nextElementSibling: Element | null;
+  /*readonly*/ previousElementSibling: Element | null;
 }

@@ -1,14 +1,20 @@
 import { CharacterData } from './CharacterData';
 import { createPrototype, defineProperty } from './utils';
 import { NodeType } from './NodeType';
-import { uncheckedAppendChild, uncheckedInsertBefore } from './node-utils';
+import { uncheckedAppendChild, uncheckedInsertBefore } from './utils-unchecked';
 
+/**
+ * @internal
+ */
 export interface Text extends CharacterData {
   readonly wholeText: string;
 
   splitText(offset: number): Text;
 }
 
+/**
+ * @internal
+ */
 export class Text {
   constructor(data?: string) {
     CharacterData.call(this, NodeType.TEXT_NODE, '#text', data);

@@ -1,10 +1,13 @@
 import { createPrototype, defineProperty, PropertyDescriptor } from './utils';
 import { Node } from './Node';
-import { constructNonDocumentTypeChildNode, NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
-import { ChildNode, extendsChildNode } from './ChildNode';
+import { ChildNode, extendsChildNode } from './extendsChildNode';
+import { NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
 
+/**
+ * @internal
+ */
 export interface CharacterData extends Node, ChildNode, NonDocumentTypeChildNode {
-  readonly length: number;
+  /*readonly*/ length: number;
 
   data: string;
 
@@ -19,11 +22,14 @@ export interface CharacterData extends Node, ChildNode, NonDocumentTypeChildNode
   substringData(offset: number, count: number): string;
 }
 
+/**
+ * @internal
+ */
 export class CharacterData {
   constructor(nodeType: number, nodeName: string, data = '') {
     Node.call(this, nodeType, nodeName);
-    constructNonDocumentTypeChildNode(this);
 
+    this.nextElementSibling = this.previousElementSibling = null;
     this.data = data;
   }
 }

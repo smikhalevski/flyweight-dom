@@ -1,19 +1,21 @@
 import { Node } from './Node';
+import { ParentNode } from './extendsParentNode';
 import {
-  assertNoCyclicReference,
+  assertChildNode,
   assertNode,
+  assertNotContains,
   assertParent,
-  managesChildNodes,
   uncheckedAppendChild,
+  uncheckedContains,
   uncheckedInsertBefore,
-  uncheckedPrependChild,
   uncheckedRemove,
-} from './node-utils';
+} from './utils-unchecked';
 
-export function extendContainer(prototype: Node): void {
+export function extendsContainer(prototype: Node): void {
   prototype.hasChildNodes = hasChildNodes;
   prototype.appendChild = appendChild;
   prototype.insertBefore = insertBefore;
+  prototype.contains = contains;
   prototype.removeChild = removeChild;
   prototype.replaceChild = replaceChild;
 }
@@ -22,69 +24,51 @@ function hasChildNodes(this: Node): boolean {
   return this.firstChild !== null;
 }
 
-function appendChild<T extends Node>(this: Node, node: T): T {
-  assertNode(node);
-  assertNoCyclicReference(this, node);
+function appendChild<T extends Node>(this: ParentNode, node: T): T {
+  assertChildNode(node);
+  assertNotContains(node, this);
 
   uncheckedRemove(node);
   uncheckedAppendChild(this, node);
-
-  if (managesChildNodes(this)) {
-    this.childNodes.push(node);
-  }
   return node;
 }
 
-function insertBefore<T extends Node>(this: Node, node: T, child: Node | null): T {
-  assertNode(node);
-  assertNoCyclicReference(this, node);
+function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | null): T {
+  assertChildNode(node);
+  assertNotContains(node, this);
 
   if (child != null) {
     assertNode(child);
     assertParent(this, child, 'The node before which the new node is to be inserted is not a child of this node');
-
-    uncheckedRemove(node);
-    uncheckedInsertBefore(this, node, child);
-
-    if (managesChildNodes(this)) {
-      const { childNodes } = this;
-
-      childNodes.splice(childNodes.indexOf(child), 0, node);
-    }
-  } else {
-    uncheckedRemove(node);
-    uncheckedPrependChild(this, node);
-
-    if (managesChildNodes(this)) {
-      this.childNodes.unshift(node);
-    }
   }
+
+  uncheckedRemove(node);
+  uncheckedInsertBefore(this, node, child);
   return node;
 }
 
+function contains(this: ParentNode, node: Node | null): boolean {
+  if (node != null) {
+    assertNode(node);
+
+    return uncheckedContains(this, node);
+  }
+  return false;
+}
+
 function removeChild<T extends Node>(this: Node, child: T): T {
-  assertNode(child);
+  assertChildNode(child);
   assertParent(this, child, 'The node to be removed is not a child of this node');
 
-  if (managesChildNodes(this)) {
-    const { childNodes } = this;
-
-    childNodes.splice(childNodes.indexOf(child), 1);
-  }
   uncheckedRemove(child);
   return child;
 }
 
-function replaceChild<T extends Node>(this: Node, node: Node, child: T): T {
-  assertNode(node);
+function replaceChild<T extends Node>(this: ParentNode, node: Node, child: T): T {
+  assertChildNode(node);
   assertNode(child);
   assertParent(this, child, 'The node to be replaced is not a child of this node');
 
-  // if (managesChildNodes(this)) {
-  //   const { _childNodes } = this;
-  //
-  //   _childNodes[_childNodes.indexOf(child)] = node;
-  // }
   uncheckedRemove(node);
   uncheckedInsertBefore(this, node, child);
   uncheckedRemove(child);

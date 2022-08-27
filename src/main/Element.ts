@@ -11,28 +11,30 @@ import { NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
  * @internal
  */
 export interface Element extends Node, ChildNode, NonDocumentTypeChildNode, ParentNode {
-  // readonly attributes: NamedNodeMap;
-  //
-  // className: string;
-  // id: string;
-  //
-  // getAttribute(name: string): string | null;
-  //
-  // getAttributeNames(): string[];
-  //
-  // getAttributeNode(name: string): Attr | null;
-  //
-  // hasAttribute(name: string): boolean;
-  //
-  // hasAttributes(): boolean;
-  //
-  // removeAttribute(name: string): void;
-  //
-  // removeAttributeNode(attr: Attr): Attr;
-  //
-  // setAttribute(name: string, value: string): void;
-  //
-  // setAttributeNode(attr: Attr): Attr | null;
+  /*readonly*/ attributes: NamedNodeMap;
+
+  className: string;
+  id: string;
+
+  /*private*/ _attributesMap: Map<string, string> | null;
+
+  getAttribute(name: string): string | null;
+
+  getAttributeNames(): string[];
+
+  getAttributeNode(name: string): Attr | null;
+
+  hasAttribute(name: string): boolean;
+
+  hasAttributes(): boolean;
+
+  removeAttribute(name: string): void;
+
+  removeAttributeNode(attr: Attr): Attr;
+
+  setAttribute(name: string, value: string): void;
+
+  setAttributeNode(attr: Attr): Attr | null;
 }
 
 /**
@@ -48,6 +50,7 @@ export class Element {
       this.nextElementSibling =
       this.previousElementSibling =
       this._children =
+      this._attributesMap =
         null;
   }
 }

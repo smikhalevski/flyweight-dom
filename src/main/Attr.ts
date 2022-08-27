@@ -6,7 +6,9 @@ import { createPrototype, defineProperty } from './utils';
 /**
  * @internal
  */
-export interface Attr extends Node {}
+export interface Attr extends Node {
+  value: string;
+}
 
 /**
  * @internal
@@ -15,18 +17,39 @@ export class Attr {
   /*readonly*/ ownerElement: Element | null;
   /*readonly*/ name: string;
 
-  value: string;
+  /*private*/ _value: string;
 
   constructor(name: string, value = '') {
     Node.call(this, NodeType.ATTRIBUTE_NODE, name);
 
     this.ownerElement = null;
     this.name = name;
-    this.value = value;
+    this._value = value;
   }
 }
 
 const prototype: Attr = (Attr.prototype = createPrototype(Node.prototype));
+
+defineProperty(prototype, 'value', {
+  get() {
+    const { ownerElement } = this;
+
+    if (ownerElement) {
+      return ownerElement._attributesMap!.get(this.name)!;
+    } else {
+      return this._value;
+    }
+  },
+  set(value) {
+    const { ownerElement } = this;
+
+    if (ownerElement) {
+      ownerElement._attributesMap!.set(this.name, value);
+    } else {
+      this._value = value;
+    }
+  },
+});
 
 defineProperty(prototype, 'nodeValue', {
   get() {

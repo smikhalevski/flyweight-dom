@@ -58,6 +58,8 @@ export class Node {
 
 const prototype = Node.prototype;
 
+prototype.nodeValue = prototype.textContent = null;
+
 defineProperty(prototype, 'childNodes', {
   get(this: Node) {
     const nodes: ChildNode[] = (this._childNodes = []);

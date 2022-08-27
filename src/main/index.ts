@@ -1,13 +1,16 @@
 export * from './Attr';
+export * from './CDATASection';
 export * from './CharacterData';
 export * from './Comment';
+export * from './Document';
+export * from './DocumentFragment';
+export * from './DocumentType';
 export * from './Element';
 export * from './NamedNodeMap';
 export * from './Node';
+export * from './NodeType';
 export * from './ProcessingInstruction';
 export * from './Text';
-
-type a = Element;
 
 // import { ParentNode } from './extendsParentNode';
 // import { ChildNode } from './extendsChildNode';

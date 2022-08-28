@@ -1,7 +1,7 @@
 import { Node } from './Node';
 import { Element } from './Element';
 import { NodeType } from './NodeType';
-import { createPrototype, defineProperty } from './utils';
+import { extendsClass, defineProperty } from './utils';
 
 /**
  * @internal
@@ -28,7 +28,7 @@ export class Attr {
   }
 }
 
-const prototype: Attr = (Attr.prototype = createPrototype(Node.prototype));
+const prototype = extendsClass(Attr, Node);
 
 defineProperty(prototype, 'value', {
   get() {

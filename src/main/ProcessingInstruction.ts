@@ -1,5 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { createPrototype } from './utils';
+import { extendsClass } from './utils';
 import { NodeType } from './NodeType';
 
 /**
@@ -16,4 +16,8 @@ export class ProcessingInstruction {
   }
 }
 
-ProcessingInstruction.prototype = createPrototype(CharacterData.prototype);
+const prototype = extendsClass(ProcessingInstruction, CharacterData);
+
+prototype.cloneNode = function () {
+  return new ProcessingInstruction(this.target, this.data);
+};

@@ -1,7 +1,7 @@
 import { Node } from './Node';
 import { extendsParentNode, ParentNode } from './extendsParentNode';
 import { NodeType } from './NodeType';
-import { createPrototype } from './utils';
+import { extendsClass } from './utils';
 
 export interface DocumentFragment extends Node, ParentNode {}
 
@@ -11,6 +11,6 @@ export class DocumentFragment {
   }
 }
 
-const prototype: DocumentFragment = (DocumentFragment.prototype = createPrototype(Node.prototype));
+const prototype = extendsClass(DocumentFragment, Node);
 
 extendsParentNode(prototype);

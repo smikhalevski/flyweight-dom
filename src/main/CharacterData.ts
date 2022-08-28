@@ -1,4 +1,4 @@
-import { createPrototype, defineProperty, PropertyDescriptor } from './utils';
+import { Constructor, defineProperty, extendsClass, PropertyDescriptor } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendsChildNode } from './extendsChildNode';
 import { NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
@@ -25,7 +25,7 @@ export interface CharacterData extends Node, ChildNode, NonDocumentTypeChildNode
 /**
  * @internal
  */
-export class CharacterData {
+export /*abstract*/ class CharacterData {
   constructor(nodeType: number, nodeName: string, data = '') {
     Node.call(this, nodeType, nodeName);
 
@@ -34,7 +34,7 @@ export class CharacterData {
   }
 }
 
-const prototype: CharacterData = (CharacterData.prototype = createPrototype(Node.prototype));
+const prototype = extendsClass(CharacterData, Node);
 
 extendsChildNode(prototype);
 
@@ -75,4 +75,8 @@ prototype.replaceData = function (offset, count, data) {
 
 prototype.substringData = function (offset, count) {
   return this.data.substring(offset, offset + count);
+};
+
+prototype.cloneNode = function () {
+  return new (this.constructor as Constructor<CharacterData>)(this.data);
 };

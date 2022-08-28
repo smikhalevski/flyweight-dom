@@ -7,10 +7,10 @@ import { ParentNode } from './extendsParentNode';
  * @internal
  */
 export interface Node {
-  /*readonly*/ childNodes: readonly ChildNode[];
+  readonly childNodes: readonly ChildNode[];
 
-  nodeValue: string | null;
-  textContent: string | null;
+  /*abstract*/ nodeValue: string | null;
+  /*abstract*/ textContent: string | null;
 
   hasChildNodes(): boolean;
 
@@ -30,7 +30,7 @@ export interface Node {
 /**
  * @internal
  */
-export class Node {
+export /*abstract*/ class Node {
   /*readonly*/ nodeType: number;
   /*readonly*/ nodeName: string;
   /*readonly*/ parentNode: ParentNode | null;

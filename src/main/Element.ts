@@ -1,7 +1,7 @@
 import { Node } from './Node';
-import { extendsContainer } from './extendContainer';
+import { extendsContainer } from './extendsContainer';
 import { uncheckedCloneChildNodes } from './utils-unchecked';
-import { createPrototype } from './utils';
+import { extendsClass } from './utils';
 import { NodeType } from './NodeType';
 import { ChildNode, extendsChildNode } from './extendsChildNode';
 import { extendsParentNode, ParentNode } from './extendsParentNode';
@@ -55,7 +55,7 @@ export class Element {
   }
 }
 
-const prototype: Element = (Element.prototype = createPrototype(Node.prototype));
+const prototype = extendsClass(Element, Node);
 
 extendsChildNode(prototype);
 extendsContainer(prototype);

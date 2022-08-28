@@ -1,5 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { createPrototype } from './utils';
+import { extendsClass } from './utils';
 import { NodeType } from './NodeType';
 
 /**
@@ -16,4 +16,4 @@ export class Comment {
   }
 }
 
-Comment.prototype = createPrototype(CharacterData.prototype);
+extendsClass(Comment, CharacterData);

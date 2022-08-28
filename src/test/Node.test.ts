@@ -5,6 +5,7 @@ describe('Node', () => {
     const node = new Node(0, '#node');
 
     expect(node).toBeInstanceOf(Node);
+    expect(node.childNodes).toEqual([]);
     expect(node.parentNode).toBe(null);
     expect(node.parentElement).toBe(null);
     expect(node.previousSibling).toBe(null);

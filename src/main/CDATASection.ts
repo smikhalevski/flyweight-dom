@@ -1,6 +1,6 @@
 import { Text } from './Text';
 import { CharacterData } from './CharacterData';
-import { createPrototype } from './utils';
+import { extendsClass } from './utils';
 import { NodeType } from './NodeType';
 
 /**
@@ -17,4 +17,4 @@ export class CDATASection {
   }
 }
 
-CDATASection.prototype = createPrototype(Text.prototype);
+extendsClass(CDATASection, Text);

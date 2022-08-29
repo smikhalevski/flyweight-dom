@@ -3,7 +3,6 @@ import { ChildNode } from '../extendsChildNode';
 import { isElement } from './utils';
 
 /**
- * @internal
  * Updates the parent and the node, so node is the last child of the parent.
  */
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {

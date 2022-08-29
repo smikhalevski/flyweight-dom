@@ -3,16 +3,10 @@ import { Element } from './Element';
 import { NodeType } from './NodeType';
 import { extendsClass, defineProperty } from './utils';
 
-/**
- * @internal
- */
 export interface Attr extends Node {
   value: string;
 }
 
-/**
- * @internal
- */
 export class Attr {
   /*readonly*/ ownerElement: Element | null;
   /*readonly*/ name: string;

@@ -2,9 +2,6 @@ import { Constructor, defineProperty, extendsClass, PropertyDescriptor } from '.
 import { Node } from './Node';
 import { ChildNode, extendsChildNode } from './extendsChildNode';
 
-/**
- * @internal
- */
 export interface CharacterData extends Node, ChildNode {
   /*readonly*/ length: number;
 
@@ -21,9 +18,6 @@ export interface CharacterData extends Node, ChildNode {
   substringData(offset: number, count: number): string;
 }
 
-/**
- * @internal
- */
 export /*abstract*/ class CharacterData {
   constructor(nodeType: number, nodeName: string, data = '') {
     Node.call(this, nodeType, nodeName);

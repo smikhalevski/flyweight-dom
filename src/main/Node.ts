@@ -3,9 +3,6 @@ import { defineProperty, die } from './utils';
 import { ChildNode } from './extendsChildNode';
 import { ParentNode } from './extendsParentNode';
 
-/**
- * @internal
- */
 export interface Node {
   readonly childNodes: readonly ChildNode[];
 
@@ -27,9 +24,6 @@ export interface Node {
   cloneNode(deep?: boolean): this;
 }
 
-/**
- * @internal
- */
 export /*abstract*/ class Node {
   /*readonly*/ nodeType: number;
   /*readonly*/ nodeName: string;

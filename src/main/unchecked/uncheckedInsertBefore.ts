@@ -3,7 +3,6 @@ import { ChildNode } from '../extendsChildNode';
 import { isElement } from './utils';
 
 /**
- * @internal
  * Inserts the node before the child in parent.
  */
 export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child: ChildNode | null): void {

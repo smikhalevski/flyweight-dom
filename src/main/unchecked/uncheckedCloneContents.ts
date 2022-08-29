@@ -3,7 +3,6 @@ import { isElement } from './utils';
 import { ChildNode } from '../extendsChildNode';
 
 /**
- * @internal
  * Appends cloned child nodes from the origin to the parent.
  */
 export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): void {

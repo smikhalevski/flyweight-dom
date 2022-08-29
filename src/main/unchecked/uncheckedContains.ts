@@ -1,7 +1,6 @@
 import { Node } from '../Node';
 
 /**
- * @internal
  * Returns `true` if the parent contains the node, or `false` otherwise.
  */
 export function uncheckedContains(parent: Node, node: Node | null): boolean {

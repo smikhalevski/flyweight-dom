@@ -2,7 +2,6 @@ import { ChildNode } from '../extendsChildNode';
 import { isElement } from './utils';
 
 /**
- * @internal
  * Removes a child from its parent, or no-op if child has no parent.
  */
 export function uncheckedRemove(child: ChildNode): void {

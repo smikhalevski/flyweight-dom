@@ -6,20 +6,17 @@ import { DocumentType } from './DocumentType';
 import { defineProperty, extendsClass } from './utils';
 import { uncheckedCloneContents } from './unchecked';
 
-/**
- * @internal
- */
 export interface Document extends Node, ParentNode {
   /*readonly*/ documentElement: Element | null;
-  /*readonly*/ doctype: DocumentType | null;
 }
 
-/**
- * @internal
- */
 export class Document {
+  /*readonly*/ doctype: DocumentType | null;
+
   constructor() {
     Node.call(this, NodeType.DOCUMENT_NODE, '#document');
+
+    this.doctype = null;
   }
 }
 
@@ -30,13 +27,6 @@ extendsParentNode(prototype);
 defineProperty(prototype, 'documentElement', {
   get() {
     return this.firstElementChild;
-  },
-});
-
-defineProperty(prototype, 'doctype', {
-  get() {
-    const { firstChild } = this;
-    return firstChild && firstChild.nodeType !== NodeType.DOCUMENT_TYPE_NODE ? (firstChild as DocumentType) : null;
   },
 });
 

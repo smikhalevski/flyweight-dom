@@ -6,9 +6,6 @@ import { ChildNode, extendsChildNode } from './extendsChildNode';
 import { extendsParentNode, ParentNode } from './extendsParentNode';
 import { uncheckedCloneContents } from './unchecked';
 
-/**
- * @internal
- */
 export interface Element extends Node, ChildNode, ParentNode {
   /*readonly*/ attributes: NamedNodeMap;
 
@@ -36,9 +33,6 @@ export interface Element extends Node, ChildNode, ParentNode {
   setAttributeNode(attr: Attr): Attr | null;
 }
 
-/**
- * @internal
- */
 export class Element {
   constructor(readonly tagName: string) {
     Node.call(this, NodeType.ELEMENT_NODE, tagName);

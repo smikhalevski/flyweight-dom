@@ -3,18 +3,12 @@ import { Constructor, defineProperty, extendsClass } from './utils';
 import { NodeType } from './NodeType';
 import { uncheckedAppendChild, uncheckedInsertBefore } from './unchecked';
 
-/**
- * @internal
- */
 export interface Text extends CharacterData {
   readonly wholeText: string;
 
   splitText(offset: number): this;
 }
 
-/**
- * @internal
- */
 export class Text {
   constructor(data?: string) {
     CharacterData.call(this, NodeType.TEXT_NODE, '#text', data);

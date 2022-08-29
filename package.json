@@ -1,5 +1,5 @@
 {
-  "name": "some-dom",
+  "name": "flyweight-dom",
   "version": "1.0.0",
   "description": "Partial DOM implementation.",
   "main": "./lib/index-cjs.js",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smikhalevski/some-dom.git"
+    "url": "git+https://github.com/smikhalevski/flyweight-dom.git"
   },
   "keywords": [
     "dom",
@@ -30,9 +30,9 @@
   "author": "Savva Mikhalevski <smikhalevski@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/smikhalevski/some-dom/issues"
+    "url": "https://github.com/smikhalevski/flyweight-dom/issues"
   },
-  "homepage": "https://github.com/smikhalevski/some-dom#readme",
+  "homepage": "https://github.com/smikhalevski/flyweight-dom#readme",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@types/jest": "^28.1.7",

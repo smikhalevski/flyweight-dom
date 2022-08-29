@@ -1,7 +1,7 @@
 import { Text } from './Text';
 import { Node } from './Node';
 import { ChildNode } from './extendsChildNode';
-import { assertChildNode } from './utils-unchecked';
+import { assertChildNode } from './unchecked';
 
 export function coerceAssertChildNodes(nodes: Array<Node | string>): asserts nodes is ChildNode[] {
   for (let i = 0; i < nodes.length; ++i) {

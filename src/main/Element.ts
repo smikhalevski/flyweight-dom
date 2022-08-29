@@ -1,16 +1,15 @@
 import { Node } from './Node';
 import { extendsContainer } from './extendsContainer';
-import { uncheckedCloneChildNodes } from './utils-unchecked';
 import { extendsClass } from './utils';
 import { NodeType } from './NodeType';
 import { ChildNode, extendsChildNode } from './extendsChildNode';
 import { extendsParentNode, ParentNode } from './extendsParentNode';
-import { NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
+import { uncheckedCloneContents } from './unchecked';
 
 /**
  * @internal
  */
-export interface Element extends Node, ChildNode, NonDocumentTypeChildNode, ParentNode {
+export interface Element extends Node, ChildNode, ParentNode {
   /*readonly*/ attributes: NamedNodeMap;
 
   className: string;
@@ -61,10 +60,10 @@ extendsChildNode(prototype);
 extendsContainer(prototype);
 extendsParentNode(prototype);
 
-prototype.cloneNode = function (deep?: boolean): Node {
+prototype.cloneNode = function (deep) {
   const node = new Element(this.tagName);
   if (deep) {
-    uncheckedCloneChildNodes(this, node);
+    uncheckedCloneContents(this, node);
   }
   return node;
 };

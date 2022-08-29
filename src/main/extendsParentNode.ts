@@ -1,8 +1,12 @@
 import { Node } from './Node';
 import { Element } from './Element';
 import { coerceAssertChildNodes } from './utils-coerse';
-import { uncheckedAppendChild, uncheckedInsertBefore, uncheckedRemove } from './utils-unchecked';
+import { isDocumentFragment, uncheckedAppendChild, uncheckedInsertBefore, uncheckedRemove } from './unchecked';
+import { defineProperty, PropertyDescriptor } from './utils';
 
+/**
+ * @internal
+ */
 export interface ParentNode extends Node {
   /*readonly*/ children: Node[];
   /*readonly*/ childElementCount: number;
@@ -18,11 +22,29 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: Array<Node | string>): void;
 }
 
+/**
+ * @internal
+ */
 export function extendsParentNode(prototype: ParentNode): void {
+  defineProperty(prototype, 'children', childrenDescriptor);
+
   prototype.append = append;
   prototype.prepend = prepend;
   prototype.replaceChildren = replaceChildren;
 }
+
+const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
+  get() {
+    const nodes: Element[] = (this._children = []);
+
+    for (let child = this.firstElementChild; child; child = child.nextElementSibling) {
+      nodes.push(child);
+    }
+    defineProperty(this, 'children', { value: nodes });
+
+    return nodes;
+  },
+};
 
 function append(this: ParentNode, ...nodes: Array<Node | string>): void {
   coerceAssertChildNodes(nodes);
@@ -55,6 +77,9 @@ function replaceChildren(this: ParentNode, ...nodes: Array<Node | string>): void
     uncheckedRemove(this.firstChild);
   }
   for (const node of nodes) {
-    uncheckedAppendChild(this, node);
+    if (isDocumentFragment(node)) {
+    } else {
+      uncheckedAppendChild(this, node);
+    }
   }
 }

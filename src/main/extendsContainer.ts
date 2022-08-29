@@ -9,8 +9,11 @@ import {
   uncheckedContains,
   uncheckedInsertBefore,
   uncheckedRemove,
-} from './utils-unchecked';
+} from './unchecked';
 
+/**
+ * @internal
+ */
 export function extendsContainer(prototype: Node): void {
   prototype.hasChildNodes = hasChildNodes;
   prototype.appendChild = appendChild;

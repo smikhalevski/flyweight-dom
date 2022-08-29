@@ -1,6 +1,13 @@
 import { Node } from './Node';
+import { Element } from './Element';
 
+/**
+ * @internal
+ */
 export interface ChildNode extends Node {
+  /*readonly*/ nextElementSibling: Element | null;
+  /*readonly*/ previousElementSibling: Element | null;
+
   after(...nodes: Array<Node | string>): void;
 
   before(...nodes: Array<Node | string>): void;
@@ -10,6 +17,9 @@ export interface ChildNode extends Node {
   replaceWith(...nodes: Array<Node | string>): void;
 }
 
+/**
+ * @internal
+ */
 export function extendsChildNode(node: ChildNode): void {
   node.after = after;
   node.before = before;

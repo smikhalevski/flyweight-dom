@@ -24,7 +24,7 @@ export interface Node {
 
   replaceChild<T extends Node>(node: Node, child: T): T;
 
-  cloneNode(deep?: boolean): Node;
+  cloneNode(deep?: boolean): this;
 }
 
 /**
@@ -73,7 +73,10 @@ defineProperty(prototype, 'childNodes', {
   },
 });
 
-prototype.hasChildNodes = () => false;
+prototype.hasChildNodes = function () {
+  const { _childNodes } = this;
+  return _childNodes !== null && _childNodes.length !== 0;
+};
 
 prototype.appendChild =
   prototype.insertBefore =

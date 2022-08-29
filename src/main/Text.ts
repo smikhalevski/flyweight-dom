@@ -1,7 +1,7 @@
 import { CharacterData } from './CharacterData';
 import { Constructor, defineProperty, extendsClass } from './utils';
 import { NodeType } from './NodeType';
-import { uncheckedAppendChild, uncheckedInsertBefore } from './utils-unchecked';
+import { uncheckedAppendChild, uncheckedInsertBefore } from './unchecked';
 
 /**
  * @internal

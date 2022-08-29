@@ -1,12 +1,11 @@
 import { Constructor, defineProperty, extendsClass, PropertyDescriptor } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendsChildNode } from './extendsChildNode';
-import { NonDocumentTypeChildNode } from './NonDocumentTypeChildNode';
 
 /**
  * @internal
  */
-export interface CharacterData extends Node, ChildNode, NonDocumentTypeChildNode {
+export interface CharacterData extends Node, ChildNode {
   /*readonly*/ length: number;
 
   data: string;

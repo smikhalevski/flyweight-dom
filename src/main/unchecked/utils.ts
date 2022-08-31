@@ -8,6 +8,10 @@ import { uncheckedContains } from './uncheckedContains';
 import { ParentNode } from '../extendsParentNode';
 import { Text } from '../Text';
 
+export type NodeLike = Node | string;
+
+export type InsertableNode = DocumentFragment | ChildNode;
+
 export function assertNode(node: any): asserts node is Node {
   if (!node || typeof node !== 'object' || typeof node.nodeType !== 'number') {
     die('Node expected');
@@ -46,18 +50,6 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   assertNotContains(node, parent);
 }
 
-export function isElement(node: Node): node is Element {
-  return node.nodeType === NodeType.ELEMENT_NODE;
-}
-
-export function isDocumentFragment(node: Node): node is DocumentFragment {
-  return node.nodeType === NodeType.DOCUMENT_FRAGMENT_NODE;
-}
-
-export type NodeLike = Node | string;
-
-export type InsertableNode = DocumentFragment | ChildNode;
-
 export function coerceInsertableNodes(parent: ParentNode, nodes: NodeLike[]): asserts nodes is InsertableNode[] {
   for (let i = 0; i < nodes.length; ++i) {
     const node = nodes[i];
@@ -68,4 +60,12 @@ export function coerceInsertableNodes(parent: ParentNode, nodes: NodeLike[]): as
       assertInsertableNode(parent, node);
     }
   }
+}
+
+export function isElement(node: Node): node is Element {
+  return node.nodeType === NodeType.ELEMENT_NODE;
+}
+
+export function isDocumentFragment(node: Node): node is DocumentFragment {
+  return node.nodeType === NodeType.DOCUMENT_FRAGMENT_NODE;
 }

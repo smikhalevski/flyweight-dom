@@ -25,8 +25,8 @@ export interface Node {
 }
 
 export /*abstract*/ class Node {
-  /*readonly*/ nodeType: number;
-  /*readonly*/ nodeName: string;
+  readonly nodeType: number;
+  readonly nodeName: string;
   /*readonly*/ parentNode: ParentNode | null;
   /*readonly*/ parentElement: Element | null;
   /*readonly*/ previousSibling: ChildNode | null;

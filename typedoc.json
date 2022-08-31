@@ -1,5 +1,4 @@
 {
-  "name": "Some DOM",
   "includeVersion": true,
   "out": "./docs"
 }

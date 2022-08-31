@@ -171,7 +171,7 @@ export declare class Element extends Node {
   /**
    * Mapping from the attribute name to its value.
    */
-  readonly attrs: { readonly [name: string]: string };
+  readonly attrs: { readonly [name: string]: string } | null;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute on MDN}

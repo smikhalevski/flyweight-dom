@@ -171,7 +171,7 @@ export declare class Element extends Node {
   /**
    * Mapping from the attribute name to its value.
    */
-  readonly attrs: { readonly [name: string]: string } | null;
+  readonly attrs: { [name: string]: string };
 
   /**
    * Creates a new instance of {@link Element}.
@@ -189,14 +189,14 @@ export declare class Element extends Node {
   getAttribute(name: string): string | null;
 
   /**
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute Element.removeAttribute on MDN}
-   */
-  removeAttribute(name: string): this;
-
-  /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute on MDN}
    */
   hasAttribute(name: string): boolean;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute Element.removeAttribute on MDN}
+   */
+  removeAttribute(name: string): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames Element.getAttributeNames on MDN}

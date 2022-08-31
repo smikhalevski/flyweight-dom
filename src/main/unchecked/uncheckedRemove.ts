@@ -5,12 +5,13 @@ import { isElement } from './utils';
  * Removes a child from its parent, or no-op if child has no parent.
  */
 export function uncheckedRemove(child: ChildNode): void {
-  const { parentNode, previousSibling, nextSibling, previousElementSibling, nextElementSibling } = child;
+  const { parentNode } = child;
 
   if (!parentNode) {
     return;
   }
 
+  const { previousSibling, nextSibling, previousElementSibling, nextElementSibling } = child;
   const { _childNodes: childNodes, _children: children } = parentNode;
 
   childNodes?.splice(childNodes.indexOf(child), 1);

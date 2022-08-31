@@ -8,6 +8,8 @@ export interface Node {
 
   nodeValue: string | null;
   textContent: string | null;
+  startIndex: number;
+  endIndex: number;
 
   hasChildNodes(): boolean;
 
@@ -39,6 +41,7 @@ export /*abstract*/ class Node {
   constructor(nodeType: number, nodeName: string) {
     this.nodeType = nodeType;
     this.nodeName = nodeName;
+    this.startIndex = this.endIndex = -1;
     this.parentNode =
       this.parentElement =
       this.previousSibling =

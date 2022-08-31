@@ -6,7 +6,6 @@ export * from './Document';
 export * from './DocumentFragment';
 export * from './DocumentType';
 export * from './Element';
-export * from './NamedNodeMap';
 export * from './Node';
 export * from './NodeType';
 export * from './ProcessingInstruction';

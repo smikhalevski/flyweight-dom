@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { extendsParentNode, ParentNode } from './extendsParentNode';
+import { constructParentNode, extendsParentNode, ParentNode } from './extendsParentNode';
 import { NodeType } from './NodeType';
 import { Element } from './Element';
 import { defineProperty, extendsClass } from './utils';
@@ -12,6 +12,7 @@ export interface Document extends Node, ParentNode {
 export class Document {
   constructor() {
     Node.call(this, NodeType.DOCUMENT_NODE, '#document');
+    constructParentNode(this);
   }
 }
 

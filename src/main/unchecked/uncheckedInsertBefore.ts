@@ -22,6 +22,8 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
     if (!isElement(node)) {
       return;
     }
+    ++parent.childElementCount;
+
     children?.push(node);
 
     parent.firstElementChild = parent.lastElementChild = node;
@@ -50,6 +52,7 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
   if (!isElement(node)) {
     return;
   }
+  ++parent.childElementCount;
 
   child.previousElementSibling = node;
 

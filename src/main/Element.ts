@@ -2,8 +2,8 @@ import { Node } from './Node';
 import { extendsContainer } from './extendsContainer';
 import { extendsClass } from './utils';
 import { NodeType } from './NodeType';
-import { ChildNode, extendsChildNode } from './extendsChildNode';
-import { extendsParentNode, ParentNode } from './extendsParentNode';
+import { ChildNode, constructChildNode, extendsChildNode } from './extendsChildNode';
+import { constructParentNode, extendsParentNode, ParentNode } from './extendsParentNode';
 import { uncheckedCloneContents } from './unchecked';
 
 export interface Element extends Node, ChildNode, ParentNode {
@@ -13,38 +13,34 @@ export interface Element extends Node, ChildNode, ParentNode {
   id: string;
 
   /*private*/ _attributesMap: Map<string, string> | null;
+  /*private*/ _attributeNames: string[] | null;
+
+  setAttribute(name: string, value: string): void;
 
   getAttribute(name: string): string | null;
 
-  getAttributeNames(): string[];
-
-  getAttributeNode(name: string): Attr | null;
+  removeAttribute(name: string): void;
 
   hasAttribute(name: string): boolean;
 
   hasAttributes(): boolean;
 
-  removeAttribute(name: string): void;
-
-  removeAttributeNode(attr: Attr): Attr;
-
-  setAttribute(name: string, value: string): void;
+  getAttributeNames(): string[];
 
   setAttributeNode(attr: Attr): Attr | null;
+
+  getAttributeNode(name: string): Attr | null;
+
+  removeAttributeNode(attr: Attr): Attr;
 }
 
 export class Element {
   constructor(readonly tagName: string) {
     Node.call(this, NodeType.ELEMENT_NODE, tagName);
+    constructChildNode(this);
+    constructParentNode(this);
 
-    this.childElementCount = 0;
-    this.firstElementChild =
-      this.lastElementChild =
-      this.nextElementSibling =
-      this.previousElementSibling =
-      this._children =
-      this._attributesMap =
-        null;
+    this._attributesMap = null;
   }
 }
 

@@ -21,6 +21,10 @@ export interface ChildNode extends Node {
   replaceWith(...nodes: NodeLike[]): void;
 }
 
+export function constructChildNode(node: ChildNode): void {
+  node.nextElementSibling = node.previousElementSibling = null;
+}
+
 export function extendsChildNode(node: ChildNode): void {
   node.after = after;
   node.before = before;

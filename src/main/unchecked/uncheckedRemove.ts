@@ -40,6 +40,8 @@ export function uncheckedRemove(child: ChildNode): void {
   if (!isElement(child)) {
     return;
   }
+  --parentNode.childElementCount;
+
   children?.splice(children.indexOf(child), 1);
 
   if (previousElementSibling) {

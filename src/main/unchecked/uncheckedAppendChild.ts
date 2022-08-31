@@ -21,6 +21,8 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
     if (!isElement(node)) {
       return;
     }
+    ++parent.childElementCount;
+
     children?.push(node);
 
     parent.firstElementChild = parent.lastElementChild = node;
@@ -34,6 +36,8 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
   if (!isElement(node)) {
     return;
   }
+  ++parent.childElementCount;
+
   children?.push(node);
 
   lastChild.nextElementSibling = node;

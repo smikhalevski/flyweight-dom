@@ -24,6 +24,11 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: NodeLike[]): void;
 }
 
+export function constructParentNode(node: ParentNode): void {
+  node.childElementCount = 0;
+  node.firstElementChild = node.lastElementChild = node._children = null;
+}
+
 export function extendsParentNode(prototype: ParentNode): void {
   defineProperty(prototype, 'children', childrenDescriptor);
 

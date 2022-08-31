@@ -13,9 +13,7 @@ export function uncheckedRemove(child: ChildNode): void {
 
   const { _childNodes: childNodes, _children: children } = parentNode;
 
-  if (childNodes) {
-    childNodes.splice(childNodes.indexOf(child), 1);
-  }
+  childNodes?.splice(childNodes.indexOf(child), 1);
 
   if (previousSibling) {
     previousSibling.nextSibling = nextSibling;
@@ -42,9 +40,7 @@ export function uncheckedRemove(child: ChildNode): void {
   if (!isElement(child)) {
     return;
   }
-  if (children) {
-    children.splice(children.indexOf(child), 1);
-  }
+  children?.splice(children.indexOf(child), 1);
 
   if (previousElementSibling) {
     previousElementSibling.nextElementSibling = nextElementSibling;

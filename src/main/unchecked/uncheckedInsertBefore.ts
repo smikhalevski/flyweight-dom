@@ -14,17 +14,16 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
   child ||= parent.firstChild;
 
   if (!child) {
+    // The parent has no children
     parent.firstChild = parent.lastChild = node;
 
-    if (childNodes) {
-      childNodes.push(node);
-    }
+    childNodes?.push(node);
+
     if (!isElement(node)) {
       return;
     }
-    if (children) {
-      children.push(node);
-    }
+    children?.push(node);
+
     parent.firstElementChild = parent.lastElementChild = node;
     return;
   }
@@ -41,15 +40,11 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
     node.previousSibling = previousSibling;
     node.previousElementSibling = previousElementSibling;
 
-    if (childNodes) {
-      childNodes.splice(childNodes.indexOf(child), 0, node);
-    }
+    childNodes?.splice(childNodes.indexOf(child), 0, node);
   } else {
     parent.firstChild = node;
 
-    if (childNodes) {
-      childNodes.unshift(node);
-    }
+    childNodes?.unshift(node);
   }
 
   if (!isElement(node)) {
@@ -67,9 +62,7 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
       parent.firstElementChild = node;
     }
 
-    if (children) {
-      children.push(node);
-    }
+    children?.push(node);
     return;
   }
 
@@ -79,16 +72,12 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
   if (!previousElementSibling) {
     parent.firstElementChild = node;
 
-    if (children) {
-      children.unshift(node);
-    }
+    children?.unshift(node);
     return;
   }
 
   previousElementSibling.nextElementSibling = node;
   node.previousElementSibling = previousElementSibling;
 
-  if (children) {
-    children.splice(children.indexOf(nextElementSibling), 0, node);
-  }
+  children?.splice(children.indexOf(nextElementSibling), 0, node);
 }

@@ -1,7 +1,12 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { coerceNodes } from './utils-coerse';
-import { isDocumentFragment, uncheckedAppendChild, uncheckedInsertBefore, uncheckedRemove } from './unchecked';
+import {
+  coerceInsertableNodes,
+  NodeLike,
+  uncheckedRemove,
+  uncheckedRemoveAndAppendChild,
+  uncheckedRemoveAndInsertBefore,
+} from './unchecked';
 import { defineProperty, PropertyDescriptor } from './utils';
 
 export interface ParentNode extends Node {
@@ -12,11 +17,11 @@ export interface ParentNode extends Node {
 
   /*private*/ _children: Element[] | null;
 
-  append(...nodes: Array<Node | string>): void;
+  append(...nodes: NodeLike[]): void;
 
-  prepend(...nodes: Array<Node | string>): void;
+  prepend(...nodes: NodeLike[]): void;
 
-  replaceChildren(...nodes: Array<Node | string>): void;
+  replaceChildren(...nodes: NodeLike[]): void;
 }
 
 export function extendsParentNode(prototype: ParentNode): void {
@@ -40,40 +45,37 @@ const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
   },
 };
 
-function append(this: ParentNode, ...nodes: Array<Node | string>): void {
-  coerceNodes(nodes);
+function append(this: ParentNode, ...nodes: NodeLike[]): void {
+  coerceInsertableNodes(this, nodes);
 
   for (const node of nodes) {
-    uncheckedAppendChild(this, node);
+    uncheckedRemoveAndAppendChild(this, node);
   }
 }
 
-function prepend(this: ParentNode, ...nodes: Array<Node | string>): void {
+function prepend(this: ParentNode, ...nodes: NodeLike[]): void {
   const { firstChild } = this;
 
-  coerceNodes(nodes);
+  coerceInsertableNodes(this, nodes);
 
   if (firstChild) {
     for (const node of nodes) {
-      uncheckedInsertBefore(this, node, firstChild);
+      uncheckedRemoveAndInsertBefore(this, node, firstChild);
     }
   } else {
     for (const node of nodes) {
-      uncheckedAppendChild(this, node);
+      uncheckedRemoveAndAppendChild(this, node);
     }
   }
 }
 
-function replaceChildren(this: ParentNode, ...nodes: Array<Node | string>): void {
-  coerceNodes(nodes);
+function replaceChildren(this: ParentNode, ...nodes: NodeLike[]): void {
+  coerceInsertableNodes(this, nodes);
 
   while (this.firstChild) {
     uncheckedRemove(this.firstChild);
   }
   for (const node of nodes) {
-    if (isDocumentFragment(node)) {
-    } else {
-      uncheckedAppendChild(this, node);
-    }
+    uncheckedRemoveAndAppendChild(this, node);
   }
 }

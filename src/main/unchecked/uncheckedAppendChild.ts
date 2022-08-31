@@ -8,9 +8,7 @@ import { isElement } from './utils';
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
   const { lastChild, lastElementChild, _childNodes: childNodes, _children: children } = parent;
 
-  if (childNodes) {
-    childNodes.push(node);
-  }
+  childNodes?.push(node);
 
   node.parentNode = parent;
   node.parentElement = isElement(parent) ? parent : parent.parentElement;
@@ -23,9 +21,8 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
     if (!isElement(node)) {
       return;
     }
-    if (children) {
-      children.push(node);
-    }
+    children?.push(node);
+
     parent.firstElementChild = parent.lastElementChild = node;
     return;
   }
@@ -37,9 +34,7 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
   if (!isElement(node)) {
     return;
   }
-  if (children) {
-    children.push(node);
-  }
+  children?.push(node);
 
   lastChild.nextElementSibling = node;
   parent.lastElementChild = node;

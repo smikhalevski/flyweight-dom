@@ -1,17 +1,24 @@
 import { Node } from './Node';
 import { Element } from './Element';
+import {
+  coerceInsertableNodes,
+  NodeLike,
+  uncheckedRemove,
+  uncheckedRemoveAndAppendChild,
+  uncheckedRemoveAndInsertBefore,
+} from './unchecked';
 
 export interface ChildNode extends Node {
   /*readonly*/ nextElementSibling: Element | null;
   /*readonly*/ previousElementSibling: Element | null;
 
-  after(...nodes: Array<Node | string>): void;
+  after(...nodes: NodeLike[]): void;
 
-  before(...nodes: Array<Node | string>): void;
+  before(...nodes: NodeLike[]): void;
 
   remove(): void;
 
-  replaceWith(...nodes: Array<Node | string>): void;
+  replaceWith(...nodes: NodeLike[]): void;
 }
 
 export function extendsChildNode(node: ChildNode): void {
@@ -21,10 +28,53 @@ export function extendsChildNode(node: ChildNode): void {
   node.replaceWith = replaceWith;
 }
 
-function after(...nodes: Array<Node | string>): void {}
+function after(this: ChildNode, ...nodes: NodeLike[]): void {
+  const { parentNode } = this;
 
-function before(...nodes: Array<Node | string>): void {}
+  if (!parentNode) {
+    return;
+  }
 
-function remove(): void {}
+  coerceInsertableNodes(parentNode, nodes);
 
-function replaceWith(...nodes: Array<Node | string>): void {}
+  for (const node of nodes) {
+    uncheckedRemoveAndAppendChild(parentNode, node);
+  }
+}
+
+function before(this: ChildNode, ...nodes: NodeLike[]): void {
+  const { parentNode } = this;
+
+  if (!parentNode) {
+    return;
+  }
+
+  coerceInsertableNodes(parentNode, nodes);
+
+  for (const node of nodes) {
+    uncheckedRemoveAndInsertBefore(parentNode, node, this);
+  }
+}
+
+function remove(this: ChildNode): void {
+  const { parentNode } = this;
+
+  if (parentNode) {
+    parentNode.removeChild(this);
+  }
+}
+
+function replaceWith(this: ChildNode, ...nodes: NodeLike[]): void {
+  const { parentNode } = this;
+
+  if (!parentNode) {
+    return;
+  }
+
+  coerceInsertableNodes(parentNode, nodes);
+
+  for (const node of nodes) {
+    uncheckedRemoveAndInsertBefore(parentNode, node, this);
+  }
+  uncheckedRemove(this);
+}

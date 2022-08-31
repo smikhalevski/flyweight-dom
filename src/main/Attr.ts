@@ -1,7 +1,7 @@
 import { Node } from './Node';
 import { Element } from './Element';
 import { NodeType } from './NodeType';
-import { extendsClass, defineProperty } from './utils';
+import { defineProperty, extendsClass } from './utils';
 
 export interface Attr extends Node {
   value: string;

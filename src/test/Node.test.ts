@@ -1,4 +1,5 @@
-import { Node, Text } from '../main';
+import { Node } from '../main/Node';
+import { Text } from '../main/Text';
 
 describe('Node', () => {
   test('creates a new Node instance', () => {

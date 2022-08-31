@@ -13,7 +13,7 @@ export * from './Text';
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node on MDN}
  */
-export declare class Node {
+export declare abstract class Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType on MDN}
    */
@@ -100,7 +100,7 @@ export declare class Node {
   cloneNode(deep?: boolean): Node;
 }
 
-export declare interface ChildNode extends Node {
+export interface ChildNode extends Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling Element.nextElementSibling on MDN}
    */
@@ -111,16 +111,16 @@ export declare interface ChildNode extends Node {
    */
   readonly previousElementSibling: Element | null;
 
-  after(...nodes: Array<Node | string>): void;
+  after(...nodes: Array<Node | string>): this;
 
-  before(...nodes: Array<Node | string>): void;
+  before(...nodes: Array<Node | string>): this;
 
-  remove(): void;
+  remove(): this;
 
-  replaceWith(...nodes: Array<Node | string>): void;
+  replaceWith(...nodes: Array<Node | string>): this;
 }
 
-export declare interface ParentNode extends Node {
+export interface ParentNode extends Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children on MDN}
    */
@@ -144,20 +144,20 @@ export declare interface ParentNode extends Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/append Element.append on MDN}
    */
-  append(...nodes: Array<Node | string>): void;
+  append(...nodes: Array<Node | string>): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/prepend Element.prepend on MDN}
    */
-  prepend(...nodes: Array<Node | string>): void;
+  prepend(...nodes: Array<Node | string>): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceChildren Element.replaceChildren on MDN}
    */
-  replaceChildren(...nodes: Array<Node | string>): void;
+  replaceChildren(...nodes: Array<Node | string>): this;
 }
 
-export declare interface Element extends ChildNode, ParentNode {}
+export interface Element extends ChildNode, ParentNode {}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element on MDN}
@@ -174,9 +174,14 @@ export declare class Element extends Node {
   readonly attrs: { readonly [name: string]: string } | null;
 
   /**
+   * Creates a new instance of {@link Element}.
+   */
+  constructor(tagName: string, attrs?: { [name: string]: string } | null);
+
+  /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute on MDN}
    */
-  setAttribute(name: string, value: string): void;
+  setAttribute(name: string, value: string): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute Element.getAttribute on MDN}
@@ -186,7 +191,7 @@ export declare class Element extends Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute Element.removeAttribute on MDN}
    */
-  removeAttribute(name: string): void;
+  removeAttribute(name: string): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute on MDN}
@@ -199,7 +204,7 @@ export declare class Element extends Node {
   getAttributeNames(): string[];
 }
 
-export declare interface CharacterData extends ChildNode {}
+export interface CharacterData extends ChildNode {}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData CharacterData on MDN}
@@ -216,24 +221,29 @@ export declare class CharacterData extends Node {
   data: string;
 
   /**
+   * Creates a new instance of {@link CharacterData}.
+   */
+  constructor(nodeType: number, nodeName: string, data?: string);
+
+  /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/appendData CharacterData.appendData on MDN}
    */
-  appendData(data: string): void;
+  appendData(data: string): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/deleteData CharacterData.deleteData on MDN}
    */
-  deleteData(offset: number, count: number): void;
+  deleteData(offset: number, count: number): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/insertData CharacterData.insertData on MDN}
    */
-  insertData(offset: number, data: string): void;
+  insertData(offset: number, data: string): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData CharacterData.replaceData on MDN}
    */
-  replaceData(offset: number, count: number, data: string): void;
+  replaceData(offset: number, count: number, data: string): this;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData CharacterData.substringData on MDN}
@@ -244,13 +254,23 @@ export declare class CharacterData extends Node {
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Comment Comment on MDN}
  */
-export declare class Comment extends CharacterData {}
+export declare class Comment extends CharacterData {
+  /**
+   * Creates a new instance of {@link Comment}.
+   */
+  constructor(data?: string);
+}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction ProcessingInstruction on MDN}
  */
 export declare class ProcessingInstruction extends CharacterData {
   readonly target: string;
+
+  /**
+   * Creates a new instance of {@link ProcessingInstruction}.
+   */
+  constructor(target: string, data?: string);
 }
 
 /**
@@ -263,6 +283,11 @@ export declare class Text extends CharacterData {
   readonly wholeText: string;
 
   /**
+   * Creates a new instance of {@link Text}.
+   */
+  constructor(data?: string);
+
+  /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Text/splitText Text.splitText on MDN}
    */
   splitText(offset: number): this;
@@ -271,9 +296,14 @@ export declare class Text extends CharacterData {
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CDATASection CDATASection on MDN}
  */
-export declare class CDATASection extends Text {}
+export declare class CDATASection extends Text {
+  /**
+   * Creates a new instance of {@link CDATASection}.
+   */
+  constructor(data?: string);
+}
 
-export declare interface DocumentType extends ChildNode {}
+export interface DocumentType extends ChildNode {}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType on MDN}
@@ -282,16 +312,21 @@ export declare class DocumentType extends Node {
   readonly name: string;
   readonly publicId: string;
   readonly systemId: string;
+
+  /**
+   * Creates a new instance of {@link DocumentType}.
+   */
+  constructor(name: string, publicId?: string, systemId?: string);
 }
 
-export declare interface DocumentFragment extends ParentNode {}
+export interface DocumentFragment extends ParentNode {}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment DocumentFragment on MDN}
  */
 export declare class DocumentFragment extends Node {}
 
-export declare interface Document extends ParentNode {}
+export interface Document extends ParentNode {}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Document Document on MDN}

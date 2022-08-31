@@ -6,9 +6,9 @@ import { extendsClass } from './utils';
 export interface DocumentType extends Node, ChildNode {}
 
 export class DocumentType {
-  /*readonly*/ name: string;
-  /*readonly*/ publicId: string;
-  /*readonly*/ systemId: string;
+  readonly name: string;
+  readonly publicId: string;
+  readonly systemId: string;
 
   constructor(name: string, publicId = '', systemId = '') {
     Node.call(this, NodeType.DOCUMENT_TYPE_NODE, name);

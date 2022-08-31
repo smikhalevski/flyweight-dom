@@ -17,11 +17,11 @@ export interface ParentNode extends Node {
 
   /*private*/ _children: Element[] | null;
 
-  append(...nodes: NodeLike[]): void;
+  append(...nodes: NodeLike[]): this;
 
-  prepend(...nodes: NodeLike[]): void;
+  prepend(...nodes: NodeLike[]): this;
 
-  replaceChildren(...nodes: NodeLike[]): void;
+  replaceChildren(...nodes: NodeLike[]): this;
 }
 
 export function constructParentNode(node: ParentNode): void {
@@ -50,15 +50,16 @@ const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
   },
 };
 
-function append(this: ParentNode, ...nodes: NodeLike[]): void {
+function append(this: ParentNode, ...nodes: NodeLike[]) {
   coerceInsertableNodes(this, nodes);
 
   for (const node of nodes) {
     uncheckedRemoveAndAppendChild(this, node);
   }
+  return this;
 }
 
-function prepend(this: ParentNode, ...nodes: NodeLike[]): void {
+function prepend(this: ParentNode, ...nodes: NodeLike[]) {
   const { firstChild } = this;
 
   coerceInsertableNodes(this, nodes);
@@ -72,9 +73,10 @@ function prepend(this: ParentNode, ...nodes: NodeLike[]): void {
       uncheckedRemoveAndAppendChild(this, node);
     }
   }
+  return this;
 }
 
-function replaceChildren(this: ParentNode, ...nodes: NodeLike[]): void {
+function replaceChildren(this: ParentNode, ...nodes: NodeLike[]) {
   coerceInsertableNodes(this, nodes);
 
   while (this.firstChild) {
@@ -83,4 +85,5 @@ function replaceChildren(this: ParentNode, ...nodes: NodeLike[]): void {
   for (const node of nodes) {
     uncheckedRemoveAndAppendChild(this, node);
   }
+  return this;
 }

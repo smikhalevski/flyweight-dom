@@ -9,11 +9,11 @@ import { uncheckedCloneContents } from './unchecked';
 export interface Element extends Node, ChildNode, ParentNode {
   /*readonly*/ attrs: { /*readonly*/ [name: string]: string } | null;
 
-  setAttribute(name: string, value: string): void;
+  setAttribute(name: string, value: string): this;
 
   getAttribute(name: string): string | null;
 
-  removeAttribute(name: string): void;
+  removeAttribute(name: string): this;
 
   hasAttribute(name: string): boolean;
 
@@ -23,13 +23,13 @@ export interface Element extends Node, ChildNode, ParentNode {
 export class Element {
   readonly tagName: string;
 
-  constructor(tagName: string) {
+  constructor(tagName: string, attrs: { [name: string]: string } | null = null) {
     Node.call(this, NodeType.ELEMENT_NODE, tagName);
     constructChildNode(this);
     constructParentNode(this);
 
     this.tagName = tagName;
-    this.attrs = null;
+    this.attrs = attrs;
   }
 }
 
@@ -47,6 +47,7 @@ prototype.setAttribute = function (name, value) {
   } else {
     this.attrs = { [name]: value };
   }
+  return this;
 };
 
 prototype.getAttribute = function (name) {
@@ -66,6 +67,7 @@ prototype.removeAttribute = function (name) {
   if (this.attrs) {
     delete this.attrs[name];
   }
+  return this;
 };
 
 prototype.hasAttribute = function (name) {
@@ -77,12 +79,9 @@ prototype.getAttributeNames = function () {
 };
 
 prototype.cloneNode = function (deep) {
-  const node = new Element(this.tagName);
+  const node = new Element(this.tagName, this.attrs ? Object.assign({}, this.attrs) : null);
   if (deep) {
     uncheckedCloneContents(this, node);
-  }
-  if (this.attrs) {
-    node.attrs = Object.assign({}, this.attrs);
   }
   return node;
 };

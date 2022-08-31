@@ -12,13 +12,13 @@ export interface ChildNode extends Node {
   /*readonly*/ nextElementSibling: Element | null;
   /*readonly*/ previousElementSibling: Element | null;
 
-  after(...nodes: NodeLike[]): void;
+  after(...nodes: NodeLike[]): this;
 
-  before(...nodes: NodeLike[]): void;
+  before(...nodes: NodeLike[]): this;
 
-  remove(): void;
+  remove(): this;
 
-  replaceWith(...nodes: NodeLike[]): void;
+  replaceWith(...nodes: NodeLike[]): this;
 }
 
 export function constructChildNode(node: ChildNode): void {
@@ -32,53 +32,51 @@ export function extendsChildNode(node: ChildNode): void {
   node.replaceWith = replaceWith;
 }
 
-function after(this: ChildNode, ...nodes: NodeLike[]): void {
+function after(this: ChildNode, ...nodes: NodeLike[]) {
   const { parentNode } = this;
 
-  if (!parentNode) {
-    return;
-  }
+  if (parentNode) {
+    coerceInsertableNodes(parentNode, nodes);
 
-  coerceInsertableNodes(parentNode, nodes);
-
-  for (const node of nodes) {
-    uncheckedRemoveAndAppendChild(parentNode, node);
+    for (const node of nodes) {
+      uncheckedRemoveAndAppendChild(parentNode, node);
+    }
   }
+  return this;
 }
 
-function before(this: ChildNode, ...nodes: NodeLike[]): void {
+function before(this: ChildNode, ...nodes: NodeLike[]) {
   const { parentNode } = this;
 
-  if (!parentNode) {
-    return;
-  }
+  if (parentNode) {
+    coerceInsertableNodes(parentNode, nodes);
 
-  coerceInsertableNodes(parentNode, nodes);
-
-  for (const node of nodes) {
-    uncheckedRemoveAndInsertBefore(parentNode, node, this);
+    for (const node of nodes) {
+      uncheckedRemoveAndInsertBefore(parentNode, node, this);
+    }
   }
+  return this;
 }
 
-function remove(this: ChildNode): void {
+function remove(this: ChildNode) {
   const { parentNode } = this;
 
   if (parentNode) {
     parentNode.removeChild(this);
   }
+  return this;
 }
 
-function replaceWith(this: ChildNode, ...nodes: NodeLike[]): void {
+function replaceWith(this: ChildNode, ...nodes: NodeLike[]) {
   const { parentNode } = this;
 
-  if (!parentNode) {
-    return;
-  }
+  if (parentNode) {
+    coerceInsertableNodes(parentNode, nodes);
 
-  coerceInsertableNodes(parentNode, nodes);
-
-  for (const node of nodes) {
-    uncheckedRemoveAndInsertBefore(parentNode, node, this);
+    for (const node of nodes) {
+      uncheckedRemoveAndInsertBefore(parentNode, node, this);
+    }
+    uncheckedRemove(this);
   }
-  uncheckedRemove(this);
+  return this;
 }

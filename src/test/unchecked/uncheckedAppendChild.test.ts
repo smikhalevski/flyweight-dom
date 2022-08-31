@@ -1,4 +1,5 @@
-import { Element, Text } from '../../main';
+import { Element } from '../../main/Element';
+import { Text } from '../../main/Text';
 import { uncheckedAppendChild } from '../../main/unchecked';
 
 describe('uncheckedAppendChild', () => {

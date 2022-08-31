@@ -3,17 +3,17 @@ import { Node } from './Node';
 import { ChildNode, extendsChildNode } from './extendsChildNode';
 
 export interface CharacterData extends Node, ChildNode {
-  /*readonly*/ length: number;
+  readonly length: number;
 
   data: string;
 
-  appendData(data: string): void;
+  appendData(data: string): this;
 
-  deleteData(offset: number, count: number): void;
+  deleteData(offset: number, count: number): this;
 
-  insertData(offset: number, data: string): void;
+  insertData(offset: number, data: string): this;
 
-  replaceData(offset: number, count: number, data: string): void;
+  replaceData(offset: number, count: number, data: string): this;
 
   substringData(offset: number, count: number): string;
 }
@@ -52,18 +52,22 @@ defineProperty(prototype, 'textContent', dataDescriptor);
 
 prototype.appendData = function (data) {
   this.data += data;
+  return this;
 };
 
 prototype.deleteData = function (offset, count) {
   this.data = this.data.substring(0, offset) + this.data.substring(offset + count);
+  return this;
 };
 
 prototype.insertData = function (offset, data) {
   this.data = this.data.substring(0, offset) + data + this.data.substring(offset);
+  return this;
 };
 
 prototype.replaceData = function (offset, count, data) {
   this.data = this.data.substring(0, offset) + data + this.data.substring(offset + count);
+  return this;
 };
 
 prototype.substringData = function (offset, count) {

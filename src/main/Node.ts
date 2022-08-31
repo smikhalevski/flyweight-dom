@@ -6,8 +6,8 @@ import { ParentNode } from './extendsParentNode';
 export interface Node {
   readonly childNodes: readonly ChildNode[];
 
-  /*abstract*/ nodeValue: string | null;
-  /*abstract*/ textContent: string | null;
+  nodeValue: string | null;
+  textContent: string | null;
 
   hasChildNodes(): boolean;
 

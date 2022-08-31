@@ -25,7 +25,7 @@ export function extendsContainer(prototype: Node): void {
 }
 
 function hasChildNodes(this: Node): boolean {
-  return this.firstChild !== null;
+  return this.firstChild != null;
 }
 
 function appendChild<T extends Node>(this: ParentNode, node: T): T {

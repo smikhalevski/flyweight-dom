@@ -55,7 +55,7 @@ const prototype = Node.prototype;
 prototype.nodeValue = prototype.textContent = null;
 
 defineProperty(prototype, 'childNodes', {
-  get(this: Node) {
+  get() {
     const nodes: ChildNode[] = (this._childNodes = []);
 
     for (let child = this.firstChild; child; child = child.nextSibling) {
@@ -68,8 +68,7 @@ defineProperty(prototype, 'childNodes', {
 });
 
 prototype.hasChildNodes = function () {
-  const { _childNodes } = this;
-  return _childNodes !== null && _childNodes.length !== 0;
+  return this._childNodes != null && this._childNodes.length !== 0;
 };
 
 prototype.appendChild =

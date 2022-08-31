@@ -1,4 +1,3 @@
-export * from './Attr';
 export * from './CDATASection';
 export * from './CharacterData';
 export * from './Comment';

@@ -5,8 +5,12 @@ import { NodeType } from './NodeType';
 export interface ProcessingInstruction extends CharacterData {}
 
 export class ProcessingInstruction {
-  constructor(readonly target: string, data?: string) {
+  readonly target: string;
+
+  constructor(target: string, data?: string) {
     CharacterData.call(this, NodeType.PROCESSING_INSTRUCTION_NODE, target, data);
+
+    this.target = target;
   }
 }
 

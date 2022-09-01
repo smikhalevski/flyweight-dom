@@ -27,7 +27,7 @@ function appendChild<T extends Node>(this: ParentNode, node: T): T {
   return node;
 }
 
-function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | null): T {
+function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | null | undefined): T {
   unboundInsertBefore(
     this,
     node,
@@ -37,7 +37,7 @@ function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | n
   return node;
 }
 
-function contains(this: ParentNode, node: Node | null): boolean {
+function contains(this: ParentNode, node: Node | null | undefined): boolean {
   return node != null ? uncheckedContains(this, node) : false;
 }
 
@@ -64,7 +64,7 @@ function replaceChild<T extends Node>(this: ParentNode, node: Node, child: T): T
 function unboundInsertBefore(
   parent: ParentNode,
   node: Node,
-  child: Node | null,
+  child: Node | null | undefined,
   message: string
 ): asserts child is ChildNode {
   if (child != null && child.parentNode !== parent) {

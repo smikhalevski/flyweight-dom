@@ -2,9 +2,6 @@ import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 import { isElement } from './utils';
 
-/**
- * Appends a node as the last child to the parent.
- */
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
   const { lastChild, lastElementChild, _childNodes: childNodes, _children: children } = parent;
 

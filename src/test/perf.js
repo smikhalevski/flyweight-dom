@@ -10,30 +10,21 @@ describe(
 
     test('lib', measure => {
       measure(() => {
-        let root = new lib.Element('div', null);
+        const root = new lib.Element('div');
 
-        for (let i = 0; i < 5; ++i) {
-          let child;
-          for (let i = 0; i < 5; ++i) {
-            child = root.appendChild(new lib.Element('div', null));
-          }
-          root = child;
-        }
+        root.appendChild(new lib.Element('div'));
+        root.appendChild(new lib.Element('div'));
+        root.appendChild(new lib.Element('div'));
       });
     });
 
     test('domhandler', measure => {
       measure(() => {
-        let root = new domhandler.Element('div', {});
+        const root = new domhandler.Element('div', {});
 
-        for (let i = 0; i < 5; ++i) {
-          let child;
-          for (let i = 0; i < 5; ++i) {
-            child = new domhandler.Element('div', {});
-            root.children.push(child);
-          }
-          root = child;
-        }
+        root.children.push(new domhandler.Element('div', {}));
+        root.children.push(new domhandler.Element('div', {}));
+        root.children.push(new domhandler.Element('div', {}));
       });
     });
   },

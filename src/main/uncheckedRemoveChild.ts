@@ -2,9 +2,6 @@ import { ChildNode } from './extendChildNode';
 import { ParentNode } from './extendParentNode';
 import { isElement } from './utils';
 
-/**
- * Removes a child from its parent.
- */
 export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
   const { previousSibling, nextSibling, previousElementSibling, nextElementSibling } = child;
   const { _childNodes: childNodes, _children: children } = parent;

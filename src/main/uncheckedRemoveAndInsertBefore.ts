@@ -9,27 +9,27 @@ import { isDocumentFragment } from './utils';
 export function uncheckedRemoveAndInsertBefore(
   parent: ParentNode,
   node: InsertableNode,
-  child: ChildNode | null
+  child: ChildNode | null | undefined
 ): void {
-  if (!isDocumentFragment(node)) {
-    const { parentNode } = node;
+  if (isDocumentFragment(node)) {
+    child ||= parent.firstChild;
 
-    if (parentNode != null) {
-      uncheckedRemoveChild(parentNode, node);
+    if (child != null) {
+      for (let nodeChild = node.firstChild; nodeChild != null; nodeChild = nodeChild.nextSibling) {
+        uncheckedRemoveChild(node, nodeChild);
+        uncheckedInsertBefore(parent, nodeChild, child);
+      }
+    } else {
+      for (let nodeChild = node.firstChild; nodeChild != null; nodeChild = nodeChild.nextSibling) {
+        uncheckedRemoveChild(node, nodeChild);
+        uncheckedAppendChild(parent, nodeChild);
+      }
     }
-    uncheckedInsertBefore(parent, node, child);
     return;
   }
 
-  child ||= parent.firstChild;
-
-  for (let nodeChild = node.firstChild; nodeChild != null; nodeChild = nodeChild.nextSibling) {
-    uncheckedRemoveChild(node, nodeChild);
-
-    if (child != null) {
-      uncheckedInsertBefore(parent, nodeChild, child);
-    } else {
-      uncheckedAppendChild(parent, nodeChild);
-    }
+  if (node.parentNode != null) {
+    uncheckedRemoveChild(node.parentNode, node);
   }
+  uncheckedInsertBefore(parent, node, child);
 }

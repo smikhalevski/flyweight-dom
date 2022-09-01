@@ -28,9 +28,9 @@ export interface Node {
 
   appendChild<T extends Node>(node: T): T;
 
-  insertBefore<T extends Node>(node: T, child: Node | null): T;
+  insertBefore<T extends Node>(node: T, child: Node | null | undefined): T;
 
-  contains(node: Node | null): boolean;
+  contains(node: Node | null | undefined): boolean;
 
   removeChild<T extends Node>(child: T): T;
 

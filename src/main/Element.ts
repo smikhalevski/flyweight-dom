@@ -13,7 +13,7 @@ export interface Element extends Node, ChildNode, ParentNode {
 
   setAttribute(name: string, value: string): this;
 
-  getAttribute(name: string): string | null;
+  getAttribute(name: string): string | undefined;
 
   hasAttribute(name: string): boolean;
 
@@ -43,7 +43,7 @@ prototype.setAttribute = function (name, value) {
 };
 
 prototype.getAttribute = function (name) {
-  return this.attrs[name] ?? null;
+  return this.attrs[name];
 };
 
 prototype.hasAttribute = function (name) {

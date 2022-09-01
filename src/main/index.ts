@@ -92,7 +92,12 @@ export declare abstract class Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore Node.insertBefore on MDN}
    */
-  insertBefore<T extends Node>(node: T, child: Node | null): T;
+  insertBefore<T extends Node>(node: T, child: Node | null | undefined): T;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/contains Node.contains on MDN}
+   */
+  contains(node: Node | null | undefined): boolean;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/removeChild Node.removeChild on MDN}
@@ -196,7 +201,7 @@ export declare class Element extends Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute Element.getAttribute on MDN}
    */
-  getAttribute(name: string): string | null;
+  getAttribute(name: string): string | undefined;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute on MDN}

@@ -2,9 +2,6 @@ import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 import { isElement } from './utils';
 
-/**
- * Appends cloned child nodes from the origin to the parent.
- */
 export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): void {
   const { firstChild } = origin;
 

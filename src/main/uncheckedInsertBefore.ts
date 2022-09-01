@@ -2,10 +2,7 @@ import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 import { isElement } from './utils';
 
-/**
- * Inserts the node before the child in parent.
- */
-export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child: ChildNode | null): void {
+export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child: ChildNode | null | undefined): void {
   const { _childNodes: childNodes, _children: children } = parent;
 
   node.parentNode = parent;

@@ -1,9 +1,9 @@
-import { ParentNode } from '../extendsParentNode';
-import { ChildNode } from '../extendsChildNode';
+import { ParentNode } from '../constructParentNode';
+import { ChildNode } from '../constructChildNode';
 import { isElement } from './utils';
 
 /**
- * Updates the parent and the node, so node is the last child of the parent.
+ * Appends a node as the last child to the parent.
  */
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
   const { lastChild, lastElementChild, _childNodes: childNodes, _children: children } = parent;
@@ -14,7 +14,7 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
   node.parentElement = isElement(parent) ? parent : parent.parentElement;
   parent.lastChild = node;
 
-  if (!lastChild) {
+  if (lastChild == null) {
     // The parent has no children
     parent.firstChild = node;
 
@@ -43,7 +43,7 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
   lastChild.nextElementSibling = node;
   parent.lastElementChild = node;
 
-  if (lastElementChild) {
+  if (lastElementChild != null) {
     lastElementChild.nextElementSibling = node;
   } else {
     parent.firstElementChild = node;

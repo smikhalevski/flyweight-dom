@@ -3,7 +3,7 @@ import { Element } from './Element';
 import {
   coerceInsertableNodes,
   NodeLike,
-  uncheckedRemove,
+  uncheckedRemoveChild,
   uncheckedRemoveAndAppendChild,
   uncheckedRemoveAndInsertBefore,
 } from './unchecked';
@@ -29,7 +29,7 @@ export function constructParentNode(node: ParentNode): void {
   node.firstElementChild = node.lastElementChild = node._children = null;
 }
 
-export function extendsParentNode(prototype: ParentNode): void {
+export function extendParentNode(prototype: ParentNode): void {
   defineProperty(prototype, 'children', childrenDescriptor);
 
   prototype.append = append;
@@ -41,7 +41,7 @@ const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
   get() {
     const nodes: Element[] = (this._children = []);
 
-    for (let child = this.firstElementChild; child; child = child.nextElementSibling) {
+    for (let child = this.firstElementChild; child != null; child = child.nextElementSibling) {
       nodes.push(child);
     }
     defineProperty(this, 'children', { value: nodes });
@@ -64,7 +64,7 @@ function prepend(this: ParentNode, ...nodes: NodeLike[]) {
 
   coerceInsertableNodes(this, nodes);
 
-  if (firstChild) {
+  if (firstChild != null) {
     for (const node of nodes) {
       uncheckedRemoveAndInsertBefore(this, node, firstChild);
     }
@@ -80,7 +80,7 @@ function replaceChildren(this: ParentNode, ...nodes: NodeLike[]) {
   coerceInsertableNodes(this, nodes);
 
   while (this.firstChild) {
-    uncheckedRemove(this.firstChild);
+    uncheckedRemoveChild(this, this.firstChild);
   }
   for (const node of nodes) {
     uncheckedRemoveAndAppendChild(this, node);

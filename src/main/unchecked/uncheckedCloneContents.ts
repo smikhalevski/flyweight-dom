@@ -1,6 +1,6 @@
-import { ParentNode } from '../extendsParentNode';
+import { ParentNode } from '../constructParentNode';
 import { isElement } from './utils';
-import { ChildNode } from '../extendsChildNode';
+import { ChildNode } from '../constructChildNode';
 
 /**
  * Appends cloned child nodes from the origin to the parent.
@@ -8,7 +8,7 @@ import { ChildNode } from '../extendsChildNode';
 export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): void {
   const { firstChild } = origin;
 
-  if (!firstChild) {
+  if (firstChild == null) {
     // The parent has no children
     return;
   }
@@ -17,7 +17,7 @@ export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): 
 
   const parentElement = isElement(parent) ? parent : parent.parentElement;
 
-  for (let child: ChildNode | null = firstChild; child; child = child.nextSibling) {
+  for (let child: ChildNode | null = firstChild; child != null; child = child.nextSibling) {
     const node = child.cloneNode(true);
 
     node.parentNode = parent;
@@ -26,7 +26,7 @@ export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): 
     node.previousSibling = lastChild;
     node.previousElementSibling = lastElementChild;
 
-    if (lastChild) {
+    if (lastChild != null) {
       lastChild.nextSibling = node;
     }
     lastChild = node;
@@ -35,7 +35,7 @@ export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): 
       continue;
     }
 
-    if (lastElementChild) {
+    if (lastElementChild != null) {
       lastElementChild.nextElementSibling = node;
     }
     lastElementChild = node;

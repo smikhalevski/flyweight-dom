@@ -1,7 +1,7 @@
 import { CharacterData } from './CharacterData';
-import { Constructor, defineProperty, extendsClass } from './utils';
+import { Constructor, defineProperty, extendClass } from './utils';
 import { NodeType } from './NodeType';
-import { uncheckedAppendChild, uncheckedInsertBefore } from './unchecked';
+import { constructCharacterData } from './constructCharacterData';
 
 export interface Text extends CharacterData {
   readonly wholeText: string;
@@ -11,11 +11,11 @@ export interface Text extends CharacterData {
 
 export class Text {
   constructor(data?: string) {
-    CharacterData.call(this, NodeType.TEXT_NODE, '#text', data);
+    constructCharacterData(this, NodeType.TEXT_NODE, '#text', data);
   }
 }
 
-const prototype = extendsClass(Text, CharacterData);
+const prototype = extendClass(Text, CharacterData);
 
 defineProperty(prototype, 'wholeText', {
   get() {
@@ -23,13 +23,13 @@ defineProperty(prototype, 'wholeText', {
 
     let text = this;
 
-    for (let node = text.previousSibling; node && node.nodeType === nodeType; node = node.previousSibling) {
+    for (let node = text.previousSibling; node != null && node.nodeType === nodeType; node = node.previousSibling) {
       text = node as Text;
     }
 
     let str = '';
 
-    for (let node: Text | null = text; node && node.nodeType === nodeType; node = node.nextSibling as Text) {
+    for (let node: Text | null = text; node != null && node.nodeType === nodeType; node = node.nextSibling as Text) {
       str += node.data;
     }
 
@@ -44,11 +44,11 @@ prototype.splitText = function (offset) {
 
   const node = new (this.constructor as Constructor<Text>)(data.substring(offset));
 
-  if (parentNode) {
-    if (nextSibling) {
-      uncheckedInsertBefore(parentNode, node, nextSibling);
+  if (parentNode != null) {
+    if (nextSibling != null) {
+      parentNode.insertBefore(node, nextSibling);
     } else {
-      uncheckedAppendChild(parentNode, node);
+      parentNode.appendChild(node);
     }
   }
   return node;

@@ -1,9 +1,9 @@
 import { Node } from './Node';
-import { extendsContainer } from './extendsContainer';
-import { extendsClass } from './utils';
+import { constructNode, extendNode } from './constructNode';
+import { extendClass } from './utils';
 import { NodeType } from './NodeType';
-import { ChildNode, constructChildNode, extendsChildNode } from './extendsChildNode';
-import { constructParentNode, extendsParentNode, ParentNode } from './extendsParentNode';
+import { ChildNode, constructChildNode, extendChildNode } from './constructChildNode';
+import { constructParentNode, extendParentNode, ParentNode } from './constructParentNode';
 import { uncheckedCloneContents } from './unchecked';
 
 export interface Element extends Node, ChildNode, ParentNode {
@@ -22,8 +22,8 @@ export class Element {
   readonly tagName: string;
   readonly attrs: { [name: string]: string };
 
-  constructor(tagName: string, attrs: { [name: string]: string } = {}) {
-    Node.call(this, NodeType.ELEMENT_NODE, tagName);
+  constructor(tagName: string, attrs?: any) {
+    constructNode(this, NodeType.ELEMENT_NODE, tagName);
     constructParentNode(this);
     constructChildNode(this);
 
@@ -32,11 +32,11 @@ export class Element {
   }
 }
 
-const prototype = extendsClass(Element, Node);
+const prototype = extendClass(Element, Node);
 
-extendsChildNode(prototype);
-extendsContainer(prototype);
-extendsParentNode(prototype);
+extendChildNode(prototype);
+extendNode(prototype);
+extendParentNode(prototype);
 
 prototype.setAttribute = function (name, value) {
   this.attrs[name] = value;

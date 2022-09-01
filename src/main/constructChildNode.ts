@@ -3,7 +3,7 @@ import { Element } from './Element';
 import {
   coerceInsertableNodes,
   NodeLike,
-  uncheckedRemove,
+  uncheckedRemoveChild,
   uncheckedRemoveAndAppendChild,
   uncheckedRemoveAndInsertBefore,
 } from './unchecked';
@@ -25,7 +25,7 @@ export function constructChildNode(node: ChildNode): void {
   node.nextElementSibling = node.previousElementSibling = null;
 }
 
-export function extendsChildNode(node: ChildNode): void {
+export function extendChildNode(node: ChildNode): void {
   node.after = after;
   node.before = before;
   node.remove = remove;
@@ -35,7 +35,7 @@ export function extendsChildNode(node: ChildNode): void {
 function after(this: ChildNode, ...nodes: NodeLike[]) {
   const { parentNode } = this;
 
-  if (parentNode) {
+  if (parentNode != null) {
     coerceInsertableNodes(parentNode, nodes);
 
     for (const node of nodes) {
@@ -48,7 +48,7 @@ function after(this: ChildNode, ...nodes: NodeLike[]) {
 function before(this: ChildNode, ...nodes: NodeLike[]) {
   const { parentNode } = this;
 
-  if (parentNode) {
+  if (parentNode != null) {
     coerceInsertableNodes(parentNode, nodes);
 
     for (const node of nodes) {
@@ -61,7 +61,7 @@ function before(this: ChildNode, ...nodes: NodeLike[]) {
 function remove(this: ChildNode) {
   const { parentNode } = this;
 
-  if (parentNode) {
+  if (parentNode != null) {
     parentNode.removeChild(this);
   }
   return this;
@@ -70,13 +70,13 @@ function remove(this: ChildNode) {
 function replaceWith(this: ChildNode, ...nodes: NodeLike[]) {
   const { parentNode } = this;
 
-  if (parentNode) {
+  if (parentNode != null) {
     coerceInsertableNodes(parentNode, nodes);
 
     for (const node of nodes) {
       uncheckedRemoveAndInsertBefore(parentNode, node, this);
     }
-    uncheckedRemove(this);
+    uncheckedRemoveChild(parentNode, this);
   }
   return this;
 }

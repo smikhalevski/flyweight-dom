@@ -1,6 +1,7 @@
-import { Constructor, defineProperty, extendsClass, PropertyDescriptor } from './utils';
+import { Constructor, defineProperty, extendClass, PropertyDescriptor } from './utils';
 import { Node } from './Node';
-import { ChildNode, extendsChildNode } from './extendsChildNode';
+import { ChildNode, extendChildNode } from './constructChildNode';
+import { constructCharacterData } from './constructCharacterData';
 
 export interface CharacterData extends Node, ChildNode {
   readonly length: number;
@@ -19,17 +20,14 @@ export interface CharacterData extends Node, ChildNode {
 }
 
 export /*abstract*/ class CharacterData {
-  constructor(nodeType: number, nodeName: string, data = '') {
-    Node.call(this, nodeType, nodeName);
-
-    this.nextElementSibling = this.previousElementSibling = null;
-    this.data = data;
+  constructor(nodeType: number, nodeName: string, data?: string) {
+    constructCharacterData(this, nodeType, nodeName, data);
   }
 }
 
-const prototype = extendsClass(CharacterData, Node);
+const prototype = extendClass(CharacterData, Node);
 
-extendsChildNode(prototype);
+extendChildNode(prototype);
 
 const dataDescriptor: PropertyDescriptor<CharacterData, string | null> = {
   get() {

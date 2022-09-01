@@ -1,6 +1,6 @@
 import { Element } from '../../main/Element';
 import { Text } from '../../main/Text';
-import { uncheckedAppendChild, uncheckedRemove } from '../../main/unchecked';
+import { uncheckedAppendChild, uncheckedRemoveChild } from '../../main/unchecked';
 
 describe('uncheckedRemove', () => {
   test('removes the only child', () => {
@@ -8,7 +8,7 @@ describe('uncheckedRemove', () => {
     const node = new Text('node');
 
     uncheckedAppendChild(parent, node);
-    uncheckedRemove(node);
+    uncheckedRemoveChild(parent, node);
 
     expect(parent._childNodes).toBe(null);
     expect(parent.firstChild).toBe(null);
@@ -33,7 +33,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node1);
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
-    uncheckedRemove(node2);
+    uncheckedRemoveChild(parent, node2);
 
     expect(parent._childNodes).toBe(null);
     expect(parent.firstChild).toBe(node1);
@@ -75,7 +75,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node1);
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
-    uncheckedRemove(node2);
+    uncheckedRemoveChild(parent, node2);
 
     expect(parent.childNodes.length).toBe(2);
     expect(parent.childNodes[0]).toBe(node1);
@@ -89,7 +89,7 @@ describe('uncheckedRemove', () => {
     const node = new Element('node');
 
     uncheckedAppendChild(parent, node);
-    uncheckedRemove(node);
+    uncheckedRemoveChild(parent, node);
 
     expect(parent._childNodes).toBe(null);
     expect(parent.firstChild).toBe(null);
@@ -114,7 +114,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node1);
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
-    uncheckedRemove(node2);
+    uncheckedRemoveChild(parent, node2);
 
     expect(parent._children).toBe(null);
     expect(parent.firstChild).toBe(node1);
@@ -156,7 +156,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node1);
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
-    uncheckedRemove(node2);
+    uncheckedRemoveChild(parent, node2);
 
     expect(parent.childNodes.length).toBe(2);
     expect(parent.childNodes[0]).toBe(node1);

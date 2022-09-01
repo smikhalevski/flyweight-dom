@@ -1,20 +1,21 @@
 import { Node } from './Node';
-import { extendsParentNode, ParentNode } from './extendsParentNode';
+import { extendParentNode, ParentNode } from './constructParentNode';
 import { NodeType } from './NodeType';
-import { extendsClass } from './utils';
+import { extendClass } from './utils';
 import { uncheckedCloneContents } from './unchecked';
+import { constructNode } from './constructNode';
 
 export interface DocumentFragment extends Node, ParentNode {}
 
 export class DocumentFragment {
   constructor() {
-    Node.call(this, NodeType.DOCUMENT_FRAGMENT_NODE, '#document-fragment');
+    constructNode(this, NodeType.DOCUMENT_FRAGMENT_NODE, '#document-fragment');
   }
 }
 
-const prototype = extendsClass(DocumentFragment, Node);
+const prototype = extendClass(DocumentFragment, Node);
 
-extendsParentNode(prototype);
+extendParentNode(prototype);
 
 prototype.cloneNode = function (deep) {
   const node = new DocumentFragment();

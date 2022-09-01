@@ -4,10 +4,10 @@ import { Node } from '../Node';
  * Returns `true` if the parent contains the node, or `false` otherwise.
  */
 export function uncheckedContains(parent: Node, node: Node | null): boolean {
-  if (!parent.firstChild || !node) {
+  if (parent.firstChild == null || node == null) {
     return false;
   }
-  while (node) {
+  while (node != null) {
     if (parent === node) {
       return true;
     }

@@ -1,22 +1,16 @@
 import { die } from '../utils';
 import { Node } from '../Node';
-import { ChildNode } from '../extendsChildNode';
+import { ChildNode } from '../constructChildNode';
 import { NodeType } from '../NodeType';
 import { Element } from '../Element';
 import { DocumentFragment } from '../DocumentFragment';
 import { uncheckedContains } from './uncheckedContains';
-import { ParentNode } from '../extendsParentNode';
+import { ParentNode } from '../constructParentNode';
 import { Text } from '../Text';
 
 export type NodeLike = Node | string;
 
 export type InsertableNode = DocumentFragment | ChildNode;
-
-export function assertNode(node: any): asserts node is Node {
-  if (!node || typeof node !== 'object' || typeof node.nodeType !== 'number') {
-    die('Node expected');
-  }
-}
 
 export function assertChildNode(node: Node): asserts node is ChildNode {
   const { nodeType } = node;
@@ -29,25 +23,21 @@ export function assertChildNode(node: Node): asserts node is ChildNode {
   }
 }
 
-export function assertNotContains(parent: Node, node: Node): void {
-  if (uncheckedContains(parent, node)) {
-    die('The new child element contains the parent');
-  }
-}
-
 export function assertParent(parent: Node, child: Node, message: string): asserts child is ChildNode {
   if (child.parentNode !== parent) {
     die(message);
   }
 }
 
-export function assertInsertableNode(parent: ParentNode, node: Node): asserts node is ChildNode {
-  assertNode(node);
+export function assertInsertableNode(parent: ParentNode, node: Node): asserts node is InsertableNode {
+  const { nodeType } = node;
 
-  if (!isDocumentFragment(node)) {
-    assertChildNode(node);
+  if (nodeType === NodeType.ATTRIBUTE_NODE || nodeType === NodeType.DOCUMENT_NODE) {
+    die('Child node expected');
   }
-  assertNotContains(node, parent);
+  if (uncheckedContains(parent, node)) {
+    die('The new child element contains the parent');
+  }
 }
 
 export function coerceInsertableNodes(parent: ParentNode, nodes: NodeLike[]): asserts nodes is InsertableNode[] {

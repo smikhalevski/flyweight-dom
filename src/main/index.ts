@@ -219,7 +219,7 @@ export interface CharacterData extends ChildNode {}
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData CharacterData on MDN}
  */
-export declare class CharacterData extends Node {
+export declare abstract class CharacterData extends Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/length CharacterData.length on MDN}
    */

@@ -1,5 +1,5 @@
-import { ParentNode } from '../extendsParentNode';
-import { ChildNode } from '../extendsChildNode';
+import { ParentNode } from '../constructParentNode';
+import { ChildNode } from '../constructChildNode';
 import { isElement } from './utils';
 
 /**
@@ -13,7 +13,7 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
 
   child ||= parent.firstChild;
 
-  if (!child) {
+  if (child == null) {
     // The parent has no children
     parent.firstChild = parent.lastChild = node;
 
@@ -37,7 +37,7 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
   node.nextElementSibling = nextElementSibling;
   child.previousSibling = node;
 
-  if (previousSibling) {
+  if (previousSibling != null) {
     previousSibling.nextSibling = node;
     node.previousSibling = previousSibling;
     node.previousElementSibling = previousElementSibling;
@@ -56,10 +56,10 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
 
   child.previousElementSibling = node;
 
-  if (!nextElementSibling) {
+  if (nextElementSibling == null) {
     parent.lastElementChild = node;
 
-    if (previousElementSibling) {
+    if (previousElementSibling != null) {
       previousElementSibling.nextElementSibling = node;
     } else {
       parent.firstElementChild = node;
@@ -72,7 +72,7 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
   nextElementSibling.previousElementSibling = node;
   node.nextElementSibling = nextElementSibling;
 
-  if (!previousElementSibling) {
+  if (previousElementSibling == null) {
     parent.firstElementChild = node;
 
     children?.unshift(node);

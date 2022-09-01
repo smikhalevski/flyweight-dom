@@ -1,26 +1,28 @@
 import { Element } from './Element';
 import { defineProperty, die } from './utils';
-import { ChildNode } from './constructChildNode';
-import { ParentNode } from './constructParentNode';
-import { constructNode } from './constructNode';
+import { ChildNode } from './extendChildNode';
+import { ParentNode } from './extendParentNode';
 
 export interface Node {
-  /*readonly*/ nodeType: number;
-  /*readonly*/ nodeName: string;
-  /*readonly*/ childNodes: readonly ChildNode[];
-  /*readonly*/ parentNode: ParentNode | null;
-  /*readonly*/ parentElement: Element | null;
-  /*readonly*/ previousSibling: ChildNode | null;
-  /*readonly*/ nextSibling: ChildNode | null;
-  /*readonly*/ firstChild: ChildNode | null;
-  /*readonly*/ lastChild: ChildNode | null;
+  // public readonly
+  nodeType: number;
+  nodeName: string;
+  childNodes: readonly ChildNode[];
+  parentNode: ParentNode | null;
+  parentElement: Element | null;
+  previousSibling: ChildNode | null;
+  nextSibling: ChildNode | null;
+  firstChild: ChildNode | null;
+  lastChild: ChildNode | null;
 
+  // public
   nodeValue: string | null;
   textContent: string | null;
   startIndex: number;
   endIndex: number;
 
-  /*private*/ _childNodes: ChildNode[] | null;
+  // private
+  _childNodes: ChildNode[] | undefined;
 
   hasChildNodes(): boolean;
 
@@ -37,13 +39,22 @@ export interface Node {
   cloneNode(deep?: boolean): this;
 }
 
-export class Node {
-  constructor(nodeType: number, nodeName: string) {
-    constructNode(this, nodeType, nodeName);
-  }
-}
+// abstract
+export class Node {}
 
 const prototype = Node.prototype;
+
+prototype.startIndex = prototype.endIndex = -1;
+
+prototype.parentNode =
+  prototype.parentElement =
+  prototype.previousSibling =
+  prototype.nextSibling =
+  prototype.firstChild =
+  prototype.lastChild =
+  prototype.nodeValue =
+  prototype.textContent =
+    null;
 
 defineProperty(prototype, 'childNodes', {
   get() {

@@ -3,7 +3,7 @@ import { Text } from '../main/Text';
 
 describe('Node', () => {
   test('creates a new Node instance', () => {
-    const node = new Node(0, '#node');
+    const node = new Node();
 
     expect(node).toBeInstanceOf(Node);
     expect(node.childNodes).toEqual([]);
@@ -13,24 +13,24 @@ describe('Node', () => {
     expect(node.nextSibling).toBe(null);
     expect(node.firstChild).toBe(null);
     expect(node.lastChild).toBe(null);
-    expect(node.nodeType).toBe(0);
-    expect(node.nodeName).toBe('#node');
+    expect(node.nodeType).toBe(undefined);
+    expect(node.nodeName).toBe(undefined);
   });
 
   test('populates childNodes', () => {
-    const node = new Node(0, '#node');
+    const node = new Node();
 
     expect(node.childNodes).toEqual([]);
   });
 
   test('hasChildNodes return false', () => {
-    const node = new Node(0, '#node');
+    const node = new Node();
 
     expect(node.hasChildNodes()).toBe(false);
   });
 
   test('child mutation methods throw', () => {
-    const node = new Node(0, '#node');
+    const node = new Node();
 
     const text = new Text();
 
@@ -41,7 +41,7 @@ describe('Node', () => {
   });
 
   test('cloneNode throws', () => {
-    const node = new Node(0, '#node');
+    const node = new Node();
 
     expect(() => node.cloneNode()).toThrow(new Error('Abstract method'));
   });

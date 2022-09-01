@@ -231,11 +231,6 @@ export declare abstract class CharacterData extends Node {
   data: string;
 
   /**
-   * Creates a new instance of {@link CharacterData}.
-   */
-  constructor(nodeType: number, nodeName: string, data?: string);
-
-  /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/appendData CharacterData.appendData on MDN}
    */
   appendData(data: string): this;

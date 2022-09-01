@@ -1,4 +1,4 @@
-import { Node } from '../Node';
+import { Node } from './Node';
 
 /**
  * Returns `true` if the parent contains the node, or `false` otherwise.

@@ -1,16 +1,14 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import {
-  coerceInsertableNodes,
-  NodeLike,
-  uncheckedRemoveChild,
-  uncheckedRemoveAndAppendChild,
-  uncheckedRemoveAndInsertBefore,
-} from './unchecked';
+import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
+import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
+import { coerceInsertableNodes, NodeLike } from './coerceInsertableNodes';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 
 export interface ChildNode extends Node {
-  /*readonly*/ nextElementSibling: Element | null;
-  /*readonly*/ previousElementSibling: Element | null;
+  // public readonly
+  nextElementSibling: Element | null;
+  previousElementSibling: Element | null;
 
   after(...nodes: NodeLike[]): this;
 
@@ -21,15 +19,13 @@ export interface ChildNode extends Node {
   replaceWith(...nodes: NodeLike[]): this;
 }
 
-export function constructChildNode(node: ChildNode): void {
-  node.nextElementSibling = node.previousElementSibling = null;
-}
+export function extendChildNode(prototype: ChildNode): void {
+  prototype.after = after;
+  prototype.before = before;
+  prototype.remove = remove;
+  prototype.replaceWith = replaceWith;
 
-export function extendChildNode(node: ChildNode): void {
-  node.after = after;
-  node.before = before;
-  node.remove = remove;
-  node.replaceWith = replaceWith;
+  prototype.nextElementSibling = prototype.previousElementSibling = null;
 }
 
 function after(this: ChildNode, ...nodes: NodeLike[]) {

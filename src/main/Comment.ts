@@ -1,14 +1,16 @@
 import { CharacterData } from './CharacterData';
 import { extendClass } from './utils';
 import { NodeType } from './NodeType';
-import { constructCharacterData } from './constructCharacterData';
 
 export interface Comment extends CharacterData {}
 
 export class Comment {
-  constructor(data?: string) {
-    constructCharacterData(this, NodeType.COMMENT_NODE, '#comment', data);
+  constructor(data = '') {
+    this.data = data;
   }
 }
 
-extendClass(Comment, CharacterData);
+const parent = extendClass(Comment, CharacterData);
+
+parent.nodeType = NodeType.COMMENT_NODE;
+parent.nodeName = '#comment';

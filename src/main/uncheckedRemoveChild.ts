@@ -1,6 +1,6 @@
-import { ChildNode } from '../constructChildNode';
+import { ChildNode } from './extendChildNode';
+import { ParentNode } from './extendParentNode';
 import { isElement } from './utils';
-import { ParentNode } from '../constructParentNode';
 
 /**
  * Removes a child from its parent.

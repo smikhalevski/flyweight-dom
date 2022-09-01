@@ -1,21 +1,26 @@
 import { CharacterData } from './CharacterData';
 import { Constructor, defineProperty, extendClass } from './utils';
 import { NodeType } from './NodeType';
-import { constructCharacterData } from './constructCharacterData';
+import { uncheckedAppendChild } from './uncheckedAppendChild';
+import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 
 export interface Text extends CharacterData {
-  readonly wholeText: string;
+  // public readonly
+  wholeText: string;
 
   splitText(offset: number): this;
 }
 
 export class Text {
-  constructor(data?: string) {
-    constructCharacterData(this, NodeType.TEXT_NODE, '#text', data);
+  constructor(data = '') {
+    this.data = data;
   }
 }
 
 const prototype = extendClass(Text, CharacterData);
+
+prototype.nodeType = NodeType.TEXT_NODE;
+prototype.nodeName = '#text';
 
 defineProperty(prototype, 'wholeText', {
   get() {
@@ -42,13 +47,13 @@ prototype.splitText = function (offset) {
 
   this.data = data.substring(0, offset);
 
-  const node = new (this.constructor as Constructor<Text>)(data.substring(offset));
+  const node = new (this.constructor as Constructor)(data.substring(offset));
 
   if (parentNode != null) {
     if (nextSibling != null) {
-      parentNode.insertBefore(node, nextSibling);
+      uncheckedInsertBefore(parentNode, node, nextSibling);
     } else {
-      parentNode.appendChild(node);
+      uncheckedAppendChild(parentNode, node);
     }
   }
   return node;

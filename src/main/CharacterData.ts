@@ -1,11 +1,12 @@
 import { Constructor, defineProperty, extendClass, PropertyDescriptor } from './utils';
 import { Node } from './Node';
-import { ChildNode, extendChildNode } from './constructChildNode';
-import { constructCharacterData } from './constructCharacterData';
+import { ChildNode, extendChildNode } from './extendChildNode';
 
 export interface CharacterData extends Node, ChildNode {
-  readonly length: number;
+  // public readonly
+  length: number;
 
+  // public
   data: string;
 
   appendData(data: string): this;
@@ -19,15 +20,14 @@ export interface CharacterData extends Node, ChildNode {
   substringData(offset: number, count: number): string;
 }
 
-export /*abstract*/ class CharacterData {
-  constructor(nodeType: number, nodeName: string, data?: string) {
-    constructCharacterData(this, nodeType, nodeName, data);
-  }
-}
+// abstract
+export class CharacterData {}
 
 const prototype = extendClass(CharacterData, Node);
 
 extendChildNode(prototype);
+
+prototype.nextElementSibling = prototype.previousElementSibling = null;
 
 const dataDescriptor: PropertyDescriptor<CharacterData, string | null> = {
   get() {
@@ -73,5 +73,5 @@ prototype.substringData = function (offset, count) {
 };
 
 prototype.cloneNode = function () {
-  return new (this.constructor as Constructor<CharacterData>)(this.data);
+  return new (this.constructor as Constructor)(this.data);
 };

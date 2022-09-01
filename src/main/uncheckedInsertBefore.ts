@@ -1,5 +1,5 @@
-import { ParentNode } from '../constructParentNode';
-import { ChildNode } from '../constructChildNode';
+import { ParentNode } from './extendParentNode';
+import { ChildNode } from './extendChildNode';
 import { isElement } from './utils';
 
 /**

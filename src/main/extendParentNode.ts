@@ -1,21 +1,20 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import {
-  coerceInsertableNodes,
-  NodeLike,
-  uncheckedRemoveChild,
-  uncheckedRemoveAndAppendChild,
-  uncheckedRemoveAndInsertBefore,
-} from './unchecked';
 import { defineProperty, PropertyDescriptor } from './utils';
+import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
+import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
+import { coerceInsertableNodes, NodeLike } from './coerceInsertableNodes';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 
 export interface ParentNode extends Node {
-  /*readonly*/ children: Node[];
-  /*readonly*/ childElementCount: number;
-  /*readonly*/ firstElementChild: Element | null;
-  /*readonly*/ lastElementChild: Element | null;
+  // public readonly
+  children: Node[];
+  childElementCount: number;
+  firstElementChild: Element | null;
+  lastElementChild: Element | null;
 
-  /*private*/ _children: Element[] | null;
+  // private
+  _children: Element[] | undefined;
 
   append(...nodes: NodeLike[]): this;
 
@@ -24,17 +23,15 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: NodeLike[]): this;
 }
 
-export function constructParentNode(node: ParentNode): void {
-  node.childElementCount = 0;
-  node.firstElementChild = node.lastElementChild = node._children = null;
-}
-
 export function extendParentNode(prototype: ParentNode): void {
   defineProperty(prototype, 'children', childrenDescriptor);
 
   prototype.append = append;
   prototype.prepend = prepend;
   prototype.replaceChildren = replaceChildren;
+
+  prototype.childElementCount = 0;
+  prototype.firstElementChild = prototype.lastElementChild = null;
 }
 
 const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
@@ -79,7 +76,7 @@ function prepend(this: ParentNode, ...nodes: NodeLike[]) {
 function replaceChildren(this: ParentNode, ...nodes: NodeLike[]) {
   coerceInsertableNodes(this, nodes);
 
-  while (this.firstChild) {
+  while (this.firstChild != null) {
     uncheckedRemoveChild(this, this.firstChild);
   }
   for (const node of nodes) {

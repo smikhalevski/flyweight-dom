@@ -1,23 +1,21 @@
 import { Node } from './Node';
-import { constructParentNode, extendParentNode, ParentNode } from './constructParentNode';
+import { extendParentNode, ParentNode } from './extendParentNode';
 import { NodeType } from './NodeType';
 import { Element } from './Element';
 import { defineProperty, extendClass } from './utils';
-import { uncheckedCloneContents } from './unchecked';
-import { constructNode } from './constructNode';
+import { uncheckedCloneContents } from './uncheckedCloneContents';
 
 export interface Document extends Node, ParentNode {
-  readonly documentElement: Element | null;
+  // public readonly
+  documentElement: Element | null;
 }
 
-export class Document {
-  constructor() {
-    constructNode(this, NodeType.DOCUMENT_NODE, '#document');
-    constructParentNode(this);
-  }
-}
+export class Document {}
 
 const prototype = extendClass(Document, Node);
+
+prototype.nodeType = NodeType.DOCUMENT_NODE;
+prototype.nodeName = '#document';
 
 extendParentNode(prototype);
 

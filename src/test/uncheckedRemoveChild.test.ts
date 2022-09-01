@@ -1,6 +1,7 @@
-import { Element } from '../../main/Element';
-import { Text } from '../../main/Text';
-import { uncheckedAppendChild, uncheckedRemoveChild } from '../../main/unchecked';
+import { Element } from '../main/Element';
+import { Text } from '../main/Text';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
+import { uncheckedRemoveChild } from '../main/uncheckedRemoveChild';
 
 describe('uncheckedRemove', () => {
   test('removes the only child', () => {
@@ -10,7 +11,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node);
     uncheckedRemoveChild(parent, node);
 
-    expect(parent._childNodes).toBe(null);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(null);
     expect(parent.lastChild).toBe(null);
     expect(parent.firstElementChild).toBe(null);
@@ -35,7 +36,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node3);
     uncheckedRemoveChild(parent, node2);
 
-    expect(parent._childNodes).toBe(null);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
     expect(parent.firstElementChild).toBe(null);
@@ -91,7 +92,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node);
     uncheckedRemoveChild(parent, node);
 
-    expect(parent._childNodes).toBe(null);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(null);
     expect(parent.lastChild).toBe(null);
     expect(parent.firstElementChild).toBe(null);
@@ -116,7 +117,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node3);
     uncheckedRemoveChild(parent, node2);
 
-    expect(parent._children).toBe(null);
+    expect(parent._children).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
     expect(parent.firstElementChild).toBe(node1);

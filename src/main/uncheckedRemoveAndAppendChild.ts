@@ -1,12 +1,15 @@
-import { ParentNode } from '../constructParentNode';
-import { InsertableNode, isDocumentFragment } from './utils';
+import { ParentNode } from './extendParentNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
+import { InsertableNode } from './coerceInsertableNodes';
+import { isDocumentFragment } from './utils';
 
 export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {
   if (!isDocumentFragment(node)) {
-    if (node.parentNode != null) {
-      uncheckedRemoveChild(node.parentNode, node);
+    const { parentNode } = node;
+
+    if (parentNode != null) {
+      uncheckedRemoveChild(parentNode, node);
     }
     uncheckedAppendChild(parent, node);
     return;

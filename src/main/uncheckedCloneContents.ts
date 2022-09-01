@@ -1,6 +1,6 @@
-import { ParentNode } from '../constructParentNode';
+import { ParentNode } from './extendParentNode';
+import { ChildNode } from './extendChildNode';
 import { isElement } from './utils';
-import { ChildNode } from '../constructChildNode';
 
 /**
  * Appends cloned child nodes from the origin to the parent.

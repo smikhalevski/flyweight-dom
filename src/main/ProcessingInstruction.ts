@@ -2,12 +2,11 @@ import { CharacterData } from './CharacterData';
 import { extendClass } from './utils';
 import { NodeType } from './NodeType';
 
-export interface ProcessingInstruction extends CharacterData {
-  // public readonly
-  target: string;
-}
+export interface ProcessingInstruction extends CharacterData {}
 
 export class ProcessingInstruction {
+  readonly target: string;
+
   constructor(target: string, data = '') {
     this.nodeName = this.target = target;
     this.data = data;

@@ -2,33 +2,46 @@ import { Node } from './Node';
 import { Element } from './Element';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
-import { coerceInsertableNodes, NodeLike } from './coerceInsertableNodes';
+import { coerceInsertableNodes } from './coerceInsertableNodes';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
+import { defineProperty, getNextElementSibling, getPreviousElementSibling, PropertyDescriptor } from './utils';
 
 export interface ChildNode extends Node {
-  // public readonly
-  nextElementSibling: Element | null;
-  previousElementSibling: Element | null;
+  readonly previousElementSibling: Element | null;
+  readonly nextElementSibling: Element | null;
 
-  after(...nodes: NodeLike[]): this;
+  after(...nodes: Array<Node | string>): this;
 
-  before(...nodes: NodeLike[]): this;
+  before(...nodes: Array<Node | string>): this;
 
   remove(): this;
 
-  replaceWith(...nodes: NodeLike[]): this;
+  replaceWith(...nodes: Array<Node | string>): this;
 }
 
 export function extendChildNode(prototype: ChildNode): void {
+  defineProperty(prototype, 'previousElementSibling', previousElementSiblingDescriptor);
+  defineProperty(prototype, 'nextElementSibling', nextElementSiblingDescriptor);
+
   prototype.after = after;
   prototype.before = before;
   prototype.remove = remove;
   prototype.replaceWith = replaceWith;
-
-  prototype.nextElementSibling = prototype.previousElementSibling = null;
 }
 
-function after(this: ChildNode, ...nodes: NodeLike[]) {
+const nextElementSiblingDescriptor: PropertyDescriptor<ChildNode, Element | null> = {
+  get() {
+    return getNextElementSibling(this.nextSibling);
+  },
+};
+
+const previousElementSiblingDescriptor: PropertyDescriptor<ChildNode, Element | null> = {
+  get() {
+    return getPreviousElementSibling(this.previousSibling);
+  },
+};
+
+function after(this: ChildNode, ...nodes: Array<Node | string>) {
   const { parentNode } = this;
 
   if (parentNode != null) {
@@ -41,7 +54,7 @@ function after(this: ChildNode, ...nodes: NodeLike[]) {
   return this;
 }
 
-function before(this: ChildNode, ...nodes: NodeLike[]) {
+function before(this: ChildNode, ...nodes: Array<Node | string>) {
   const { parentNode } = this;
 
   if (parentNode != null) {
@@ -63,7 +76,7 @@ function remove(this: ChildNode) {
   return this;
 }
 
-function replaceWith(this: ChildNode, ...nodes: NodeLike[]) {
+function replaceWith(this: ChildNode, ...nodes: Array<Node | string>) {
   const { parentNode } = this;
 
   if (parentNode != null) {

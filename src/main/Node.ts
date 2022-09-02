@@ -2,6 +2,7 @@ import { Element } from './Element';
 import { defineProperty, die } from './utils';
 import { ChildNode } from './extendChildNode';
 import { ParentNode } from './extendParentNode';
+import { NodeType } from './NodeType';
 
 export interface Node {
   // public readonly
@@ -9,7 +10,7 @@ export interface Node {
   nodeName: string;
   childNodes: readonly ChildNode[];
   parentNode: ParentNode | null;
-  parentElement: Element | null;
+  readonly parentElement: Element | null;
   previousSibling: ChildNode | null;
   nextSibling: ChildNode | null;
   firstChild: ChildNode | null;
@@ -47,7 +48,6 @@ const prototype = Node.prototype;
 prototype.startIndex = prototype.endIndex = -1;
 
 prototype.parentNode =
-  prototype.parentElement =
   prototype.previousSibling =
   prototype.nextSibling =
   prototype.firstChild =
@@ -55,6 +55,17 @@ prototype.parentNode =
   prototype.nodeValue =
   prototype.textContent =
     null;
+
+defineProperty(prototype, 'parentElement', {
+  get() {
+    let parent = this.parentNode;
+
+    while (parent !== null && parent.nodeType !== NodeType.ELEMENT_NODE) {
+      parent = parent.parentNode;
+    }
+    return parent as Element | null;
+  },
+});
 
 defineProperty(prototype, 'childNodes', {
   get() {

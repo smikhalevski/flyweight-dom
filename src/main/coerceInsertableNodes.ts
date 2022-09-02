@@ -7,8 +7,6 @@ import { die } from './utils';
 import { uncheckedContains } from './uncheckedContains';
 import { Text } from './Text';
 
-export type NodeLike = Node | string;
-
 export type InsertableNode = DocumentFragment | ChildNode;
 
 export function assertInsertableNode(parent: ParentNode, node: Node): asserts node is InsertableNode {
@@ -22,7 +20,10 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   }
 }
 
-export function coerceInsertableNodes(parent: ParentNode, nodes: NodeLike[]): asserts nodes is InsertableNode[] {
+export function coerceInsertableNodes(
+  parent: ParentNode,
+  nodes: Array<Node | string>
+): asserts nodes is InsertableNode[] {
   for (let i = 0; i < nodes.length; ++i) {
     const node = nodes[i];
 

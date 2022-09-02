@@ -3,10 +3,8 @@ import { Node } from './Node';
 import { ChildNode, extendChildNode } from './extendChildNode';
 
 export interface CharacterData extends Node, ChildNode {
-  // public readonly
-  length: number;
+  readonly length: number;
 
-  // public
   data: string;
 
   appendData(data: string): this;
@@ -20,14 +18,11 @@ export interface CharacterData extends Node, ChildNode {
   substringData(offset: number, count: number): string;
 }
 
-// abstract
 export class CharacterData {}
 
 const prototype = extendClass(CharacterData, Node);
 
 extendChildNode(prototype);
-
-prototype.nextElementSibling = prototype.previousElementSibling = null;
 
 const dataDescriptor: PropertyDescriptor<CharacterData, string | null> = {
   get() {

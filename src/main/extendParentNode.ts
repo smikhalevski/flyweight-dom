@@ -1,37 +1,37 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { defineProperty, PropertyDescriptor } from './utils';
+import { defineProperty, getNextElementSibling, getPreviousElementSibling, PropertyDescriptor } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
-import { coerceInsertableNodes, NodeLike } from './coerceInsertableNodes';
+import { coerceInsertableNodes } from './coerceInsertableNodes';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
+import { NodeType } from './NodeType';
 
 export interface ParentNode extends Node {
-  // public readonly
-  children: Node[];
-  childElementCount: number;
-  firstElementChild: Element | null;
-  lastElementChild: Element | null;
+  readonly children: Node[];
+  readonly childElementCount: number;
+  readonly firstElementChild: Element | null;
+  readonly lastElementChild: Element | null;
 
   // private
   _children: Element[] | undefined;
 
-  append(...nodes: NodeLike[]): this;
+  append(...nodes: Array<Node | string>): this;
 
-  prepend(...nodes: NodeLike[]): this;
+  prepend(...nodes: Array<Node | string>): this;
 
-  replaceChildren(...nodes: NodeLike[]): this;
+  replaceChildren(...nodes: Array<Node | string>): this;
 }
 
 export function extendParentNode(prototype: ParentNode): void {
   defineProperty(prototype, 'children', childrenDescriptor);
+  defineProperty(prototype, 'firstElementChild', firstElementChildDescriptor);
+  defineProperty(prototype, 'lastElementChild', lastElementChildDescriptor);
+  defineProperty(prototype, 'childElementCount', childElementCountDescriptor);
 
   prototype.append = append;
   prototype.prepend = prepend;
   prototype.replaceChildren = replaceChildren;
-
-  prototype.childElementCount = 0;
-  prototype.firstElementChild = prototype.lastElementChild = null;
 }
 
 const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
@@ -47,7 +47,31 @@ const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
   },
 };
 
-function append(this: ParentNode, ...nodes: NodeLike[]) {
+const firstElementChildDescriptor: PropertyDescriptor<ParentNode, Element | null> = {
+  get() {
+    return getNextElementSibling(this.firstChild);
+  },
+};
+
+const lastElementChildDescriptor: PropertyDescriptor<ParentNode, Element | null> = {
+  get() {
+    return getPreviousElementSibling(this.lastChild);
+  },
+};
+
+const childElementCountDescriptor: PropertyDescriptor<ParentNode, number> = {
+  get() {
+    let count = 0;
+    for (let node = this.firstChild; node !== null; node = node.previousSibling) {
+      if (node.nodeType === NodeType.ELEMENT_NODE) {
+        ++count;
+      }
+    }
+    return count;
+  },
+};
+
+function append(this: ParentNode, ...nodes: Array<Node | string>) {
   coerceInsertableNodes(this, nodes);
 
   for (const node of nodes) {
@@ -56,7 +80,7 @@ function append(this: ParentNode, ...nodes: NodeLike[]) {
   return this;
 }
 
-function prepend(this: ParentNode, ...nodes: NodeLike[]) {
+function prepend(this: ParentNode, ...nodes: Array<Node | string>) {
   const { firstChild } = this;
 
   coerceInsertableNodes(this, nodes);
@@ -73,7 +97,7 @@ function prepend(this: ParentNode, ...nodes: NodeLike[]) {
   return this;
 }
 
-function replaceChildren(this: ParentNode, ...nodes: NodeLike[]) {
+function replaceChildren(this: ParentNode, ...nodes: Array<Node | string>) {
   coerceInsertableNodes(this, nodes);
 
   while (this.firstChild != null) {

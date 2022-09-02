@@ -6,8 +6,7 @@ import { defineProperty, extendClass } from './utils';
 import { uncheckedCloneContents } from './uncheckedCloneContents';
 
 export interface Document extends Node, ParentNode {
-  // public readonly
-  documentElement: Element | null;
+  readonly documentElement: Element | null;
 }
 
 export class Document {}

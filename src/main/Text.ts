@@ -5,8 +5,7 @@ import { uncheckedAppendChild } from './uncheckedAppendChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 
 export interface Text extends CharacterData {
-  // public readonly
-  wholeText: string;
+  readonly wholeText: string;
 
   splitText(offset: number): this;
 }

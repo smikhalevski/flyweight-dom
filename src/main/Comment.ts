@@ -6,7 +6,7 @@ export interface Comment extends CharacterData {}
 
 export class Comment {
   constructor(data = '') {
-    this.data = data;
+    this.data = String(data);
   }
 }
 

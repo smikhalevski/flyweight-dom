@@ -12,9 +12,9 @@ export interface DocumentType extends Node, ChildNode {
 
 export class DocumentType {
   constructor(name: string, publicId = '', systemId = '') {
-    this.nodeName = this.name = name;
-    this.publicId = publicId;
-    this.systemId = systemId;
+    this.nodeName = this.name = String(name);
+    this.publicId = String(publicId);
+    this.systemId = String(systemId);
   }
 }
 

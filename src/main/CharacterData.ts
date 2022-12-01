@@ -36,7 +36,7 @@ const dataDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
     return this.data;
   },
   set(value) {
-    this.data = value != null ? value : '';
+    this.data = value != null ? String(value) : '';
   },
 };
 
@@ -46,6 +46,7 @@ Object.defineProperties(prototype, {
       return this.data.length;
     },
   },
+
   nodeValue: dataDescriptor,
   textContent: dataDescriptor,
 });

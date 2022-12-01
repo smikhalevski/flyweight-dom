@@ -40,6 +40,7 @@ export function extendParentNode(prototype: ParentNode): void {
         return nodes;
       },
     },
+
     childElementCount: {
       get(this: ParentNode) {
         let count = 0;
@@ -52,11 +53,13 @@ export function extendParentNode(prototype: ParentNode): void {
         return count;
       },
     },
+
     firstElementChild: {
       get(this: ParentNode) {
         return getNextElementSibling(this.firstChild);
       },
     },
+
     lastElementChild: {
       get(this: ParentNode) {
         return getPreviousElementSibling(this.lastChild);

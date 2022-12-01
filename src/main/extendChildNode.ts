@@ -27,6 +27,7 @@ export function extendChildNode(prototype: ChildNode): void {
         return getPreviousElementSibling(this.previousSibling);
       },
     },
+
     nextElementSibling: {
       get(this: ChildNode) {
         return getNextElementSibling(this.nextSibling);

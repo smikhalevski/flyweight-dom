@@ -8,8 +8,8 @@ export class ProcessingInstruction {
   readonly target: string;
 
   constructor(target: string, data = '') {
-    this.nodeName = this.target = target;
-    this.data = data;
+    this.nodeName = this.target = String(target);
+    this.data = String(data);
   }
 }
 

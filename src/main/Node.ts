@@ -85,6 +85,7 @@ Object.defineProperties(prototype, {
       return nodes;
     },
   },
+
   parentElement: {
     get(this: Node) {
       let parent = this.parentNode;

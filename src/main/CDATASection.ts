@@ -6,7 +6,7 @@ export interface CDATASection extends Text {}
 
 export class CDATASection {
   constructor(data = '') {
-    this.data = data;
+    this.data = String(data);
   }
 }
 

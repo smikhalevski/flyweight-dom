@@ -30,6 +30,7 @@ Object.defineProperties(prototype, {
       return node;
     },
   },
+
   documentElement: {
     get(this: Document) {
       return this.firstElementChild;

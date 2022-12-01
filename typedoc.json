@@ -1,4 +1,9 @@
 {
   "includeVersion": true,
-  "out": "./docs"
+  "out": "./docs",
+  "excludePrivate": true,
+  "excludeExternals": true,
+  "visibilityFilters": {
+    "inherited": true
+  }
 }

@@ -13,15 +13,15 @@ export * from './Text';
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node on MDN}
  */
 export declare abstract class Node {
-  static ELEMENT_NODE: number;
-  static ATTRIBUTE_NODE: number;
-  static TEXT_NODE: number;
-  static CDATA_SECTION_NODE: number;
-  static PROCESSING_INSTRUCTION_NODE: number;
-  static COMMENT_NODE: number;
-  static DOCUMENT_NODE: number;
-  static DOCUMENT_TYPE_NODE: number;
-  static DOCUMENT_FRAGMENT_NODE: number;
+  static readonly ELEMENT_NODE: number;
+  static readonly ATTRIBUTE_NODE: number;
+  static readonly TEXT_NODE: number;
+  static readonly CDATA_SECTION_NODE: number;
+  static readonly PROCESSING_INSTRUCTION_NODE: number;
+  static readonly COMMENT_NODE: number;
+  static readonly DOCUMENT_NODE: number;
+  static readonly DOCUMENT_TYPE_NODE: number;
+  static readonly DOCUMENT_FRAGMENT_NODE: number;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType on MDN}
@@ -135,12 +135,24 @@ export interface ChildNode extends Node {
    */
   readonly previousElementSibling: Element | null;
 
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/after Element.after on MDN}
+   */
   after(...nodes: Array<Node | string>): this;
 
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/before Element.before on MDN}
+   */
   before(...nodes: Array<Node | string>): this;
 
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/remove Element.remove on MDN}
+   */
   remove(): this;
 
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith Element.replaceWith on MDN}
+   */
   replaceWith(...nodes: Array<Node | string>): this;
 }
 
@@ -181,12 +193,10 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: Array<Node | string>): this;
 }
 
-export interface Element extends ChildNode, ParentNode {}
-
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element on MDN}
  */
-export declare class Element extends Node {
+export declare class Element extends Node implements ChildNode, ParentNode {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName Element.tagName on MDN}
    */
@@ -226,14 +236,38 @@ export declare class Element extends Node {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames Element.getAttributeNames on MDN}
    */
   getAttributeNames(): string[];
-}
 
-export interface CharacterData extends ChildNode {}
+  // Inherited from ChildNode
+
+  readonly nextElementSibling: Element | null;
+  readonly previousElementSibling: Element | null;
+
+  after(...nodes: Array<Node | string>): this;
+
+  before(...nodes: Array<Node | string>): this;
+
+  remove(): this;
+
+  replaceWith(...nodes: Array<Node | string>): this;
+
+  // Inherited from ParentNode
+
+  readonly children: readonly Node[];
+  readonly childElementCount: number;
+  readonly firstElementChild: Element | null;
+  readonly lastElementChild: Element | null;
+
+  append(...nodes: Array<Node | string>): this;
+
+  prepend(...nodes: Array<Node | string>): this;
+
+  replaceChildren(...nodes: Array<Node | string>): this;
+}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData CharacterData on MDN}
  */
-export declare abstract class CharacterData extends Node {
+export declare abstract class CharacterData extends Node implements ChildNode {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/length CharacterData.length on MDN}
    */
@@ -268,6 +302,19 @@ export declare abstract class CharacterData extends Node {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData CharacterData.substringData on MDN}
    */
   substringData(offset: number, count: number): string;
+
+  // Inherited from ChildNode
+
+  readonly nextElementSibling: Element | null;
+  readonly previousElementSibling: Element | null;
+
+  after(...nodes: Array<Node | string>): this;
+
+  before(...nodes: Array<Node | string>): this;
+
+  remove(): this;
+
+  replaceWith(...nodes: Array<Node | string>): this;
 }
 
 /**
@@ -322,12 +369,10 @@ export declare class CDATASection extends Text {
   constructor(data?: string);
 }
 
-export interface DocumentType extends ChildNode {}
-
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType on MDN}
  */
-export declare class DocumentType extends Node {
+export declare class DocumentType extends Node implements ChildNode {
   readonly name: string;
   readonly publicId: string;
   readonly systemId: string;
@@ -336,21 +381,43 @@ export declare class DocumentType extends Node {
    * Creates a new instance of {@link DocumentType}.
    */
   constructor(name: string, publicId?: string, systemId?: string);
-}
 
-export interface DocumentFragment extends ParentNode {}
+  // Inherited from ChildNode
+
+  readonly nextElementSibling: Element | null;
+  readonly previousElementSibling: Element | null;
+
+  after(...nodes: Array<Node | string>): this;
+
+  before(...nodes: Array<Node | string>): this;
+
+  remove(): this;
+
+  replaceWith(...nodes: Array<Node | string>): this;
+}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment DocumentFragment on MDN}
  */
-export declare class DocumentFragment extends Node {}
+export declare class DocumentFragment extends Node implements ParentNode {
+  // Inherited from ParentNode
 
-export interface Document extends ParentNode {}
+  readonly children: readonly Node[];
+  readonly childElementCount: number;
+  readonly firstElementChild: Element | null;
+  readonly lastElementChild: Element | null;
+
+  append(...nodes: Array<Node | string>): this;
+
+  prepend(...nodes: Array<Node | string>): this;
+
+  replaceChildren(...nodes: Array<Node | string>): this;
+}
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Document Document on MDN}
  */
-export declare class Document extends Node {
+export declare class Document extends Node implements ParentNode {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype Document.doctype on MDN}
    */
@@ -360,4 +427,17 @@ export declare class Document extends Node {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement Document.documentElement on MDN}
    */
   readonly documentElement: Element | null;
+
+  // Inherited from ParentNode
+
+  readonly children: readonly Node[];
+  readonly childElementCount: number;
+  readonly firstElementChild: Element | null;
+  readonly lastElementChild: Element | null;
+
+  append(...nodes: Array<Node | string>): this;
+
+  prepend(...nodes: Array<Node | string>): this;
+
+  replaceChildren(...nodes: Array<Node | string>): this;
 }

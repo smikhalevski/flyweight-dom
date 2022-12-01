@@ -42,15 +42,15 @@ export interface Node {
 
 // abstract
 export class Node {
-  static ELEMENT_NODE: number = NodeType.ELEMENT_NODE;
-  static ATTRIBUTE_NODE: number = NodeType.ATTRIBUTE_NODE;
-  static TEXT_NODE: number = NodeType.TEXT_NODE;
-  static CDATA_SECTION_NODE: number = NodeType.CDATA_SECTION_NODE;
-  static PROCESSING_INSTRUCTION_NODE: number = NodeType.PROCESSING_INSTRUCTION_NODE;
-  static COMMENT_NODE: number = NodeType.COMMENT_NODE;
-  static DOCUMENT_NODE: number = NodeType.DOCUMENT_NODE;
-  static DOCUMENT_TYPE_NODE: number = NodeType.DOCUMENT_TYPE_NODE;
-  static DOCUMENT_FRAGMENT_NODE: number = NodeType.DOCUMENT_FRAGMENT_NODE;
+  static readonly ELEMENT_NODE: number = NodeType.ELEMENT_NODE;
+  static readonly ATTRIBUTE_NODE: number = NodeType.ATTRIBUTE_NODE;
+  static readonly TEXT_NODE: number = NodeType.TEXT_NODE;
+  static readonly CDATA_SECTION_NODE: number = NodeType.CDATA_SECTION_NODE;
+  static readonly PROCESSING_INSTRUCTION_NODE: number = NodeType.PROCESSING_INSTRUCTION_NODE;
+  static readonly COMMENT_NODE: number = NodeType.COMMENT_NODE;
+  static readonly DOCUMENT_NODE: number = NodeType.DOCUMENT_NODE;
+  static readonly DOCUMENT_TYPE_NODE: number = NodeType.DOCUMENT_TYPE_NODE;
+  static readonly DOCUMENT_FRAGMENT_NODE: number = NodeType.DOCUMENT_FRAGMENT_NODE;
 
   constructor() {
     if (this.constructor === Node) {

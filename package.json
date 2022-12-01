@@ -10,7 +10,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc && rollup --external speedy-entities --input ./lib/index.js --file ./lib/index-cjs.js --format cjs --plugin @rollup/plugin-node-resolve && npm run build:terser && prettier --loglevel warn --write './lib/*.js'",
+    "build": "tsc && rollup --external speedy-entities --input ./lib/index.js --file ./lib/index-cjs.js --format cjs --plugin @rollup/plugin-node-resolve && npm run build:terser && exit 0 && prettier --loglevel warn --write './lib/*.js'",
     "build:terser": "TEMP=$(mktemp) && rm $TEMP && for FILE in $(find ./lib -name '*.js'); do terser --name-cache $TEMP --compress --mangle toplevel --mangle-props reserved=[__esModule],regex=/^__/ --output $FILE -- $FILE; done && rm $TEMP || exit 1",
     "clean": "rimraf ./lib ./docs",
     "test": "jest",

@@ -5,11 +5,15 @@ import { NodeType } from './NodeType';
 import { ChildNode, extendChildNode } from './extendChildNode';
 import { extendParentNode, ParentNode } from './extendParentNode';
 import { uncheckedCloneContents } from './uncheckedCloneContents';
+import { createDOMTokenList, DOMTokenList } from './DOMTokenList';
 
 export interface Element extends Node, ChildNode, ParentNode {
   // readonly
   tagName: string;
   attrs: { [name: string]: string };
+  id: string;
+  className: string;
+  classList: DOMTokenList;
 
   setAttribute(name: string, value: string): this;
 
@@ -36,6 +40,41 @@ prototype.nodeType = NodeType.ELEMENT_NODE;
 extendChildNode(prototype);
 extendNode(prototype);
 extendParentNode(prototype);
+
+Object.defineProperties(prototype, {
+  id: {
+    get(this: Element) {
+      return this.attrs.id || '';
+    },
+    set(this: Element, value) {
+      this.attrs.id = String(value);
+    },
+  },
+
+  className: {
+    get(this: Element) {
+      return this.attrs.className || '';
+    },
+    set(this: Element, value) {
+      this.attrs.className = String(value);
+    },
+  },
+
+  classList: {
+    get(this: Element) {
+      const tokenList = createDOMTokenList({
+        get: () => this.className,
+        set: value => {
+          this.className = value;
+        },
+      });
+
+      Object.defineProperty(this, 'classList', { value: tokenList });
+
+      return tokenList;
+    },
+  },
+});
 
 prototype.setAttribute = function (name, value) {
   this.attrs[name] = value;

@@ -194,6 +194,56 @@ export interface ParentNode extends Node {
 }
 
 /**
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList on MDN}
+ */
+export declare abstract class DOMTokenList {
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length DOMTokenList.length on MDN}
+   */
+  readonly length: number;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value DOMTokenList.value on MDN}
+   */
+  value: string;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add DOMTokenList.add on MDN}
+   */
+  add(...tokens: string[]): void;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/contains DOMTokenList.contains on MDN}
+   */
+  contains(token: string): boolean;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/item DOMTokenList.item on MDN}
+   */
+  item(index: number): string | null;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/remove DOMTokenList.remove on MDN}
+   */
+  remove(...tokens: string[]): void;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace DOMTokenList.replace on MDN}
+   */
+  replace(oldToken: string, newToken: string): boolean;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle DOMTokenList.toggle on MDN}
+   */
+  toggle(token: string, force?: boolean): boolean;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/forEach DOMTokenList.forEach on MDN}
+   */
+  forEach(callback: (value: string, index: number, parent: DOMTokenList) => void, thisArg?: any): void;
+}
+
+/**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element on MDN}
  */
 export declare class Element extends Node implements ChildNode, ParentNode {
@@ -206,6 +256,21 @@ export declare class Element extends Node implements ChildNode, ParentNode {
    * Mapping from the attribute name to its value.
    */
   readonly attrs: { [name: string]: string };
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/id Element.id on MDN}
+   */
+  id: string;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/className Element.className on MDN}
+   */
+  className: string;
+
+  /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/classList Element.classList on MDN}
+   */
+  readonly classList: DOMTokenList;
 
   /**
    * Creates a new instance of {@link Element}.

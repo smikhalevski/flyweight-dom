@@ -1,18 +1,17 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { getNextElementSibling, getPreviousElementSibling } from './utils';
+import { getNextElementSibling, getPreviousElementSibling, isElement } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { NodeType } from './NodeType';
 
 export interface ParentNode extends Node {
   // public readonly
-  children: Node[];
-  childElementCount: number;
-  firstElementChild: Element | null;
-  lastElementChild: Element | null;
+  readonly children: Node[];
+  readonly childElementCount: number;
+  readonly firstElementChild: Element | null;
+  readonly lastElementChild: Element | null;
 
   // private
   _children: Element[] | undefined;
@@ -30,8 +29,10 @@ export function extendParentNode(prototype: ParentNode): void {
       get(this: ParentNode) {
         const nodes: Element[] = (this._children = []);
 
-        for (let child = this.firstElementChild; child != null; child = child.nextElementSibling) {
-          nodes.push(child);
+        for (let child = this.firstChild; child != null; child = child.nextSibling) {
+          if (isElement(child)) {
+            nodes.push(child);
+          }
         }
         Object.defineProperty(this, 'children', { value: nodes });
 
@@ -43,7 +44,7 @@ export function extendParentNode(prototype: ParentNode): void {
         let count = 0;
 
         for (let node = this.firstChild; node !== null; node = node.nextSibling) {
-          if (node.nodeType === NodeType.ELEMENT_NODE) {
+          if (isElement(node)) {
             ++count;
           }
         }

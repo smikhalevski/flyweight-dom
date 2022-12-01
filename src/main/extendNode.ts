@@ -68,9 +68,19 @@ function unboundInsertBefore(
   child: Node | null | undefined,
   message: string
 ): asserts child is ChildNode {
-  if (child != null && child.parentNode !== parent) {
-    die(message);
+  if (child != null) {
+    if (child.parentNode !== parent) {
+      die(message);
+    } else {
+      child = parent.firstChild;
+    }
   }
+
   assertInsertableNode(parent, node);
-  uncheckedRemoveAndInsertBefore(parent, node, child as ChildNode);
+
+  if (child != null) {
+    uncheckedRemoveAndInsertBefore(parent, node, child as ChildNode);
+  } else {
+    uncheckedRemoveAndAppendChild(parent, node);
+  }
 }

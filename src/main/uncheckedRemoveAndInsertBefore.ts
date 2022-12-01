@@ -31,5 +31,9 @@ export function uncheckedRemoveAndInsertBefore(
   if (node.parentNode != null) {
     uncheckedRemoveChild(node.parentNode, node);
   }
-  uncheckedInsertBefore(parent, node, child);
+  if (child != null) {
+    uncheckedInsertBefore(parent, node, child);
+  } else {
+    uncheckedAppendChild(parent, node);
+  }
 }

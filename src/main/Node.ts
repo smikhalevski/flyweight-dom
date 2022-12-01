@@ -10,7 +10,7 @@ export interface Node {
   nodeName: string;
   childNodes: readonly ChildNode[];
   parentNode: ParentNode | null;
-  parentElement: Element | null;
+  readonly parentElement: Element | null;
   previousSibling: ChildNode | null;
   nextSibling: ChildNode | null;
   firstChild: ChildNode | null;

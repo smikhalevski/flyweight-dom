@@ -12,6 +12,7 @@ export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: Insertab
     }
     return;
   }
+
   const { parentNode } = node;
 
   if (parentNode != null) {

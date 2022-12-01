@@ -8,8 +8,8 @@ import { getNextElementSibling, getPreviousElementSibling } from './utils';
 
 export interface ChildNode extends Node {
   // public readonly
-  previousElementSibling: Element | null;
-  nextElementSibling: Element | null;
+  readonly previousElementSibling: Element | null;
+  readonly nextElementSibling: Element | null;
 
   after(...nodes: Array<Node | string>): this;
 

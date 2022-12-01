@@ -1,8 +1,15 @@
 import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
+import { isElement } from './utils';
 
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
-  const { lastChild } = parent;
+  const { _childNodes, _children, lastChild } = parent;
+
+  _childNodes?.push(node);
+
+  if (isElement(node)) {
+    _children?.push(node);
+  }
 
   node.parentNode = parent;
   parent.lastChild = node;

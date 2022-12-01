@@ -1,11 +1,11 @@
-import { DocumentFragment } from './DocumentFragment';
-import { ChildNode } from './extendChildNode';
 import { Node } from './Node';
 import { ParentNode } from './extendParentNode';
+import { Text } from './Text';
+import { DocumentFragment } from './DocumentFragment';
+import { ChildNode } from './extendChildNode';
 import { NodeType } from './NodeType';
 import { die } from './utils';
 import { uncheckedContains } from './uncheckedContains';
-import { Text } from './Text';
 
 export type InsertableNode = DocumentFragment | ChildNode;
 

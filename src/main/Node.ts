@@ -1,5 +1,5 @@
 import { Element } from './Element';
-import { defineProperty, die } from './utils';
+import { die } from './utils';
 import { ChildNode } from './extendChildNode';
 import { ParentNode } from './extendParentNode';
 import { NodeType } from './NodeType';
@@ -43,7 +43,9 @@ export interface Node {
 // abstract
 export class Node {
   constructor() {
-    die('Illegal constructor');
+    if (this.constructor === Node) {
+      die('Illegal constructor');
+    }
   }
 }
 
@@ -60,27 +62,28 @@ prototype.parentNode =
   prototype.textContent =
     null;
 
-defineProperty(prototype, 'parentElement', {
-  get() {
-    let parent = this.parentNode;
+Object.defineProperties(prototype, {
+  childNodes: {
+    get(this: Node) {
+      const nodes: ChildNode[] = (this._childNodes = []);
 
-    while (parent !== null && parent.nodeType !== NodeType.ELEMENT_NODE) {
-      parent = parent.parentNode;
-    }
-    return parent as Element | null;
+      for (let child = this.firstChild; child != null; child = child.nextSibling) {
+        nodes.push(child);
+      }
+      Object.defineProperty(this, 'childNodes', { value: nodes });
+
+      return nodes;
+    },
   },
-});
+  parentElement: {
+    get(this: Node) {
+      let parent = this.parentNode;
 
-defineProperty(prototype, 'childNodes', {
-  get() {
-    const nodes: ChildNode[] = (this._childNodes = []);
-
-    for (let child = this.firstChild; child != null; child = child.nextSibling) {
-      nodes.push(child);
-    }
-    defineProperty(this, 'childNodes', { value: nodes });
-
-    return nodes;
+      while (parent !== null && parent.nodeType !== NodeType.ELEMENT_NODE) {
+        parent = parent.parentNode;
+      }
+      return parent as Element | null;
+    },
   },
 });
 

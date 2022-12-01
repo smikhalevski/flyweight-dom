@@ -343,6 +343,11 @@ export interface Document extends ParentNode {}
  */
 export declare class Document extends Node {
   /**
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype Document.doctype on MDN}
+   */
+  readonly doctype: DocumentType | null;
+
+  /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement Document.documentElement on MDN}
    */
   readonly documentElement: Element | null;

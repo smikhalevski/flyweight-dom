@@ -1,6 +1,6 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { defineProperty, getNextElementSibling, getPreviousElementSibling, PropertyDescriptor } from './utils';
+import { getNextElementSibling, getPreviousElementSibling } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
@@ -25,53 +25,47 @@ export interface ParentNode extends Node {
 }
 
 export function extendParentNode(prototype: ParentNode): void {
-  defineProperty(prototype, 'children', childrenDescriptor);
-  defineProperty(prototype, 'firstElementChild', firstElementChildDescriptor);
-  defineProperty(prototype, 'lastElementChild', lastElementChildDescriptor);
-  defineProperty(prototype, 'childElementCount', childElementCountDescriptor);
+  Object.defineProperties(prototype, {
+    children: {
+      get(this: ParentNode) {
+        const nodes: Element[] = (this._children = []);
+
+        for (let child = this.firstElementChild; child != null; child = child.nextElementSibling) {
+          nodes.push(child);
+        }
+        Object.defineProperty(this, 'children', { value: nodes });
+
+        return nodes;
+      },
+    },
+    childElementCount: {
+      get(this: ParentNode) {
+        let count = 0;
+
+        for (let node = this.firstChild; node !== null; node = node.nextSibling) {
+          if (node.nodeType === NodeType.ELEMENT_NODE) {
+            ++count;
+          }
+        }
+        return count;
+      },
+    },
+    firstElementChild: {
+      get(this: ParentNode) {
+        return getNextElementSibling(this.firstChild);
+      },
+    },
+    lastElementChild: {
+      get(this: ParentNode) {
+        return getPreviousElementSibling(this.lastChild);
+      },
+    },
+  });
 
   prototype.append = append;
   prototype.prepend = prepend;
   prototype.replaceChildren = replaceChildren;
 }
-
-const childrenDescriptor: PropertyDescriptor<ParentNode, Element[]> = {
-  get() {
-    const nodes: Element[] = (this._children = []);
-
-    for (let child = this.firstElementChild; child != null; child = child.nextElementSibling) {
-      nodes.push(child);
-    }
-    defineProperty(this, 'children', { value: nodes });
-
-    return nodes;
-  },
-};
-
-const firstElementChildDescriptor: PropertyDescriptor<ParentNode, Element | null> = {
-  get() {
-    return getNextElementSibling(this.firstChild);
-  },
-};
-
-const lastElementChildDescriptor: PropertyDescriptor<ParentNode, Element | null> = {
-  get() {
-    return getPreviousElementSibling(this.lastChild);
-  },
-};
-
-const childElementCountDescriptor: PropertyDescriptor<ParentNode, number> = {
-  get() {
-    let count = 0;
-
-    for (let node = this.firstChild; node !== null; node = node.previousSibling) {
-      if (node.nodeType === NodeType.ELEMENT_NODE) {
-        ++count;
-      }
-    }
-    return count;
-  },
-};
 
 function append(this: ParentNode /*, ...nodes: Array<Node | string>*/) {
   const nodesLength = arguments.length;

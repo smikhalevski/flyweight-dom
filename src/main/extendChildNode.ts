@@ -4,7 +4,7 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { defineProperty, getNextElementSibling, getPreviousElementSibling, PropertyDescriptor } from './utils';
+import { getNextElementSibling, getPreviousElementSibling } from './utils';
 
 export interface ChildNode extends Node {
   // public readonly
@@ -21,26 +21,24 @@ export interface ChildNode extends Node {
 }
 
 export function extendChildNode(prototype: ChildNode): void {
-  defineProperty(prototype, 'previousElementSibling', previousElementSiblingDescriptor);
-  defineProperty(prototype, 'nextElementSibling', nextElementSiblingDescriptor);
+  Object.defineProperties(prototype, {
+    previousElementSibling: {
+      get(this: ChildNode) {
+        return getPreviousElementSibling(this.previousSibling);
+      },
+    },
+    nextElementSibling: {
+      get(this: ChildNode) {
+        return getNextElementSibling(this.nextSibling);
+      },
+    },
+  });
 
   prototype.after = after;
   prototype.before = before;
   prototype.remove = remove;
   prototype.replaceWith = replaceWith;
 }
-
-const nextElementSiblingDescriptor: PropertyDescriptor<ChildNode, Element | null> = {
-  get() {
-    return getNextElementSibling(this.nextSibling);
-  },
-};
-
-const previousElementSiblingDescriptor: PropertyDescriptor<ChildNode, Element | null> = {
-  get() {
-    return getPreviousElementSibling(this.previousSibling);
-  },
-};
 
 function after(this: ChildNode /*, ...nodes: Array<Node | string>*/) {
   const nodesLength = arguments.length;

@@ -1,20 +1,20 @@
 import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 
-export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): void {
-  const { firstChild } = origin;
+export function uncheckedCloneContents(sourceParent: ParentNode, targetParent: ParentNode): void {
+  const { firstChild } = sourceParent;
 
   if (firstChild == null) {
     // The parent has no children
     return;
   }
 
-  let { lastChild } = parent;
+  let { lastChild } = targetParent;
 
   for (let child: ChildNode | null = firstChild; child != null; child = child.nextSibling) {
     const node = child.cloneNode(true);
 
-    node.parentNode = parent;
+    node.parentNode = targetParent;
     node.previousSibling = lastChild;
 
     if (lastChild != null) {
@@ -23,5 +23,5 @@ export function uncheckedCloneContents(origin: ParentNode, parent: ParentNode): 
     lastChild = node;
   }
 
-  parent.lastChild = lastChild;
+  targetParent.lastChild = lastChild;
 }

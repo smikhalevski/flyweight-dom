@@ -1,4 +1,4 @@
-import { Constructor, defineProperty, die, extendClass, PropertyDescriptor } from './utils';
+import { Constructor, die, extendClass } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './extendChildNode';
 
@@ -21,7 +21,9 @@ export interface CharacterData extends Node, ChildNode {
 // abstract
 export class CharacterData {
   constructor() {
-    die('Illegal constructor');
+    if (this.constructor === CharacterData) {
+      die('Illegal constructor');
+    }
   }
 }
 
@@ -29,7 +31,7 @@ const prototype = extendClass(CharacterData, Node);
 
 extendChildNode(prototype);
 
-const dataDescriptor: PropertyDescriptor<CharacterData, string | null> = {
+const dataDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
   get() {
     return this.data;
   },
@@ -38,15 +40,15 @@ const dataDescriptor: PropertyDescriptor<CharacterData, string | null> = {
   },
 };
 
-defineProperty(prototype, 'length', {
-  get() {
-    return this.data.length;
+Object.defineProperties(prototype, {
+  length: {
+    get(this: CharacterData) {
+      return this.data.length;
+    },
   },
+  nodeValue: dataDescriptor,
+  textContent: dataDescriptor,
 });
-
-defineProperty(prototype, 'nodeValue', dataDescriptor);
-
-defineProperty(prototype, 'textContent', dataDescriptor);
 
 prototype.appendData = function (data) {
   this.data += data;

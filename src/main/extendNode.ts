@@ -3,10 +3,10 @@ import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 import { die } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
-import { assertInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedContains } from './uncheckedContains';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
+import { assertInsertableNode } from './uncheckedToInsertableNode';
 
 export function extendNode(prototype: Node): void {
   prototype.hasChildNodes = hasChildNodes;

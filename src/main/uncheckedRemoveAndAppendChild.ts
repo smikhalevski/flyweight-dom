@@ -1,8 +1,8 @@
 import { ParentNode } from './extendParentNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
-import { InsertableNode } from './uncheckedToInsertableNode';
 import { isDocumentFragment } from './utils';
+import { InsertableNode } from './uncheckedToInsertableNode';
 
 export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {
   if (isDocumentFragment(node)) {

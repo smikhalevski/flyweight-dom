@@ -2,10 +2,11 @@ import { Node } from './Node';
 import { extendParentNode, ParentNode } from './extendParentNode';
 import { NodeType } from './NodeType';
 import { Element } from './Element';
-import { defineProperty, extendClass } from './utils';
+import { extendClass } from './utils';
 import { uncheckedCloneContents } from './uncheckedCloneContents';
 
 export interface Document extends Node, ParentNode {
+  readonly doctype: DocumentType | null;
   readonly documentElement: Element | null;
 }
 
@@ -18,9 +19,21 @@ prototype.nodeName = '#document';
 
 extendParentNode(prototype);
 
-defineProperty(prototype, 'documentElement', {
-  get() {
-    return this.firstElementChild;
+Object.defineProperties(prototype, {
+  doctype: {
+    get(this: Document) {
+      let node = this.firstChild;
+
+      while (node !== null && node.nodeType !== NodeType.DOCUMENT_TYPE_NODE) {
+        node = node.nextSibling;
+      }
+      return node;
+    },
+  },
+  documentElement: {
+    get(this: Document) {
+      return this.firstElementChild;
+    },
   },
 });
 

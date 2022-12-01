@@ -1,5 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { Constructor, defineProperty, extendClass } from './utils';
+import { Constructor, extendClass } from './utils';
 import { NodeType } from './NodeType';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
@@ -21,8 +21,8 @@ const prototype = extendClass(Text, CharacterData);
 prototype.nodeType = NodeType.TEXT_NODE;
 prototype.nodeName = '#text';
 
-defineProperty(prototype, 'wholeText', {
-  get() {
+Object.defineProperty(prototype, 'wholeText', {
+  get(this: Text) {
     const { nodeType } = this;
 
     let text = this;

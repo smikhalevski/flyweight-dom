@@ -1,4 +1,4 @@
-import { CharacterData, Node, NodeType, ProcessingInstruction } from '../main';
+import { CharacterData, Node, ProcessingInstruction } from '../main';
 
 describe('ProcessingInstruction', () => {
   test('creates a new ProcessingInstruction instance', () => {
@@ -7,7 +7,7 @@ describe('ProcessingInstruction', () => {
     expect(node).toBeInstanceOf(Node);
     expect(node).toBeInstanceOf(CharacterData);
     expect(node).toBeInstanceOf(ProcessingInstruction);
-    expect(node.nodeType).toBe(NodeType.PROCESSING_INSTRUCTION_NODE);
+    expect(node.nodeType).toBe(Node.PROCESSING_INSTRUCTION_NODE);
     expect(node.nodeName).toBe('xml');
     expect(node.length).toBe(0);
     expect(node.data).toBe('');

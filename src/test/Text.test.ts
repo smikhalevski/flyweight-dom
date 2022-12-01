@@ -1,4 +1,4 @@
-import { CharacterData, Node, NodeType, Text } from '../main';
+import { CharacterData, Node, Text } from '../main';
 
 describe('Text', () => {
   test('creates a new Text instance', () => {
@@ -7,7 +7,7 @@ describe('Text', () => {
     expect(node).toBeInstanceOf(Node);
     expect(node).toBeInstanceOf(CharacterData);
     expect(node).toBeInstanceOf(Text);
-    expect(node.nodeType).toBe(NodeType.TEXT_NODE);
+    expect(node.nodeType).toBe(Node.TEXT_NODE);
     expect(node.nodeName).toBe('#text');
     expect(node.length).toBe(0);
     expect(node.data).toBe('');

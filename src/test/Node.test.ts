@@ -2,8 +2,14 @@ import { Node } from '../main/Node';
 import { Text } from '../main/Text';
 
 describe('Node', () => {
-  test('creates a new Node instance', () => {
-    const node = new Node();
+  class MockNode extends Node {}
+
+  test('cannot be instantiated directly', () => {
+    expect(() => new Node()).toThrow(new Error('Illegal constructor'));
+  });
+
+  test('creates a new MockNode instance', () => {
+    const node = new MockNode();
 
     expect(node).toBeInstanceOf(Node);
     expect(node.childNodes).toEqual([]);
@@ -18,19 +24,19 @@ describe('Node', () => {
   });
 
   test('populates childNodes', () => {
-    const node = new Node();
+    const node = new MockNode();
 
     expect(node.childNodes).toEqual([]);
   });
 
   test('hasChildNodes return false', () => {
-    const node = new Node();
+    const node = new MockNode();
 
     expect(node.hasChildNodes()).toBe(false);
   });
 
   test('child mutation methods throw', () => {
-    const node = new Node();
+    const node = new MockNode();
 
     const text = new Text();
 
@@ -41,7 +47,7 @@ describe('Node', () => {
   });
 
   test('cloneNode throws', () => {
-    const node = new Node();
+    const node = new MockNode();
 
     expect(() => node.cloneNode()).toThrow(new Error('Abstract method'));
   });

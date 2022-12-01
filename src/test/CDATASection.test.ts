@@ -1,4 +1,4 @@
-import { CDATASection, CharacterData, Node, NodeType, Text } from '../main';
+import { CDATASection, CharacterData, Node, Text } from '../main';
 
 describe('CDATASection', () => {
   test('creates a new CDATASection instance', () => {
@@ -8,7 +8,7 @@ describe('CDATASection', () => {
     expect(node).toBeInstanceOf(CharacterData);
     expect(node).toBeInstanceOf(Text);
     expect(node).toBeInstanceOf(CDATASection);
-    expect(node.nodeType).toBe(NodeType.CDATA_SECTION_NODE);
+    expect(node.nodeType).toBe(Node.CDATA_SECTION_NODE);
     expect(node.nodeName).toBe('#cdata-section');
     expect(node.length).toBe(0);
     expect(node.data).toBe('');

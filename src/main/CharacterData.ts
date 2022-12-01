@@ -1,4 +1,4 @@
-import { Constructor, defineProperty, extendClass, PropertyDescriptor } from './utils';
+import { Constructor, defineProperty, die, extendClass, PropertyDescriptor } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './extendChildNode';
 
@@ -18,7 +18,12 @@ export interface CharacterData extends Node, ChildNode {
   substringData(offset: number, count: number): string;
 }
 
-export class CharacterData {}
+// abstract
+export class CharacterData {
+  constructor() {
+    die('Illegal constructor');
+  }
+}
 
 const prototype = extendClass(CharacterData, Node);
 

@@ -23,7 +23,7 @@ export interface Element extends Node, ChildNode, ParentNode {
 }
 
 export class Element {
-  constructor(tagName: string, attrs?: any) {
+  constructor(tagName: string, attrs: { [name: string]: string } = {}) {
     this.nodeName = this.tagName = tagName;
     this.attrs = attrs;
   }

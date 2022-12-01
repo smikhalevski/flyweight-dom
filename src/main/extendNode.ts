@@ -3,7 +3,7 @@ import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 import { die } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
-import { assertInsertableNode } from './coerceInsertableNodes';
+import { assertInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedContains } from './uncheckedContains';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
@@ -55,6 +55,7 @@ function removeChild<T extends Node>(this: Node, child: T): T {
 
 function replaceChild<T extends Node>(this: ParentNode, node: Node, child: T): T {
   unboundInsertBefore(this, node, child, 'The node to be replaced is not a child of this node');
+
   if (child.parentNode != null) {
     uncheckedRemoveChild(child.parentNode, child);
   }

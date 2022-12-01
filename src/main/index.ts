@@ -139,7 +139,7 @@ export interface ParentNode extends Node {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children on MDN}
    */
-  readonly children: Node[];
+  readonly children: readonly Node[];
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount Element.childElementCount on MDN}
@@ -191,7 +191,7 @@ export declare class Element extends Node {
   /**
    * Creates a new instance of {@link Element}.
    */
-  constructor(tagName: string, attrs?: { [name: string]: string } | null);
+  constructor(tagName: string, attrs?: { [name: string]: string });
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute on MDN}

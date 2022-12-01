@@ -10,7 +10,7 @@ export interface Node {
   nodeName: string;
   childNodes: readonly ChildNode[];
   parentNode: ParentNode | null;
-  readonly parentElement: Element | null;
+  parentElement: Element | null;
   previousSibling: ChildNode | null;
   nextSibling: ChildNode | null;
   firstChild: ChildNode | null;
@@ -41,7 +41,11 @@ export interface Node {
 }
 
 // abstract
-export class Node {}
+export class Node {
+  constructor() {
+    die('Illegal constructor');
+  }
+}
 
 const prototype = Node.prototype;
 

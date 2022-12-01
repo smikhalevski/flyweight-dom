@@ -20,17 +20,12 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   }
 }
 
-export function coerceInsertableNodes(
-  parent: ParentNode,
-  nodes: Array<Node | string>
-): asserts nodes is InsertableNode[] {
-  for (let i = 0; i < nodes.length; ++i) {
-    const node = nodes[i];
-
-    if (typeof node !== 'string') {
-      assertInsertableNode(parent, node);
-    } else {
-      nodes[i] = new Text(node);
-    }
+export function assertInsertable(parent: ParentNode, node: Node | string): asserts node is InsertableNode | string {
+  if (typeof node !== 'string') {
+    assertInsertableNode(parent, node);
   }
+}
+
+export function uncheckedToInsertableNode(parent: ParentNode, node: Node | string): InsertableNode {
+  return typeof node === 'string' ? new Text(node) : (node as InsertableNode);
 }

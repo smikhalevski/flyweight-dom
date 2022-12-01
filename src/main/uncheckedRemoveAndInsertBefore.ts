@@ -3,7 +3,7 @@ import { ChildNode } from './extendChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
-import { InsertableNode } from './coerceInsertableNodes';
+import { InsertableNode } from './uncheckedToInsertableNode';
 import { isDocumentFragment } from './utils';
 
 export function uncheckedRemoveAndInsertBefore(

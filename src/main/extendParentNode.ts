@@ -3,15 +3,16 @@ import { Element } from './Element';
 import { defineProperty, getNextElementSibling, getPreviousElementSibling, PropertyDescriptor } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
-import { coerceInsertableNodes } from './coerceInsertableNodes';
+import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { NodeType } from './NodeType';
 
 export interface ParentNode extends Node {
-  readonly children: Node[];
-  readonly childElementCount: number;
-  readonly firstElementChild: Element | null;
-  readonly lastElementChild: Element | null;
+  // public readonly
+  children: Node[];
+  childElementCount: number;
+  firstElementChild: Element | null;
+  lastElementChild: Element | null;
 
   // private
   _children: Element[] | undefined;
@@ -62,6 +63,7 @@ const lastElementChildDescriptor: PropertyDescriptor<ParentNode, Element | null>
 const childElementCountDescriptor: PropertyDescriptor<ParentNode, number> = {
   get() {
     let count = 0;
+
     for (let node = this.firstChild; node !== null; node = node.previousSibling) {
       if (node.nodeType === NodeType.ELEMENT_NODE) {
         ++count;
@@ -71,40 +73,51 @@ const childElementCountDescriptor: PropertyDescriptor<ParentNode, number> = {
   },
 };
 
-function append(this: ParentNode, ...nodes: Array<Node | string>) {
-  coerceInsertableNodes(this, nodes);
+function append(this: ParentNode /*, ...nodes: Array<Node | string>*/) {
+  const nodesLength = arguments.length;
 
-  for (const node of nodes) {
-    uncheckedRemoveAndAppendChild(this, node);
+  for (let i = 0; i < nodesLength; ++i) {
+    assertInsertable(this, arguments[i]);
+  }
+  for (let i = 0; i < nodesLength; ++i) {
+    uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(this, arguments[i]));
   }
   return this;
 }
 
-function prepend(this: ParentNode, ...nodes: Array<Node | string>) {
+function prepend(this: ParentNode /*, ...nodes: Array<Node | string>*/) {
+  const nodesLength = arguments.length;
+
   const { firstChild } = this;
 
-  coerceInsertableNodes(this, nodes);
+  for (let i = 0; i < nodesLength; ++i) {
+    assertInsertable(this, arguments[i]);
+  }
 
   if (firstChild != null) {
-    for (const node of nodes) {
-      uncheckedRemoveAndInsertBefore(this, node, firstChild);
+    for (let i = 0; i < nodesLength; ++i) {
+      uncheckedRemoveAndInsertBefore(this, uncheckedToInsertableNode(this, arguments[i]), firstChild);
     }
   } else {
-    for (const node of nodes) {
-      uncheckedRemoveAndAppendChild(this, node);
+    for (let i = 0; i < nodesLength; ++i) {
+      uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(this, arguments[i]));
     }
   }
   return this;
 }
 
-function replaceChildren(this: ParentNode, ...nodes: Array<Node | string>) {
-  coerceInsertableNodes(this, nodes);
+function replaceChildren(this: ParentNode /*, ...nodes: Array<Node | string>*/) {
+  const nodesLength = arguments.length;
+
+  for (let i = 0; i < nodesLength; ++i) {
+    assertInsertable(this, arguments[i]);
+  }
 
   while (this.firstChild != null) {
     uncheckedRemoveChild(this, this.firstChild);
   }
-  for (const node of nodes) {
-    uncheckedRemoveAndAppendChild(this, node);
+  for (let i = 0; i < nodesLength; ++i) {
+    uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(this, arguments[i]));
   }
   return this;
 }

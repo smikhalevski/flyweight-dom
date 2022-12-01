@@ -6,7 +6,6 @@ export * from './DocumentFragment';
 export * from './DocumentType';
 export * from './Element';
 export * from './Node';
-export * from './NodeType';
 export * from './ProcessingInstruction';
 export * from './Text';
 
@@ -14,6 +13,16 @@ export * from './Text';
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node on MDN}
  */
 export declare abstract class Node {
+  static ELEMENT_NODE: number;
+  static ATTRIBUTE_NODE: number;
+  static TEXT_NODE: number;
+  static CDATA_SECTION_NODE: number;
+  static PROCESSING_INSTRUCTION_NODE: number;
+  static COMMENT_NODE: number;
+  static DOCUMENT_NODE: number;
+  static DOCUMENT_TYPE_NODE: number;
+  static DOCUMENT_FRAGMENT_NODE: number;
+
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType on MDN}
    */

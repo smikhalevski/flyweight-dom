@@ -1,13 +1,15 @@
 import { Node } from './Node';
 
-export function uncheckedContains(parent: Node, node: Node | null | undefined): boolean {
+export function uncheckedContains(parent: Node, node: Node): boolean {
   if (parent.firstChild != null) {
-    while (node != null) {
-      if (parent === node) {
+    let ancestor: Node | null = node;
+
+    while (ancestor != null) {
+      if (parent === ancestor) {
         return true;
       }
-      node = node.parentNode;
+      ancestor = ancestor.parentNode;
     }
   }
-  return false;
+  return parent === node;
 }

@@ -2,38 +2,35 @@ import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
-import { uncheckedAppendChild } from './uncheckedAppendChild';
 import { isDocumentFragment } from './utils';
 import { InsertableNode } from './uncheckedToInsertableNode';
 
-export function uncheckedRemoveAndInsertBefore(
-  parent: ParentNode,
-  node: InsertableNode,
-  child: ChildNode | null | undefined
-): void {
+export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {
   if (isDocumentFragment(node)) {
-    child ||= parent.firstChild;
+    const { _childNodes, _children } = node;
 
-    if (child != null) {
-      for (let nodeChild = node.firstChild; nodeChild != null; nodeChild = nodeChild.nextSibling) {
-        uncheckedRemoveChild(node, nodeChild);
-        uncheckedInsertBefore(parent, nodeChild, child);
-      }
-    } else {
-      for (let nodeChild = node.firstChild; nodeChild != null; nodeChild = nodeChild.nextSibling) {
-        uncheckedRemoveChild(node, nodeChild);
-        uncheckedAppendChild(parent, nodeChild);
-      }
+    let nodeChild = node.firstChild;
+
+    while (nodeChild != null) {
+      const { nextSibling } = nodeChild;
+      uncheckedInsertBefore(parent, nodeChild, child);
+      nodeChild = nextSibling;
     }
+
+    if (_childNodes != null) {
+      _childNodes.length = 0;
+    }
+    if (_children != null) {
+      _children.length = 0;
+    }
+    node.firstChild = node.lastChild = null;
     return;
   }
 
-  if (node.parentNode != null) {
-    uncheckedRemoveChild(node.parentNode, node);
+  const { parentNode } = node;
+
+  if (parentNode != null) {
+    uncheckedRemoveChild(parentNode, node);
   }
-  if (child != null) {
-    uncheckedInsertBefore(parent, node, child);
-  } else {
-    uncheckedAppendChild(parent, node);
-  }
+  uncheckedInsertBefore(parent, node, child);
 }

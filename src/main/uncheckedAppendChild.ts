@@ -14,7 +14,7 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
   node.parentNode = parent;
   parent.lastChild = node;
 
-  if (lastChild !== null) {
+  if (lastChild != null) {
     lastChild.nextSibling = node;
     node.previousSibling = lastChild;
   } else {

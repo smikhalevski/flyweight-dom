@@ -79,7 +79,7 @@ Object.defineProperties(prototype, {
     get(this: Node) {
       let parent = this.parentNode;
 
-      while (parent !== null && parent.nodeType !== NodeType.ELEMENT_NODE) {
+      while (parent != null && parent.nodeType !== NodeType.ELEMENT_NODE) {
         parent = parent.parentNode;
       }
       return parent as Element | null;

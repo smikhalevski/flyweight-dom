@@ -5,6 +5,7 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
+import { NodeType } from './NodeType';
 
 export interface ParentNode extends Node {
   // public readonly
@@ -43,8 +44,8 @@ export function extendParentNode(prototype: ParentNode): void {
       get(this: ParentNode) {
         let count = 0;
 
-        for (let node = this.firstChild; node !== null; node = node.nextSibling) {
-          if (isElement(node)) {
+        for (let node = this.firstChild; node != null; node = node.nextSibling) {
+          if (node.nodeType === NodeType.ELEMENT_NODE) {
             ++count;
           }
         }

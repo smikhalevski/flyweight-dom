@@ -22,7 +22,7 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
     _childNodes?.unshift(node);
   }
 
-  if (_children !== undefined && isElement(node)) {
+  if (_children != null && isElement(node)) {
     const childElement = isElement(child) ? child : child.nextElementSibling;
 
     if (childElement != null) {

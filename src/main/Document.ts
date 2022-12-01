@@ -24,7 +24,7 @@ Object.defineProperties(prototype, {
     get(this: Document) {
       let node = this.firstChild;
 
-      while (node !== null && node.nodeType !== NodeType.DOCUMENT_TYPE_NODE) {
+      while (node != null && node.nodeType !== NodeType.DOCUMENT_TYPE_NODE) {
         node = node.nextSibling;
       }
       return node;

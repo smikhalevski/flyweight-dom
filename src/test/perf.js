@@ -58,3 +58,25 @@ describe(
   },
   { targetRme: 0.001, warmupIterationCount: 5 }
 );
+
+describe(
+  'Element.classList.add',
+  () => {
+    beforeBatch(() => {
+      gc();
+    });
+
+    test('lib', measure => {
+      let element;
+
+      beforeIteration(() => {
+        element = new lib.Element('div');
+      });
+
+      measure(() => {
+        element.classList.add('aaa', 'bbb');
+      });
+    });
+  },
+  { targetRme: 0.001, warmupIterationCount: 5 }
+);

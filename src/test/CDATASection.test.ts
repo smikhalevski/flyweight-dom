@@ -37,4 +37,11 @@ describe('CDATASection', () => {
     expect(node2).toBeInstanceOf(CDATASection);
     expect(node2.data).toBe('bbb');
   });
+
+  test('clones a CDATASection instance', () => {
+    const node = new CDATASection('aaa').cloneNode() as CDATASection;
+
+    expect(node).toBeInstanceOf(CDATASection);
+    expect(node.data).toBe('aaa');
+  });
 });

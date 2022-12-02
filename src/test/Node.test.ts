@@ -1,11 +1,10 @@
-import { Node } from '../main/Node';
-import { Text } from '../main/Text';
+import { Node, Text } from '../main';
 
 describe('Node', () => {
   class MockNode extends Node {}
 
   test('cannot be instantiated directly', () => {
-    expect(() => new Node()).toThrow(new Error('Illegal constructor'));
+    expect(() => new (Node as any)()).toThrow(new Error('Illegal constructor'));
   });
 
   test('creates a new MockNode instance', () => {

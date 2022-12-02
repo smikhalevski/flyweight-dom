@@ -44,7 +44,7 @@ describe('Text', () => {
   });
 
   test('data, nodeValue, and textContent are synchronized', () => {
-    const node = new Text('#node');
+    const node = new Text();
 
     node.data = 'aaa';
 
@@ -82,44 +82,5 @@ describe('Text', () => {
     node.nodeValue = null;
 
     expect(node.data).toBe('');
-  });
-
-  test('data and length are synchronized', () => {
-    const node = new Text('#node');
-
-    node.data = 'aaa';
-
-    expect(node.length).toBe(3);
-  });
-
-  test('appends data', () => {
-    const node = new Text('aaa');
-
-    node.appendData('bbb');
-
-    expect(node.data).toBe('aaabbb');
-  });
-
-  test('deletes data', () => {
-    const node = new Text('aaabbb');
-
-    node.deleteData(2, 3);
-
-    expect(node.data).toBe('aab');
-  });
-
-  test('replaces data', () => {
-    const node = new Text('aaabbb');
-
-    node.replaceData(2, 3, 'ccc');
-
-    expect(node.data).toBe('aacccb');
-  });
-
-  test('returns a data substring', () => {
-    const node = new Text('aaabbb');
-
-    expect(node.substringData(2, 3)).toBe('abb');
-    expect(node.data).toBe('aaabbb');
   });
 });

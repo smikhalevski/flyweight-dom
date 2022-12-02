@@ -72,50 +72,50 @@ export function extendParentNode(prototype: ParentNode): void {
   prototype.replaceChildren = replaceChildren;
 }
 
-function append(this: ParentNode /*, ...nodes: Array<Node | string>*/) {
-  const nodesLength = arguments.length;
+function append(this: ParentNode /*...nodes: Array<Node | string>*/) {
+  const argumentsLength = arguments.length;
 
-  for (let i = 0; i < nodesLength; ++i) {
+  for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);
   }
-  for (let i = 0; i < nodesLength; ++i) {
+  for (let i = 0; i < argumentsLength; ++i) {
     uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(this, arguments[i]));
   }
   return this;
 }
 
-function prepend(this: ParentNode /*, ...nodes: Array<Node | string>*/) {
-  const nodesLength = arguments.length;
+function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
+  const argumentsLength = arguments.length;
 
   const { firstChild } = this;
 
-  for (let i = 0; i < nodesLength; ++i) {
+  for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);
   }
 
   if (firstChild != null) {
-    for (let i = 0; i < nodesLength; ++i) {
+    for (let i = 0; i < argumentsLength; ++i) {
       uncheckedRemoveAndInsertBefore(this, uncheckedToInsertableNode(this, arguments[i]), firstChild);
     }
   } else {
-    for (let i = 0; i < nodesLength; ++i) {
+    for (let i = 0; i < argumentsLength; ++i) {
       uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(this, arguments[i]));
     }
   }
   return this;
 }
 
-function replaceChildren(this: ParentNode /*, ...nodes: Array<Node | string>*/) {
-  const nodesLength = arguments.length;
+function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
+  const argumentsLength = arguments.length;
 
-  for (let i = 0; i < nodesLength; ++i) {
+  for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);
   }
 
   while (this.firstChild != null) {
     uncheckedRemoveChild(this, this.firstChild);
   }
-  for (let i = 0; i < nodesLength; ++i) {
+  for (let i = 0; i < argumentsLength; ++i) {
     uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(this, arguments[i]));
   }
   return this;

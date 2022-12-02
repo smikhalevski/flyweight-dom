@@ -1,7 +1,7 @@
 import { die } from './utils';
 
-const SEPARATOR = /s+/;
-const JOINER = ' ';
+const separatorRegex = /s+/;
+const SEPARATOR = ' ';
 
 interface ValueAccessor {
   get(): string;
@@ -9,49 +9,62 @@ interface ValueAccessor {
   set(value: string): void;
 }
 
-export function createDOMTokenList(valueAccessor: ValueAccessor): DOMTokenList {
-  const tokenList: DOMTokenList = Object.create(prototype);
-  tokenList._valueAccessor = valueAccessor;
-  return tokenList;
-}
-
 export interface DOMTokenList {
   readonly length: number;
   value: string;
 
   // private
-  _valueAccessor: ValueAccessor;
+  _tokenizedValue: string;
+  _tokens: string[];
 
   add(...tokens: string[]): void;
+
+  remove(...tokens: string[]): void;
+
+  replace(replacedToken: string, token: string): boolean;
+
+  toggle(token: string, force?: boolean): boolean;
 
   contains(token: string): boolean;
 
   item(index: number): string | null;
 
-  remove(...tokens: string[]): void;
-
-  replace(oldToken: string, newToken: string): boolean;
-
-  toggle(token: string, force?: boolean): boolean;
-
   forEach(callback: (value: string, index: number, parent: DOMTokenList) => void, thisArg?: any): void;
 }
 
 export class DOMTokenList {
-  constructor() {
-    die('Illegal constructor');
-  }
+  constructor(readonly _valueAccessor: ValueAccessor) {}
 }
 
 const prototype = DOMTokenList.prototype;
 
+Object.defineProperties(prototype, {
+  length: {
+    get(this: DOMTokenList) {
+      return getTokens(this).length;
+    },
+  },
+
+  value: {
+    get(this: DOMTokenList) {
+      return this._valueAccessor.get();
+    },
+    set(this: DOMTokenList, value) {
+      this._valueAccessor.set(value);
+    },
+  },
+});
+
 prototype.add = function (/*...tokens: string[]*/) {
-  const { _valueAccessor } = this;
+  const argumentsLength = arguments.length;
 
-  const tokensLength = arguments.length;
-  const tokens = _valueAccessor.get().split(SEPARATOR);
+  for (let i = 0; i < argumentsLength; ++i) {
+    assertToken(arguments[i]);
+  }
 
-  for (let i = 0; i < tokensLength; ++i) {
+  const tokens = getTokens(this);
+
+  for (let i = 0; i < argumentsLength; ++i) {
     const token = arguments[i];
 
     if (tokens.indexOf(token) === -1) {
@@ -59,24 +72,19 @@ prototype.add = function (/*...tokens: string[]*/) {
     }
   }
 
-  _valueAccessor.set(tokens.join(JOINER));
-};
-
-prototype.contains = function (token) {
-  return this._valueAccessor.get().split(SEPARATOR).indexOf(token) !== -1;
-};
-
-prototype.item = function (index) {
-  return this._valueAccessor.get().split(SEPARATOR)[index] || null;
+  setTokens(this, tokens);
 };
 
 prototype.remove = function (/*...tokens: string[]*/) {
-  const { _valueAccessor } = this;
+  const argumentsLength = arguments.length;
 
-  const tokensLength = arguments.length;
-  const tokens = _valueAccessor.get().split(SEPARATOR);
+  for (let i = 0; i < argumentsLength; ++i) {
+    assertToken(arguments[i]);
+  }
 
-  for (let i = 0; i < tokensLength; ++i) {
+  const tokens = getTokens(this);
+
+  for (let i = 0; i < argumentsLength; ++i) {
     const index = tokens.indexOf(arguments[i]);
 
     if (index !== -1) {
@@ -84,48 +92,58 @@ prototype.remove = function (/*...tokens: string[]*/) {
     }
   }
 
-  _valueAccessor.set(tokens.join(JOINER));
+  setTokens(this, tokens);
 };
 
-prototype.replace = function (oldToken, newToken) {
-  const { _valueAccessor } = this;
+prototype.replace = function (replacedToken, token) {
+  assertToken(replacedToken);
+  assertToken(token);
 
-  const tokens = _valueAccessor.get().split(SEPARATOR);
-  const index = tokens.indexOf(oldToken);
+  const tokens = getTokens(this);
+  const index = tokens.indexOf(replacedToken);
 
-  if (index !== -1) {
-    tokens[index] = newToken;
-    _valueAccessor.set(tokens.join(JOINER));
-    return true;
+  if (index === -1) {
+    return false;
   }
 
+  tokens.splice(index, 1, token);
+  setTokens(this, tokens);
   return false;
 };
 
 prototype.toggle = function (token, force) {
-  const { _valueAccessor } = this;
+  assertToken(token);
 
-  const tokens = _valueAccessor.get().split(SEPARATOR);
+  const tokens = getTokens(this);
   const index = tokens.indexOf(token);
   const exists = index !== -1;
 
   if (!exists && (force === undefined || force)) {
     tokens.push(token);
-    _valueAccessor.set(tokens.join(JOINER));
+    setTokens(this, tokens);
     return true;
   }
 
   if (exists && (force === undefined || !force)) {
     tokens.splice(index, 1);
-    _valueAccessor.set(tokens.join(JOINER));
+    setTokens(this, tokens);
     return false;
   }
 
   return exists;
 };
 
+prototype.contains = function (token) {
+  return getTokens(this).indexOf(token) !== -1;
+};
+
+prototype.item = function (index) {
+  const tokens = getTokens(this);
+  return index < 0 || index >= tokens.length ? null : tokens[index] || null;
+};
+
 prototype.forEach = function (callback, thisArg) {
-  const tokens = this._valueAccessor.get().split(SEPARATOR);
+  const tokens = getTokens(this);
 
   for (let i = 0; i < tokens.length; ++i) {
     callback.call(thisArg, tokens[i], i, this);
@@ -133,5 +151,55 @@ prototype.forEach = function (callback, thisArg) {
 };
 
 prototype.toString = function () {
-  return this.value;
+  return this._valueAccessor.get();
 };
+
+function getTokens(tokenList: DOMTokenList): string[] {
+  const { _valueAccessor } = tokenList;
+
+  let value = _valueAccessor.get();
+
+  if (value === tokenList._tokenizedValue) {
+    return tokenList._tokens;
+  }
+
+  value = value.trim();
+
+  const tokens = value.length === 0 ? [] : value.split(separatorRegex);
+
+  // Make unique
+  for (let i = 0; i < tokens.length; ++i) {
+    const token = tokens[i];
+
+    for (let j = tokens.indexOf(token, i + 1); j !== -1; j = tokens.indexOf(token, j)) {
+      tokens.splice(j, 1);
+    }
+  }
+
+  setTokens(tokenList, tokens);
+  return tokens;
+}
+
+function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
+  const value = tokens.join(SEPARATOR);
+
+  tokenList._valueAccessor.set(value);
+  tokenList._tokenizedValue = value;
+  tokenList._tokens = tokens;
+}
+
+function assertToken(token: string): void {
+  const tokenLength = token.length;
+
+  if (tokenLength === 0) {
+    die('The token provided must not be empty.');
+  }
+  for (let i = 0; i < tokenLength; ++i) {
+    const charCode = token.charCodeAt(i);
+
+    // https://www.w3.org/TR/2009/WD-html5-20090212/infrastructure.html#space-character
+    if (charCode === 32 || charCode === 9 || charCode === 10 || charCode === 12 || charCode === 13) {
+      die("The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens.");
+    }
+  }
+}

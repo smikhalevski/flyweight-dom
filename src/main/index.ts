@@ -193,10 +193,18 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: Array<Node | string>): this;
 }
 
+interface ValueAccessor {
+  get(): string;
+
+  set(value: string): void;
+}
+
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList on MDN}
  */
-export declare abstract class DOMTokenList {
+export declare class DOMTokenList {
+  protected constructor(valueAccessor: ValueAccessor);
+
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length DOMTokenList.length on MDN}
    */
@@ -230,7 +238,7 @@ export declare abstract class DOMTokenList {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace DOMTokenList.replace on MDN}
    */
-  replace(oldToken: string, newToken: string): boolean;
+  replace(replacedToken: string, token: string): boolean;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle DOMTokenList.toggle on MDN}

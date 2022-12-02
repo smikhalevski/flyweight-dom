@@ -7,9 +7,11 @@ export type Constructor<T = any> = new (...args: any[]) => T;
 
 export function extendClass<T>(constructor: Constructor<T>, superConstructor: Constructor): T {
   Object.assign(constructor, superConstructor);
+
   const prototype = Object.create(superConstructor.prototype);
   constructor.prototype = prototype;
   prototype.constructor = constructor;
+
   return prototype;
 }
 

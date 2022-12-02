@@ -46,7 +46,7 @@ export function extendParentNode(prototype: ParentNode): void {
         let count = 0;
 
         for (let node = this.firstChild; node != null; node = node.nextSibling) {
-          if (node.nodeType === NodeType.ELEMENT_NODE) {
+          if (isElement(node)) {
             ++count;
           }
         }

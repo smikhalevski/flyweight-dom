@@ -39,8 +39,8 @@ const prototype = extendClass(Element, Node);
 
 prototype.nodeType = NodeType.ELEMENT_NODE;
 
-extendChildNode(prototype);
 extendNode(prototype);
+extendChildNode(prototype);
 extendParentNode(prototype);
 
 Object.defineProperties(prototype, {
@@ -65,9 +65,9 @@ Object.defineProperties(prototype, {
   classList: {
     get(this: Element) {
       const tokenList = new DOMTokenList({
-        get: () => this.className,
+        get: () => this._attributes.class || '',
         set: value => {
-          this.className = value;
+          this._attributes.class = value;
         },
       });
 

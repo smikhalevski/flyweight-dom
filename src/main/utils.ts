@@ -25,15 +25,15 @@ export function isDocumentFragment(node: Node): node is DocumentFragment {
   return node.nodeType === NodeType.DOCUMENT_FRAGMENT_NODE;
 }
 
-export function getPreviousElementSibling(node: Node | null): Element | null {
-  while (node != null && node.nodeType !== NodeType.ELEMENT_NODE) {
+export function getPreviousSiblingOrSelf(node: Node | null, nodeType: NodeType): Element | null {
+  while (node != null && node.nodeType !== nodeType) {
     node = node.previousSibling;
   }
   return node as Element | null;
 }
 
-export function getNextElementSibling(node: Node | null): Element | null {
-  while (node != null && node.nodeType !== NodeType.ELEMENT_NODE) {
+export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeType): Element | null {
+  while (node != null && node.nodeType !== nodeType) {
     node = node.nextSibling;
   }
   return node as Element | null;

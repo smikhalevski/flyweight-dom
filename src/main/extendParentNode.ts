@@ -1,6 +1,6 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { getNextElementSibling, getPreviousElementSibling, isElement } from './utils';
+import { getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
@@ -56,13 +56,13 @@ export function extendParentNode(prototype: ParentNode): void {
 
     firstElementChild: {
       get(this: ParentNode) {
-        return getNextElementSibling(this.firstChild);
+        return getNextSiblingOrSelf(this.firstChild, NodeType.ELEMENT_NODE);
       },
     },
 
     lastElementChild: {
       get(this: ParentNode) {
-        return getPreviousElementSibling(this.lastChild);
+        return getPreviousSiblingOrSelf(this.lastChild, NodeType.ELEMENT_NODE);
       },
     },
   });

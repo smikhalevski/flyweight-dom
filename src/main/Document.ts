@@ -2,8 +2,8 @@ import { Node } from './Node';
 import { extendParentNode, ParentNode } from './extendParentNode';
 import { NodeType } from './NodeType';
 import { Element } from './Element';
-import { extendClass } from './utils';
-import { uncheckedCloneContents } from './uncheckedCloneContents';
+import { extendClass, getNextSiblingOrSelf } from './utils';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 
 export interface Document extends Node, ParentNode {
   readonly doctype: DocumentType | null;
@@ -22,18 +22,13 @@ extendParentNode(prototype);
 Object.defineProperties(prototype, {
   doctype: {
     get(this: Document) {
-      let node = this.firstChild;
-
-      while (node != null && node.nodeType !== NodeType.DOCUMENT_TYPE_NODE) {
-        node = node.nextSibling;
-      }
-      return node;
+      return getNextSiblingOrSelf(this.firstChild, NodeType.DOCUMENT_TYPE_NODE);
     },
   },
 
   documentElement: {
     get(this: Document) {
-      return this.firstElementChild;
+      return getNextSiblingOrSelf(this.firstChild, NodeType.ELEMENT_NODE);
     },
   },
 });
@@ -41,7 +36,7 @@ Object.defineProperties(prototype, {
 prototype.cloneNode = function (deep) {
   const node = new Document();
   if (deep) {
-    uncheckedCloneContents(this, node);
+    uncheckedCloneChildren(this, node);
   }
   return node;
 };

@@ -42,45 +42,4 @@ describe('Text', () => {
 
     expect(node.length).toBe(3);
   });
-
-  test('data, nodeValue, and textContent are synchronized', () => {
-    const node = new Text();
-
-    node.data = 'aaa';
-
-    expect(node.data).toBe('aaa');
-    expect(node.nodeValue).toBe('aaa');
-    expect(node.textContent).toBe('aaa');
-
-    node.textContent = 'bbb';
-
-    expect(node.data).toBe('bbb');
-    expect(node.nodeValue).toBe('bbb');
-    expect(node.textContent).toBe('bbb');
-
-    node.textContent = null;
-
-    expect(node.data).toBe('');
-    expect(node.textContent).toBe('');
-
-    node.nodeValue = 'bbb';
-
-    expect(node.data).toBe('bbb');
-    expect(node.nodeValue).toBe('bbb');
-    expect(node.textContent).toBe('bbb');
-
-    node.nodeValue = null;
-
-    expect(node.data).toBe('');
-    expect(node.nodeValue).toBe('');
-    expect(node.textContent).toBe('');
-  });
-
-  test('clears the data', () => {
-    const node = new Text('aaa');
-
-    node.nodeValue = null;
-
-    expect(node.data).toBe('');
-  });
 });

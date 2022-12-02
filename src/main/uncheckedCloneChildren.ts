@@ -1,11 +1,10 @@
 import { ParentNode } from './extendParentNode';
 import { ChildNode } from './extendChildNode';
 
-export function uncheckedCloneContents(sourceParent: ParentNode, targetParent: ParentNode): void {
+export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: ParentNode): void {
   const { firstChild } = sourceParent;
 
-  if (firstChild == null) {
-    // The parent has no children
+  if (firstChild == null || sourceParent === targetParent) {
     return;
   }
 
@@ -19,6 +18,8 @@ export function uncheckedCloneContents(sourceParent: ParentNode, targetParent: P
 
     if (lastChild != null) {
       lastChild.nextSibling = node;
+    } else {
+      targetParent.firstChild = node;
     }
     lastChild = node;
   }

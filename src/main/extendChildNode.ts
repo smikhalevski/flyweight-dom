@@ -4,7 +4,8 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { getNextElementSibling, getPreviousElementSibling } from './utils';
+import { getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils';
+import { NodeType } from './NodeType';
 
 export interface ChildNode extends Node {
   // public readonly
@@ -24,13 +25,13 @@ export function extendChildNode(prototype: ChildNode): void {
   Object.defineProperties(prototype, {
     previousElementSibling: {
       get(this: ChildNode) {
-        return getPreviousElementSibling(this.previousSibling);
+        return getPreviousSiblingOrSelf(this.previousSibling, NodeType.ELEMENT_NODE);
       },
     },
 
     nextElementSibling: {
       get(this: ChildNode) {
-        return getNextElementSibling(this.nextSibling);
+        return getNextSiblingOrSelf(this.nextSibling, NodeType.ELEMENT_NODE);
       },
     },
   });

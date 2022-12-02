@@ -51,12 +51,6 @@ export class Node {
   static readonly DOCUMENT_NODE: number = NodeType.DOCUMENT_NODE;
   static readonly DOCUMENT_TYPE_NODE: number = NodeType.DOCUMENT_TYPE_NODE;
   static readonly DOCUMENT_FRAGMENT_NODE: number = NodeType.DOCUMENT_FRAGMENT_NODE;
-
-  constructor() {
-    if (this.constructor === Node) {
-      die('Illegal constructor');
-    }
-  }
 }
 
 const prototype = Node.prototype;

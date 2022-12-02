@@ -2,7 +2,7 @@ import { Node } from './Node';
 import { extendParentNode, ParentNode } from './extendParentNode';
 import { NodeType } from './NodeType';
 import { extendClass } from './utils';
-import { uncheckedCloneContents } from './uncheckedCloneContents';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 
 export interface DocumentFragment extends Node, ParentNode {}
 
@@ -18,7 +18,7 @@ extendParentNode(prototype);
 prototype.cloneNode = function (deep) {
   const node = new DocumentFragment();
   if (deep) {
-    uncheckedCloneContents(this, node);
+    uncheckedCloneChildren(this, node);
   }
   return node;
 };

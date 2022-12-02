@@ -12,7 +12,7 @@ export interface Text extends CharacterData {
 
 export class Text {
   constructor(data = '') {
-    this.data = String(data);
+    this.data = data;
   }
 }
 

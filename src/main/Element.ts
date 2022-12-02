@@ -4,8 +4,8 @@ import { extendClass } from './utils';
 import { NodeType } from './NodeType';
 import { ChildNode, extendChildNode } from './extendChildNode';
 import { extendParentNode, ParentNode } from './extendParentNode';
-import { uncheckedCloneContents } from './uncheckedCloneContents';
-import { createDOMTokenList, DOMTokenList } from './DOMTokenList';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren';
+import { DOMTokenList } from './DOMTokenList';
 
 export interface Element extends Node, ChildNode, ParentNode {
   // readonly
@@ -49,7 +49,7 @@ Object.defineProperties(prototype, {
       return this._attributes.id || '';
     },
     set(this: Element, value) {
-      this._attributes.id = String(value);
+      this._attributes.id = value;
     },
   },
 
@@ -58,13 +58,13 @@ Object.defineProperties(prototype, {
       return this._attributes.class || '';
     },
     set(this: Element, value) {
-      this._attributes.class = String(value);
+      this._attributes.class = value;
     },
   },
 
   classList: {
     get(this: Element) {
-      const tokenList = createDOMTokenList({
+      const tokenList = new DOMTokenList({
         get: () => this.className,
         set: value => {
           this.className = value;
@@ -103,7 +103,7 @@ prototype.getAttributeNames = function () {
 prototype.cloneNode = function (deep) {
   const node = new Element(this.tagName, Object.assign({}, this._attributes));
   if (deep) {
-    uncheckedCloneContents(this, node);
+    uncheckedCloneChildren(this, node);
   }
   return node;
 };

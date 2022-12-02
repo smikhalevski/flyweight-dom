@@ -1,10 +1,18 @@
-import { CharacterData } from '../main';
+import { CharacterData, Node } from '../main';
 
 describe('CharacterData', () => {
   class MockCharacterData extends CharacterData {}
 
-  test('cannot be instantiated directly', () => {
-    expect(() => new (CharacterData as any)()).toThrow(new Error('Illegal constructor'));
+  test('creates a CharacterData instance', () => {
+    const node = new MockCharacterData();
+
+    expect(node).toBeInstanceOf(Node);
+    expect(node.previousElementSibling).toBe(null);
+    expect(node.nextElementSibling).toBe(null);
+    expect(node.after).toBeInstanceOf(Function);
+    expect(node.before).toBeInstanceOf(Function);
+    expect(node.remove).toBeInstanceOf(Function);
+    expect(node.replaceWith).toBeInstanceOf(Function);
   });
 
   test('data and length are synchronized', () => {
@@ -21,6 +29,48 @@ describe('CharacterData', () => {
     node.appendData('bbb');
 
     expect(node.data).toBe('aaabbb');
+  });
+
+  test('data, nodeValue, and textContent are synchronized', () => {
+    const node = new MockCharacterData();
+
+    node.data = 'aaa';
+
+    expect(node.data).toBe('aaa');
+    expect(node.nodeValue).toBe('aaa');
+    expect(node.textContent).toBe('aaa');
+
+    node.textContent = 'bbb';
+
+    expect(node.data).toBe('bbb');
+    expect(node.nodeValue).toBe('bbb');
+    expect(node.textContent).toBe('bbb');
+
+    node.textContent = null;
+
+    expect(node.data).toBe('');
+    expect(node.textContent).toBe('');
+
+    node.nodeValue = 'bbb';
+
+    expect(node.data).toBe('bbb');
+    expect(node.nodeValue).toBe('bbb');
+    expect(node.textContent).toBe('bbb');
+
+    node.nodeValue = null;
+
+    expect(node.data).toBe('');
+    expect(node.nodeValue).toBe('');
+    expect(node.textContent).toBe('');
+  });
+
+  test('clears the data', () => {
+    const node = new MockCharacterData();
+    node.data = 'aaa';
+
+    node.nodeValue = null;
+
+    expect(node.data).toBe('');
   });
 
   test('deletes data', () => {
@@ -47,5 +97,13 @@ describe('CharacterData', () => {
 
     expect(node.substringData(2, 3)).toBe('abb');
     expect(node.data).toBe('aaabbb');
+  });
+
+  test('clones a CharacterData instance', () => {
+    const node = new MockCharacterData().cloneNode() as MockCharacterData;
+    node.data = 'aaa';
+
+    expect(node).toBeInstanceOf(MockCharacterData);
+    expect(node.data).toBe('aaa');
   });
 });

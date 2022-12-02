@@ -253,11 +253,6 @@ export declare class Element extends Node implements ChildNode, ParentNode {
   readonly tagName: string;
 
   /**
-   * Mapping from the attribute name to its value.
-   */
-  readonly attrs: { [name: string]: string };
-
-  /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/id Element.id on MDN}
    */
   id: string;
@@ -275,7 +270,7 @@ export declare class Element extends Node implements ChildNode, ParentNode {
   /**
    * Creates a new instance of {@link Element}.
    */
-  constructor(tagName: string, attrs?: { [name: string]: string });
+  constructor(tagName: string, attributes?: { [name: string]: string });
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute on MDN}

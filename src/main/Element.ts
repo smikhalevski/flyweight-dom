@@ -10,10 +10,12 @@ import { createDOMTokenList, DOMTokenList } from './DOMTokenList';
 export interface Element extends Node, ChildNode, ParentNode {
   // readonly
   tagName: string;
-  attrs: { [name: string]: string };
   id: string;
   className: string;
   classList: DOMTokenList;
+
+  // private
+  _attributes: { [name: string]: string };
 
   setAttribute(name: string, value: string): this;
 
@@ -27,9 +29,9 @@ export interface Element extends Node, ChildNode, ParentNode {
 }
 
 export class Element {
-  constructor(tagName: string, attrs: { [name: string]: string } = {}) {
+  constructor(tagName: string, attributes: { [name: string]: string } = {}) {
     this.nodeName = this.tagName = tagName;
-    this.attrs = attrs;
+    this._attributes = attributes;
   }
 }
 
@@ -44,19 +46,19 @@ extendParentNode(prototype);
 Object.defineProperties(prototype, {
   id: {
     get(this: Element) {
-      return this.attrs.id || '';
+      return this._attributes.id || '';
     },
     set(this: Element, value) {
-      this.attrs.id = String(value);
+      this._attributes.id = String(value);
     },
   },
 
   className: {
     get(this: Element) {
-      return this.attrs.className || '';
+      return this._attributes.class || '';
     },
     set(this: Element, value) {
-      this.attrs.className = String(value);
+      this._attributes.class = String(value);
     },
   },
 
@@ -77,29 +79,29 @@ Object.defineProperties(prototype, {
 });
 
 prototype.setAttribute = function (name, value) {
-  this.attrs[name] = value;
+  this._attributes[name] = value;
   return this;
 };
 
 prototype.getAttribute = function (name) {
-  return this.attrs[name] ?? null;
+  return this._attributes[name] ?? null;
 };
 
 prototype.hasAttribute = function (name) {
-  return this.attrs[name] != null;
+  return this._attributes[name] != null;
 };
 
 prototype.removeAttribute = function (name) {
-  delete this.attrs[name];
+  delete this._attributes[name];
   return this;
 };
 
 prototype.getAttributeNames = function () {
-  return Object.keys(this.attrs);
+  return Object.keys(this._attributes);
 };
 
 prototype.cloneNode = function (deep) {
-  const node = new Element(this.tagName, Object.assign({}, this.attrs));
+  const node = new Element(this.tagName, Object.assign({}, this._attributes));
   if (deep) {
     uncheckedCloneContents(this, node);
   }

@@ -1,3 +1,5 @@
+import { ValueAccessor } from './DOMTokenList';
+
 export * from './Text';
 export * from './CDATASection';
 export * from './CharacterData';
@@ -192,12 +194,6 @@ export interface ParentNode extends Node {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceChildren Element.replaceChildren on MDN}
    */
   replaceChildren(...nodes: Array<Node | string>): this;
-}
-
-interface ValueAccessor {
-  get(): string;
-
-  set(value: string): void;
 }
 
 /**

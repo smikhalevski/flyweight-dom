@@ -176,7 +176,9 @@ function getTokens(tokenList: DOMTokenList): string[] {
     }
   }
 
-  setTokens(tokenList, tokens);
+  tokenList._tokenizedValue = value;
+  tokenList._tokens = tokens;
+
   return tokens;
 }
 

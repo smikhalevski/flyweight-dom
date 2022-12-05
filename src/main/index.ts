@@ -1,13 +1,14 @@
+export * from './Text';
 export * from './CDATASection';
 export * from './CharacterData';
 export * from './Comment';
 export * from './Document';
 export * from './DocumentFragment';
 export * from './DocumentType';
+export * from './DOMTokenList';
 export * from './Element';
 export * from './Node';
 export * from './ProcessingInstruction';
-export * from './Text';
 
 /**
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node on MDN}
@@ -203,17 +204,16 @@ interface ValueAccessor {
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList on MDN}
  */
 export declare class DOMTokenList {
-  protected constructor(valueAccessor: ValueAccessor);
-
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length DOMTokenList.length on MDN}
    */
   readonly length: number;
-
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value DOMTokenList.value on MDN}
    */
   value: string;
+
+  protected constructor(valueAccessor: ValueAccessor);
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add DOMTokenList.add on MDN}
@@ -274,6 +274,14 @@ export declare class Element extends Node implements ChildNode, ParentNode {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/classList Element.classList on MDN}
    */
   readonly classList: DOMTokenList;
+  readonly nextElementSibling: Element | null;
+  readonly previousElementSibling: Element | null;
+  readonly children: readonly Node[];
+  readonly childElementCount: number;
+  readonly firstElementChild: Element | null;
+  readonly lastElementChild: Element | null;
+
+  // Inherited from ChildNode
 
   /**
    * Creates a new instance of {@link Element}.
@@ -305,10 +313,7 @@ export declare class Element extends Node implements ChildNode, ParentNode {
    */
   getAttributeNames(): string[];
 
-  // Inherited from ChildNode
-
-  readonly nextElementSibling: Element | null;
-  readonly previousElementSibling: Element | null;
+  // Inherited from ParentNode
 
   after(...nodes: Array<Node | string>): this;
 
@@ -317,13 +322,6 @@ export declare class Element extends Node implements ChildNode, ParentNode {
   remove(): this;
 
   replaceWith(...nodes: Array<Node | string>): this;
-
-  // Inherited from ParentNode
-
-  readonly children: readonly Node[];
-  readonly childElementCount: number;
-  readonly firstElementChild: Element | null;
-  readonly lastElementChild: Element | null;
 
   append(...nodes: Array<Node | string>): this;
 
@@ -345,6 +343,8 @@ export declare abstract class CharacterData extends Node implements ChildNode {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data CharacterData.data on MDN}
    */
   data: string;
+  readonly nextElementSibling: Element | null;
+  readonly previousElementSibling: Element | null;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/appendData CharacterData.appendData on MDN}
@@ -361,6 +361,8 @@ export declare abstract class CharacterData extends Node implements ChildNode {
    */
   insertData(offset: number, data: string): this;
 
+  // Inherited from ChildNode
+
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData CharacterData.replaceData on MDN}
    */
@@ -370,11 +372,6 @@ export declare abstract class CharacterData extends Node implements ChildNode {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData CharacterData.substringData on MDN}
    */
   substringData(offset: number, count: number): string;
-
-  // Inherited from ChildNode
-
-  readonly nextElementSibling: Element | null;
-  readonly previousElementSibling: Element | null;
 
   after(...nodes: Array<Node | string>): this;
 
@@ -444,16 +441,15 @@ export declare class DocumentType extends Node implements ChildNode {
   readonly name: string;
   readonly publicId: string;
   readonly systemId: string;
+  readonly nextElementSibling: Element | null;
+
+  // Inherited from ChildNode
+  readonly previousElementSibling: Element | null;
 
   /**
    * Creates a new instance of {@link DocumentType}.
    */
   constructor(name: string, publicId?: string, systemId?: string);
-
-  // Inherited from ChildNode
-
-  readonly nextElementSibling: Element | null;
-  readonly previousElementSibling: Element | null;
 
   after(...nodes: Array<Node | string>): this;
 

@@ -45,14 +45,21 @@ export function extendChildNode(prototype: ChildNode): void {
 function after(this: ChildNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
-  const { parentNode } = this;
+  const { parentNode, nextSibling } = this;
 
-  if (parentNode != null) {
+  if (parentNode == null) {
+    return this;
+  }
+  for (let i = 0; i < argumentsLength; ++i) {
+    assertInsertable(parentNode, arguments[i]);
+  }
+  if (nextSibling != null) {
     for (let i = 0; i < argumentsLength; ++i) {
-      assertInsertable(parentNode, arguments[i]);
+      uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), nextSibling);
     }
+  } else {
     for (let i = 0; i < argumentsLength; ++i) {
-      uncheckedRemoveAndAppendChild(parentNode, uncheckedToInsertableNode(parentNode, arguments[i]));
+      uncheckedRemoveAndAppendChild(parentNode, uncheckedToInsertableNode(arguments[i]));
     }
   }
   return this;
@@ -63,13 +70,14 @@ function before(this: ChildNode /*...nodes: Array<Node | string>*/) {
 
   const { parentNode } = this;
 
-  if (parentNode != null) {
-    for (let i = 0; i < argumentsLength; ++i) {
-      assertInsertable(parentNode, arguments[i]);
-    }
-    for (let i = 0; i < argumentsLength; ++i) {
-      uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(parentNode, arguments[i]), this);
-    }
+  if (parentNode == null) {
+    return this;
+  }
+  for (let i = 0; i < argumentsLength; ++i) {
+    assertInsertable(parentNode, arguments[i]);
+  }
+  for (let i = 0; i < argumentsLength; ++i) {
+    uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
   }
   return this;
 }
@@ -88,14 +96,15 @@ function replaceWith(this: ChildNode /*...nodes: Array<Node | string>*/) {
 
   const { parentNode } = this;
 
-  if (parentNode != null) {
-    for (let i = 0; i < argumentsLength; ++i) {
-      assertInsertable(parentNode, arguments[i]);
-    }
-    for (let i = 0; i < argumentsLength; ++i) {
-      uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(parentNode, arguments[i]), this);
-    }
-    uncheckedRemoveChild(parentNode, this);
+  if (parentNode == null) {
+    return this;
   }
+  for (let i = 0; i < argumentsLength; ++i) {
+    assertInsertable(parentNode, arguments[i]);
+  }
+  for (let i = 0; i < argumentsLength; ++i) {
+    uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
+  }
+  uncheckedRemoveChild(parentNode, this);
   return this;
 }

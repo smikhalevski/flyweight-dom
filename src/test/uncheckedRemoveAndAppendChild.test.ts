@@ -1,5 +1,5 @@
-import { Element } from '../main/Element';
 import { Text } from '../main/Text';
+import { Element } from '../main/Element';
 import { uncheckedRemoveAndAppendChild } from '../main/uncheckedRemoveAndAppendChild';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
 import { DocumentFragment } from '../main/DocumentFragment';

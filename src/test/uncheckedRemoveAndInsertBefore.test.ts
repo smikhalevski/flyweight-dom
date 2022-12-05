@@ -1,6 +1,6 @@
+import { Text } from '../main/Text';
 import { Element } from '../main/Element';
 import { DocumentFragment } from '../main/DocumentFragment';
-import { Text } from '../main/Text';
 import { uncheckedRemoveAndInsertBefore } from '../main/uncheckedRemoveAndInsertBefore';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
 

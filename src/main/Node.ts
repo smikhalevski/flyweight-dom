@@ -3,6 +3,7 @@ import { die } from './utils';
 import { ChildNode } from './extendChildNode';
 import { ParentNode } from './extendParentNode';
 import { NodeType } from './NodeType';
+import { uncheckedContains } from './uncheckedContains';
 
 export interface Node {
   // public readonly
@@ -57,6 +58,9 @@ const prototype = Node.prototype;
 
 prototype.startIndex = prototype.endIndex = -1;
 
+prototype.nodeType = -1;
+prototype.nodeName = '';
+
 prototype.parentNode =
   prototype.previousSibling =
   prototype.nextSibling =
@@ -96,9 +100,12 @@ prototype.hasChildNodes = function () {
   return this._childNodes != null && this._childNodes.length !== 0;
 };
 
+prototype.contains = function (node) {
+  return node != null ? uncheckedContains(this, node) : false;
+};
+
 prototype.appendChild =
   prototype.insertBefore =
-  prototype.contains =
   prototype.removeChild =
   prototype.replaceChild =
     () => {

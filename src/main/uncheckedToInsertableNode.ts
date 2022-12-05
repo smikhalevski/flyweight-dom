@@ -13,9 +13,9 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   const { nodeType } = node;
 
   if (nodeType === NodeType.DOCUMENT_NODE || nodeType === NodeType.ATTRIBUTE_NODE) {
-    die('Insertable node expected');
+    die('Node cannot be a child');
   }
-  if (nodeType === NodeType.ELEMENT_NODE && uncheckedContains(parent, node)) {
+  if (uncheckedContains(node, parent)) {
     die('The new child element contains the parent');
   }
 }
@@ -26,6 +26,6 @@ export function assertInsertable(parent: ParentNode, node: Node | string): asser
   }
 }
 
-export function uncheckedToInsertableNode(parent: ParentNode, node: Node | string): InsertableNode {
+export function uncheckedToInsertableNode(node: Node | string): InsertableNode {
   return typeof node === 'string' ? new Text(node) : (node as InsertableNode);
 }

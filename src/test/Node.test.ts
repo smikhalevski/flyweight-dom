@@ -14,8 +14,8 @@ describe('Node', () => {
     expect(node.nextSibling).toBe(null);
     expect(node.firstChild).toBe(null);
     expect(node.lastChild).toBe(null);
-    expect(node.nodeType).toBe(undefined);
-    expect(node.nodeName).toBe(undefined);
+    expect(node.nodeType).toBe(-1);
+    expect(node.nodeName).toBe('');
   });
 
   test('populates childNodes', () => {

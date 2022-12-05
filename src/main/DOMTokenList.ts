@@ -1,9 +1,9 @@
 import { die } from './utils';
 
-const separatorRegex = /s+/;
+const separatorRegex = /\s+/;
 const SEPARATOR = ' ';
 
-interface ValueAccessor {
+export interface ValueAccessor {
   get(): string;
 
   set(value: string): void;
@@ -108,7 +108,7 @@ prototype.replace = function (replacedToken, token) {
 
   tokens.splice(index, 1, token);
   setTokens(this, tokens);
-  return false;
+  return true;
 };
 
 prototype.toggle = function (token, force) {
@@ -192,7 +192,7 @@ function assertToken(token: string): void {
   const tokenLength = token.length;
 
   if (tokenLength === 0) {
-    die('The token provided must not be empty.');
+    die('The token provided must not be empty');
   }
   for (let i = 0; i < tokenLength; ++i) {
     const charCode = token.charCodeAt(i);

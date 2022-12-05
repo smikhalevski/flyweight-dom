@@ -1,11 +1,11 @@
 import { Node } from './Node';
-import { extendNode } from './extendNode';
 import { extendClass } from './utils';
 import { NodeType } from './NodeType';
 import { ChildNode, extendChildNode } from './extendChildNode';
 import { extendParentNode, ParentNode } from './extendParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DOMTokenList } from './DOMTokenList';
+import { extendNode } from './extendNode';
 
 export interface Element extends Node, ChildNode, ParentNode {
   // readonly

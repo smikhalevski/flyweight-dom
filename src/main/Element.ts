@@ -46,7 +46,7 @@ extendParentNode(prototype);
 Object.defineProperties(prototype, {
   id: {
     get(this: Element) {
-      return this.getAttribute('id');
+      return this.getAttribute('id') || '';
     },
     set(this: Element, value) {
       this.setAttribute('id', value);
@@ -55,7 +55,7 @@ Object.defineProperties(prototype, {
 
   className: {
     get(this: Element) {
-      return this.getAttribute('class');
+      return this.getAttribute('class') || '';
     },
     set(this: Element, value) {
       this.setAttribute('class', value);
@@ -66,7 +66,7 @@ Object.defineProperties(prototype, {
     get(this: Element) {
       const tokenList = new DOMTokenList({
         get: () => {
-          return this.getAttribute('class')!;
+          return this.getAttribute('class') || '';
         },
         set: value => {
           this.setAttribute('class', value);
@@ -82,18 +82,18 @@ Object.defineProperties(prototype, {
 
 prototype.setAttribute = function (name, value) {
   if (this._attributes === undefined) {
-    this._attributes = { id: '', class: '' };
+    this._attributes = {};
   }
   this._attributes[name] = '' + value;
   return this;
 };
 
 prototype.getAttribute = function (name) {
-  return this._attributes !== undefined && this._attributes[name] != null ? this._attributes[name] : null;
+  return this._attributes !== undefined && this._attributes[name] !== undefined ? this._attributes[name] : null;
 };
 
 prototype.hasAttribute = function (name) {
-  return this._attributes !== undefined && this._attributes[name] != null;
+  return this._attributes !== undefined && this._attributes[name] !== undefined;
 };
 
 prototype.removeAttribute = function (name) {

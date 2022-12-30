@@ -5,6 +5,10 @@ import { DocumentFragment } from './DocumentFragment';
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
+/**
+ * `extendClass` is used instead of `extends` syntax to avoid excessive super constructor calls and speed up
+ * instantiation.
+ */
 export function extendClass<T>(constructor: Constructor<T>, superConstructor: Constructor): T {
   Object.assign(constructor, superConstructor);
 

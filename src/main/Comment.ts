@@ -10,7 +10,7 @@ export class Comment {
   }
 }
 
-const parent = extendClass(Comment, CharacterData);
+const prototype = extendClass(Comment, CharacterData);
 
-parent.nodeType = NodeType.COMMENT_NODE;
-parent.nodeName = '#comment';
+prototype.nodeType = NodeType.COMMENT_NODE;
+prototype.nodeName = '#comment';

@@ -1,6 +1,10 @@
 import { CDATASection, CharacterData, Node, Text } from '../main';
 
 describe('CDATASection', () => {
+  test('inherits statics from Node', () => {
+    expect(CDATASection.ELEMENT_NODE).toBe(1);
+  });
+
   test('creates a new CDATASection instance', () => {
     const node = new CDATASection();
 

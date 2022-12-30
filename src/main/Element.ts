@@ -25,6 +25,8 @@ export interface Element extends Node, ChildNode, ParentNode {
 
   removeAttribute(name: string): this;
 
+  toggleAttribute(name: string, force?: boolean): boolean;
+
   getAttributeNames(): string[];
 }
 
@@ -101,6 +103,23 @@ prototype.removeAttribute = function (name) {
     delete this._attributes[name];
   }
   return this;
+};
+
+prototype.toggleAttribute = function (name, force) {
+  const value = this.getAttribute(name);
+  const exists = value !== null;
+
+  if (!exists && (force === undefined || force)) {
+    this.setAttribute(name, '');
+    return true;
+  }
+
+  if (exists && (force === undefined || !force)) {
+    this.removeAttribute(name);
+    return false;
+  }
+
+  return exists;
 };
 
 prototype.getAttributeNames = function () {

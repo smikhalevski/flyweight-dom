@@ -109,6 +109,40 @@ describe('Element', () => {
     expect(element.hasAttribute('bbb')).toBe(false);
   });
 
+  test('toggles an attribute on', () => {
+    const element = new Element('aaa');
+
+    expect(element.toggleAttribute('bbb')).toBe(true);
+    expect(element.getAttribute('bbb')).toBe('');
+  });
+
+  test('toggles an attribute off', () => {
+    const element = new Element('aaa', { bbb: '' });
+
+    expect(element.toggleAttribute('bbb')).toBe(false);
+    expect(element.getAttribute('bbb')).toBe(null);
+  });
+
+  test('force toggles an attribute on', () => {
+    const element = new Element('aaa');
+
+    expect(element.toggleAttribute('bbb', true)).toBe(true);
+    expect(element.getAttribute('bbb')).toBe('');
+
+    expect(element.toggleAttribute('bbb', true)).toBe(true);
+    expect(element.getAttribute('bbb')).toBe('');
+  });
+
+  test('force toggles an attribute off', () => {
+    const element = new Element('aaa', { bbb: '' });
+
+    expect(element.toggleAttribute('bbb', false)).toBe(false);
+    expect(element.getAttribute('bbb')).toBe(null);
+
+    expect(element.toggleAttribute('bbb', false)).toBe(false);
+    expect(element.getAttribute('bbb')).toBe(null);
+  });
+
   test('returns a list of attribute names', () => {
     const element = new Element('aaa', { bbb: '111', ccc: '222' });
 

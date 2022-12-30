@@ -61,14 +61,13 @@ prototype.startIndex = prototype.endIndex = -1;
 prototype.nodeType = -1;
 prototype.nodeName = '';
 
-prototype.parentNode =
-  prototype.previousSibling =
-  prototype.nextSibling =
-  prototype.firstChild =
-  prototype.lastChild =
-  prototype.nodeValue =
-  prototype.textContent =
-    null;
+prototype.parentNode = null;
+prototype.previousSibling = null;
+prototype.nextSibling = null;
+prototype.firstChild = null;
+prototype.lastChild = null;
+prototype.nodeValue = null;
+prototype.textContent = null;
 
 Object.defineProperties(prototype, {
   childNodes: {
@@ -104,13 +103,14 @@ prototype.contains = function (node) {
   return node != null ? uncheckedContains(this, node) : false;
 };
 
-prototype.appendChild =
-  prototype.insertBefore =
-  prototype.removeChild =
-  prototype.replaceChild =
-    () => {
-      die('This node type does not support this method');
-    };
+function unsupported(): never {
+  die('This node type does not support this method');
+}
+
+prototype.appendChild = unsupported;
+prototype.insertBefore = unsupported;
+prototype.removeChild = unsupported;
+prototype.replaceChild = unsupported;
 
 prototype.cloneNode = () => {
   die('Abstract method');

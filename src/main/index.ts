@@ -123,6 +123,11 @@ export declare abstract class Node {
   replaceChild<T extends Node>(node: Node, child: T): T;
 
   /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode Node.isEqualNode} on MDN
+   */
+  isEqualNode(otherNode: Node | null | undefined): boolean;
+
+  /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode Node.cloneNode} on MDN
    */
   cloneNode(deep?: boolean): Node;
@@ -283,8 +288,6 @@ export declare class Element extends Node implements ChildNode, ParentNode {
   readonly firstElementChild: Element | null;
   readonly lastElementChild: Element | null;
 
-  // Inherited from ChildNode
-
   /**
    * Creates a new instance of {@linkcode Element}.
    */
@@ -329,8 +332,6 @@ export declare class Element extends Node implements ChildNode, ParentNode {
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText Element.insertAdjacentText} on MDN
    */
   insertAdjacentText(position: InsertPosition, data: string): void;
-
-  // Inherited from ParentNode
 
   after(...nodes: Array<Node | string>): this;
 
@@ -377,8 +378,6 @@ export declare abstract class CharacterData extends Node implements ChildNode {
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/insertData CharacterData.insertData} on MDN
    */
   insertData(offset: number, data: string): this;
-
-  // Inherited from ChildNode
 
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData CharacterData.replaceData} on MDN
@@ -455,12 +454,21 @@ export declare class CDATASection extends Text {
  * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType} on MDN
  */
 export declare class DocumentType extends Node implements ChildNode {
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.name} on MDN
+   */
   readonly name: string;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.publicId} on MDN
+   */
   readonly publicId: string;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.systemId} on MDN
+   */
   readonly systemId: string;
   readonly nextElementSibling: Element | null;
-
-  // Inherited from ChildNode
   readonly previousElementSibling: Element | null;
 
   /**
@@ -481,8 +489,6 @@ export declare class DocumentType extends Node implements ChildNode {
  * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment DocumentFragment} on MDN
  */
 export declare class DocumentFragment extends Node implements ParentNode {
-  // Inherited from ParentNode
-
   readonly children: readonly Node[];
   readonly childElementCount: number;
   readonly firstElementChild: Element | null;
@@ -508,9 +514,6 @@ export declare class Document extends Node implements ParentNode {
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement Document.documentElement} on MDN
    */
   readonly documentElement: Element | null;
-
-  // Inherited from ParentNode
-
   readonly children: readonly Node[];
   readonly childElementCount: number;
   readonly firstElementChild: Element | null;

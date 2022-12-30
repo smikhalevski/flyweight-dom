@@ -8,15 +8,10 @@ import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { assertInsertableNode } from './uncheckedToInsertableNode';
 
 export function extendNode(prototype: Node): void {
-  prototype.hasChildNodes = hasChildNodes;
   prototype.appendChild = appendChild;
   prototype.insertBefore = insertBefore;
   prototype.removeChild = removeChild;
   prototype.replaceChild = replaceChild;
-}
-
-function hasChildNodes(this: Node): boolean {
-  return this.firstChild != null;
 }
 
 function appendChild<T extends Node>(this: ParentNode, node: T): T {

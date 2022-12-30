@@ -49,3 +49,18 @@ export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeType): Ele
 export function isSpaceChar(charCode: number): boolean {
   return charCode === 32 || charCode === 9 || charCode === 10 || charCode === 12 || charCode === 13;
 }
+
+export function isEqualConstructor<T extends Node>(node: T, otherNode: Node | null | undefined): otherNode is T {
+  return otherNode != null && otherNode.constructor === node.constructor;
+}
+
+export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
+  let child = node.firstChild;
+  let otherChild = otherNode.firstChild;
+
+  while (child != null && otherNode != null && child.isEqualNode(otherChild)) {
+    child = child.nextSibling;
+    otherChild = otherNode.nextSibling;
+  }
+  return child === null && otherChild === null;
+}

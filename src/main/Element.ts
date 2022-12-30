@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { die, extendClass, isSpaceChar } from './utils';
+import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
 import { NodeType } from './NodeType';
 import { ChildNode, extendChildNode } from './extendChildNode';
 import { extendParentNode, ParentNode } from './extendParentNode';
@@ -145,6 +145,15 @@ prototype.insertAdjacentText = function (position, data) {
   }
 };
 
+prototype.isEqualNode = function (otherNode) {
+  return (
+    isEqualConstructor(this, otherNode) &&
+    this.tagName == otherNode.tagName &&
+    isEqualAttributes(this._attributes, otherNode._attributes) &&
+    isEqualChildNodes(this, otherNode)
+  );
+};
+
 prototype.cloneNode = function (deep) {
   const node = new Element(this.tagName, Object.assign({}, this._attributes));
   if (deep) {
@@ -152,6 +161,25 @@ prototype.cloneNode = function (deep) {
   }
   return node;
 };
+
+function isEqualAttributes(attributes: Element['_attributes'], otherAttributes: Element['_attributes']): boolean {
+  if (attributes === undefined) {
+    return otherAttributes === undefined || Object.keys(otherAttributes).length === 0;
+  }
+  if (otherAttributes === undefined) {
+    return Object.keys(attributes).length === 0;
+  }
+  let attributeCount = 0;
+
+  for (const key in attributes) {
+    ++attributeCount;
+
+    if (attributes[key] !== otherAttributes[key]) {
+      return false;
+    }
+  }
+  return Object.keys(otherAttributes).length === attributeCount;
+}
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {
   if (position === 'beforeBegin') {

@@ -1,4 +1,4 @@
-import { Constructor, extendClass } from './utils';
+import { Constructor, extendClass, isEqualConstructor } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './extendChildNode';
 
@@ -67,6 +67,10 @@ prototype.replaceData = function (offset, count, data) {
 
 prototype.substringData = function (offset, count) {
   return this.data.substring(offset, offset + count);
+};
+
+prototype.isEqualNode = function (otherNode) {
+  return isEqualConstructor(this, otherNode) && otherNode.data === this.data;
 };
 
 prototype.cloneNode = function () {

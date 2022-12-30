@@ -1,4 +1,4 @@
-import { DOMTokenList, Element, InsertPosition, Node } from '../main';
+import { DOMTokenList, Element, InsertPosition, Node, Text } from '../main';
 
 describe('Element', () => {
   test('creates an Element instance', () => {
@@ -208,6 +208,28 @@ describe('Element', () => {
     );
   });
 
+  test('inserts adjacent text', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentText('beforeBegin', ' ccc ');
+
+    expect(element1.firstChild).toEqual(new Text(' ccc '));
+  });
+
+  test('does not insert text if it consists of spaces', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentText('beforeBegin', ' \t');
+
+    expect(element1.firstChild).toEqual(element2);
+  });
+
   test('shallow clones an Element instance', () => {
     const element1 = new Element('aaa');
     const element2 = new Element('bbb');
@@ -231,5 +253,32 @@ describe('Element', () => {
     expect(node).toBeInstanceOf(Element);
     expect(node.firstChild).not.toBe(element2);
     expect(node.firstChild!.nodeType).toBe(Node.ELEMENT_NODE);
+  });
+
+  test('elements are equal is tags are equal', () => {
+    expect(new Element('aaa').isEqualNode(new Element('aaa'))).toBe(true);
+    expect(new Element('aaa').isEqualNode(new Element('bbb'))).toBe(false);
+  });
+
+  test('elements are equal when attributes are equal', () => {
+    expect(
+      new Element('aaa').setAttribute('xxx', 'yyy').isEqualNode(new Element('aaa').setAttribute('xxx', 'yyy'))
+    ).toBe(true);
+
+    expect(new Element('aaa').setAttribute('xxx', 'yyy').isEqualNode(new Element('aaa'))).toBe(false);
+    expect(new Element('aaa').isEqualNode(new Element('aaa').setAttribute('xxx', 'yyy'))).toBe(false);
+
+    expect(
+      new Element('aaa').setAttribute('qqq', 'ppp').isEqualNode(new Element('aaa').setAttribute('xxx', 'yyy'))
+    ).toBe(false);
+  });
+
+  test('elements are equal when children are equal', () => {
+    expect(new Element('aaa').append('xxx').isEqualNode(new Element('aaa').append('xxx'))).toBe(true);
+
+    expect(new Element('aaa').append('xxx').isEqualNode(new Element('aaa'))).toBe(false);
+    expect(new Element('aaa').isEqualNode(new Element('aaa').append('xxx'))).toBe(false);
+
+    expect(new Element('aaa').append('xxx').isEqualNode(new Element('aaa').append('yyy'))).toBe(false);
   });
 });

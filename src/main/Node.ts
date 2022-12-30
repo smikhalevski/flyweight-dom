@@ -1,5 +1,5 @@
 import { Element } from './Element';
-import { die } from './utils';
+import { die, isEqualChildNodes, isEqualConstructor } from './utils';
 import { ChildNode } from './extendChildNode';
 import { ParentNode } from './extendParentNode';
 import { NodeType } from './NodeType';
@@ -37,6 +37,8 @@ export interface Node {
   removeChild<T extends Node>(child: T): T;
 
   replaceChild<T extends Node>(node: Node, child: T): T;
+
+  isEqualNode(otherNode: Node | null | undefined): boolean;
 
   cloneNode(deep?: boolean): this;
 }
@@ -96,7 +98,7 @@ Object.defineProperties(prototype, {
 });
 
 prototype.hasChildNodes = function () {
-  return this._childNodes != null && this._childNodes.length !== 0;
+  return this.firstChild != null;
 };
 
 prototype.contains = function (node) {
@@ -111,6 +113,10 @@ prototype.appendChild = unsupported;
 prototype.insertBefore = unsupported;
 prototype.removeChild = unsupported;
 prototype.replaceChild = unsupported;
+
+prototype.isEqualNode = function (otherNode) {
+  return isEqualConstructor(this, otherNode) && isEqualChildNodes(this, otherNode);
+};
 
 prototype.cloneNode = () => {
   die('Abstract method');

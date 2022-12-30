@@ -15,7 +15,7 @@ export interface Element extends Node, ChildNode, ParentNode {
   classList: DOMTokenList;
 
   // private
-  _attributes: { [name: string]: string };
+  _attributes: { [name: string]: string } | undefined;
 
   setAttribute(name: string, value: string): this;
 
@@ -29,7 +29,7 @@ export interface Element extends Node, ChildNode, ParentNode {
 }
 
 export class Element {
-  constructor(tagName: string, attributes: { [name: string]: string } = {}) {
+  constructor(tagName: string, attributes?: { [name: string]: string }) {
     this.nodeName = this.tagName = tagName;
     this._attributes = attributes;
   }
@@ -46,28 +46,30 @@ extendParentNode(prototype);
 Object.defineProperties(prototype, {
   id: {
     get(this: Element) {
-      return this._attributes.id || '';
+      return this.getAttribute('id');
     },
     set(this: Element, value) {
-      this._attributes.id = value;
+      this.setAttribute('id', value);
     },
   },
 
   className: {
     get(this: Element) {
-      return this._attributes.class || '';
+      return this.getAttribute('class');
     },
     set(this: Element, value) {
-      this._attributes.class = value;
+      this.setAttribute('class', value);
     },
   },
 
   classList: {
     get(this: Element) {
       const tokenList = new DOMTokenList({
-        get: () => this._attributes.class || '',
+        get: () => {
+          return this.getAttribute('class')!;
+        },
         set: value => {
-          this._attributes.class = value;
+          this.setAttribute('class', value);
         },
       });
 
@@ -79,25 +81,30 @@ Object.defineProperties(prototype, {
 });
 
 prototype.setAttribute = function (name, value) {
-  this._attributes[name] = value;
+  if (this._attributes === undefined) {
+    this._attributes = { id: '', class: '' };
+  }
+  this._attributes[name] = '' + value;
   return this;
 };
 
 prototype.getAttribute = function (name) {
-  return this._attributes[name] ?? null;
+  return this._attributes !== undefined && this._attributes[name] != null ? this._attributes[name] : null;
 };
 
 prototype.hasAttribute = function (name) {
-  return this._attributes[name] != null;
+  return this._attributes !== undefined && this._attributes[name] != null;
 };
 
 prototype.removeAttribute = function (name) {
-  delete this._attributes[name];
+  if (this._attributes !== undefined) {
+    delete this._attributes[name];
+  }
   return this;
 };
 
 prototype.getAttributeNames = function () {
-  return Object.keys(this._attributes);
+  return this._attributes !== undefined ? Object.keys(this._attributes) : [];
 };
 
 prototype.cloneNode = function (deep) {

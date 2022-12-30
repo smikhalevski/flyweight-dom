@@ -10,7 +10,7 @@ export interface ValueAccessor {
 }
 
 export interface DOMTokenList {
-  readonly length: number;
+  length: number;
   value: string;
 
   // private
@@ -201,7 +201,7 @@ function assertToken(token: string): void {
 
     // https://www.w3.org/TR/2009/WD-html5-20090212/infrastructure.html#space-character
     if (charCode === 32 || charCode === 9 || charCode === 10 || charCode === 12 || charCode === 13) {
-      die("The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens.");
+      die("The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens");
     }
   }
 }

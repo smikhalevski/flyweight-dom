@@ -292,7 +292,7 @@ export declare class Element extends Node implements ChildNode, ParentNode {
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute Element.getAttribute on MDN}
    */
-  getAttribute(name: string): string | undefined;
+  getAttribute(name: string): string | null;
 
   /**
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute on MDN}

@@ -23,7 +23,7 @@ export class CharacterData {}
 
 const prototype = extendClass(CharacterData, Node);
 
-extendChildNode(prototype);
+extendChildNode(CharacterData);
 
 const nodeValueDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
   get() {

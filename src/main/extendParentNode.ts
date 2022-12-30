@@ -1,10 +1,12 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
+import { Constructor, die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
-import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
+import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { NodeType } from './NodeType';
+import { ChildNode } from './extendChildNode';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 
 export interface ParentNode extends Node {
   // public readonly
@@ -23,7 +25,9 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: Array<Node | string>): this;
 }
 
-export function extendParentNode(prototype: ParentNode): void {
+export function extendParentNode(constructor: Constructor<ParentNode>): void {
+  const prototype = constructor.prototype;
+
   Object.defineProperties(prototype, {
     children: {
       get(this: ParentNode) {
@@ -72,9 +76,56 @@ export function extendParentNode(prototype: ParentNode): void {
     },
   });
 
+  prototype.appendChild = appendChild;
+  prototype.insertBefore = insertBefore;
+  prototype.removeChild = removeChild;
+  prototype.replaceChild = replaceChild;
   prototype.append = append;
   prototype.prepend = prepend;
   prototype.replaceChildren = replaceChildren;
+}
+
+function appendChild<T extends Node>(this: ParentNode, node: T): T {
+  assertInsertableNode(this, node);
+  uncheckedRemoveAndAppendChild(this, node);
+  return node;
+}
+
+function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | null | undefined): T {
+  assertInsertableNode(this, node);
+
+  if (child != null) {
+    if (child.parentNode !== this) {
+      die('The node before which the new node is to be inserted is not a child of this node');
+    }
+  } else {
+    child = this.firstChild;
+  }
+  if (child != null) {
+    uncheckedRemoveAndInsertBefore(this, node, child as ChildNode);
+  } else {
+    uncheckedRemoveAndAppendChild(this, node);
+  }
+  return node;
+}
+
+function removeChild<T extends Node>(this: Node, child: T): T {
+  if (child.parentNode !== this) {
+    die('The node to be removed is not a child of this node');
+  }
+  uncheckedRemoveChild(child.parentNode, child as Node as ChildNode);
+  return child;
+}
+
+function replaceChild<T extends Node>(this: ParentNode, node: Node, child: T): T {
+  assertInsertableNode(this, node);
+
+  if (child.parentNode !== this) {
+    die('The node to be replaced is not a child of this node');
+  }
+  uncheckedRemoveAndInsertBefore(this, node, child as Node as ChildNode);
+  uncheckedRemoveChild(this, child as Node as ChildNode);
+  return child;
 }
 
 function append(this: ParentNode /*...nodes: Array<Node | string>*/) {

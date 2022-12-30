@@ -4,7 +4,7 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils';
+import { Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils';
 import { NodeType } from './NodeType';
 
 export interface ChildNode extends Node {
@@ -21,7 +21,9 @@ export interface ChildNode extends Node {
   replaceWith(...nodes: Array<Node | string>): this;
 }
 
-export function extendChildNode(prototype: ChildNode): void {
+export function extendChildNode(constructor: Constructor<ChildNode>): void {
+  const prototype = constructor.prototype;
+
   Object.defineProperties(prototype, {
     previousElementSibling: {
       get(this: ChildNode) {

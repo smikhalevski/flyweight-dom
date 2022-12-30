@@ -22,7 +22,7 @@ const prototype = extendClass(DocumentType, Node);
 
 prototype.nodeType = NodeType.DOCUMENT_TYPE_NODE;
 
-extendChildNode(prototype);
+extendChildNode(DocumentType);
 
 prototype.isEqualNode = function (otherNode) {
   return (

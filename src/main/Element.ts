@@ -5,7 +5,6 @@ import { ChildNode, extendChildNode } from './extendChildNode';
 import { extendParentNode, ParentNode } from './extendParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DOMTokenList } from './DOMTokenList';
-import { extendNode } from './extendNode';
 import { Text } from './Text';
 
 export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
@@ -48,9 +47,8 @@ const prototype = extendClass(Element, Node);
 
 prototype.nodeType = NodeType.ELEMENT_NODE;
 
-extendNode(prototype);
-extendChildNode(prototype);
-extendParentNode(prototype);
+extendChildNode(Element);
+extendParentNode(Element);
 
 Object.defineProperties(prototype, {
   id: {

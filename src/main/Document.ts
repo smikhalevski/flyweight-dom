@@ -4,7 +4,6 @@ import { NodeType } from './NodeType';
 import { Element } from './Element';
 import { extendClass, getNextSiblingOrSelf } from './utils';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
-import { extendNode } from './extendNode';
 
 export interface Document extends Node, ParentNode {
   readonly doctype: DocumentType | null;
@@ -18,8 +17,7 @@ const prototype = extendClass(Document, Node);
 prototype.nodeType = NodeType.DOCUMENT_NODE;
 prototype.nodeName = '#document';
 
-extendNode(prototype);
-extendParentNode(prototype);
+extendParentNode(Document);
 
 Object.defineProperties(prototype, {
   doctype: {

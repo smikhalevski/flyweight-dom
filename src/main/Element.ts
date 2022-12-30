@@ -1,11 +1,14 @@
 import { Node } from './Node';
-import { extendClass } from './utils';
+import { die, extendClass, isSpaceChar } from './utils';
 import { NodeType } from './NodeType';
 import { ChildNode, extendChildNode } from './extendChildNode';
 import { extendParentNode, ParentNode } from './extendParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DOMTokenList } from './DOMTokenList';
 import { extendNode } from './extendNode';
+import { Text } from './Text';
+
+export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
 
 export interface Element extends Node, ChildNode, ParentNode {
   // readonly
@@ -28,6 +31,10 @@ export interface Element extends Node, ChildNode, ParentNode {
   toggleAttribute(name: string, force?: boolean): boolean;
 
   getAttributeNames(): string[];
+
+  insertAdjacentElement(position: InsertPosition, element: Element): Element | null;
+
+  insertAdjacentText(position: InsertPosition, data: string): void;
 }
 
 export class Element {
@@ -126,6 +133,18 @@ prototype.getAttributeNames = function () {
   return this._attributes !== undefined ? Object.keys(this._attributes) : [];
 };
 
+prototype.insertAdjacentElement = function (position, element) {
+  return insertAdjacentNode(this, position, element);
+};
+
+prototype.insertAdjacentText = function (position, data) {
+  for (let i = 0, dataLength = data.length; i < dataLength; ++i) {
+    if (!isSpaceChar(data.charCodeAt(i))) {
+      return insertAdjacentNode(this, position, new Text(data));
+    }
+  }
+};
+
 prototype.cloneNode = function (deep) {
   const node = new Element(this.tagName, Object.assign({}, this._attributes));
   if (deep) {
@@ -133,3 +152,29 @@ prototype.cloneNode = function (deep) {
   }
   return node;
 };
+
+function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {
+  if (position === 'beforeBegin') {
+    if (element.parentNode === null) {
+      return null;
+    }
+    element.before(node);
+    return node;
+  }
+  if (position === 'afterBegin') {
+    element.prepend(node);
+    return node;
+  }
+  if (position === 'beforeEnd') {
+    element.append(node);
+    return node;
+  }
+  if (position === 'afterEnd') {
+    if (element.parentNode === null) {
+      return null;
+    }
+    element.after(node);
+    return node;
+  }
+  die("The value provided ('" + position + "') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'");
+}

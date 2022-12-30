@@ -1,4 +1,5 @@
 import { ValueAccessor } from './DOMTokenList';
+import { InsertPosition } from './Element';
 
 export * from './Text';
 export * from './CDATASection';
@@ -318,6 +319,16 @@ export declare class Element extends Node implements ChildNode, ParentNode {
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames Element.getAttributeNames} on MDN
    */
   getAttributeNames(): string[];
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement Element.insertAdjacentElement} on MDN
+   */
+  insertAdjacentElement(position: InsertPosition, element: Element): Element | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText Element.insertAdjacentText} on MDN
+   */
+  insertAdjacentText(position: InsertPosition, data: string): void;
 
   // Inherited from ParentNode
 

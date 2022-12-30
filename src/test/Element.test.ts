@@ -1,4 +1,4 @@
-import { DOMTokenList, Element, Node } from '../main';
+import { DOMTokenList, Element, InsertPosition, Node } from '../main';
 
 describe('Element', () => {
   test('creates an Element instance', () => {
@@ -147,6 +147,65 @@ describe('Element', () => {
     const element = new Element('aaa', { bbb: '111', ccc: '222' });
 
     expect(element.getAttributeNames()).toEqual(['bbb', 'ccc']);
+  });
+
+  test('inserts adjacent element beforeBegin', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentElement('beforeBegin', element3);
+
+    expect(element1.firstChild).toBe(element3);
+  });
+
+  test('inserts adjacent element afterBegin', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element1.insertAdjacentElement('afterBegin', element3);
+
+    expect(element1.firstChild).toBe(element3);
+    expect(element1.lastElementChild).toBe(element2);
+  });
+
+  test('inserts adjacent element beforeEnd', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element1.insertAdjacentElement('beforeEnd', element3);
+
+    expect(element1.firstChild).toBe(element2);
+    expect(element1.lastElementChild).toBe(element3);
+  });
+
+  test('inserts adjacent element afterEnd', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentElement('afterEnd', element3);
+
+    expect(element1.lastChild).toBe(element3);
+  });
+
+  test('throw is invalid position is provided', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+
+    expect(() => element1.insertAdjacentElement('xxx' as InsertPosition, element2)).toThrow(
+      new Error("The value provided ('xxx') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'")
+    );
   });
 
   test('shallow clones an Element instance', () => {

@@ -44,3 +44,8 @@ export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeType): Ele
   }
   return node as Element | null;
 }
+
+// https://www.w3.org/TR/2009/WD-html5-20090212/infrastructure.html#space-character
+export function isSpaceChar(charCode: number): boolean {
+  return charCode === 32 || charCode === 9 || charCode === 10 || charCode === 12 || charCode === 13;
+}

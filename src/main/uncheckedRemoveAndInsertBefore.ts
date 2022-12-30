@@ -1,5 +1,5 @@
-import { ParentNode } from './extendParentNode';
-import { ChildNode } from './extendChildNode';
+import { ParentNode } from './ParentNode';
+import { ChildNode } from './ChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 import { isDocumentFragment } from './utils';

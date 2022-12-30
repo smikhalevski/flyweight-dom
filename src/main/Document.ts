@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { extendParentNode, ParentNode } from './extendParentNode';
+import { extendParentNode, ParentNode } from './ParentNode';
 import { NodeType } from './NodeType';
 import { Element } from './Element';
 import { extendClass, getNextSiblingOrSelf } from './utils';
@@ -17,7 +17,7 @@ const prototype = extendClass(Document, Node);
 prototype.nodeType = NodeType.DOCUMENT_NODE;
 prototype.nodeName = '#document';
 
-extendParentNode(Document);
+extendParentNode(prototype);
 
 Object.defineProperties(prototype, {
   doctype: {

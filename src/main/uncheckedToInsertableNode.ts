@@ -1,8 +1,8 @@
 import { Node } from './Node';
-import { ParentNode } from './extendParentNode';
+import { ParentNode } from './ParentNode';
 import { Text } from './Text';
 import { DocumentFragment } from './DocumentFragment';
-import { ChildNode } from './extendChildNode';
+import { ChildNode } from './ChildNode';
 import { NodeType } from './NodeType';
 import { die } from './utils';
 import { uncheckedContains } from './uncheckedContains';

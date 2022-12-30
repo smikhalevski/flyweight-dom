@@ -1,7 +1,7 @@
 import { Element } from './Element';
-import { die, isEqualChildNodes, isEqualConstructor } from './utils';
-import { ChildNode } from './extendChildNode';
-import { ParentNode } from './extendParentNode';
+import { Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor } from './utils';
+import { ChildNode } from './ChildNode';
+import { ParentNode } from './ParentNode';
 import { NodeType } from './NodeType';
 import { uncheckedContains } from './uncheckedContains';
 
@@ -54,6 +54,10 @@ export class Node {
   static readonly DOCUMENT_NODE: number = NodeType.DOCUMENT_NODE;
   static readonly DOCUMENT_TYPE_NODE: number = NodeType.DOCUMENT_TYPE_NODE;
   static readonly DOCUMENT_FRAGMENT_NODE: number = NodeType.DOCUMENT_FRAGMENT_NODE;
+
+  static extend(constructor: Constructor): void {
+    extendClass(constructor, this);
+  }
 }
 
 const prototype = Node.prototype;

@@ -1,5 +1,5 @@
-import { ParentNode } from './extendParentNode';
-import { ChildNode } from './extendChildNode';
+import { ParentNode } from './ParentNode';
+import { ChildNode } from './ChildNode';
 import { isElement } from './utils';
 
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {

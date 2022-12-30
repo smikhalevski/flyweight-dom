@@ -4,6 +4,7 @@ import { InsertPosition } from './Element';
 export * from './Text';
 export * from './CDATASection';
 export * from './CharacterData';
+export * from './ChildNode';
 export * from './Comment';
 export * from './Document';
 export * from './DocumentFragment';
@@ -11,7 +12,12 @@ export * from './DocumentType';
 export * from './DOMTokenList';
 export * from './Element';
 export * from './Node';
+export * from './ParentNode';
 export * from './ProcessingInstruction';
+
+export declare function extendParentNode(prototype: ParentNode): void;
+
+export declare function extendChildNode(prototype: ChildNode): void;
 
 /**
  * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
@@ -26,6 +32,8 @@ export declare abstract class Node {
   static readonly DOCUMENT_NODE: number;
   static readonly DOCUMENT_TYPE_NODE: number;
   static readonly DOCUMENT_FRAGMENT_NODE: number;
+
+  static extend(constructor: new (...args: any[]) => any): void;
 
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType} on MDN
@@ -165,6 +173,13 @@ export interface ChildNode extends Node {
   replaceWith(...nodes: Array<Node | string>): this;
 }
 
+/**
+ * Extends any class with {@linkcode ChildNode} methods.
+ */
+export declare const ChildNode: {
+  extend(constructor: new (...args: any[]) => ChildNode): void;
+};
+
 export interface ParentNode extends Node {
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children} on MDN
@@ -203,6 +218,13 @@ export interface ParentNode extends Node {
 }
 
 /**
+ * Extends any class with {@linkcode ParentNode} methods.
+ */
+export declare const ParentNode: {
+  extend(constructor: new (...args: any[]) => ParentNode): void;
+};
+
+/**
  * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList} on MDN
  */
 export declare class DOMTokenList {
@@ -220,7 +242,7 @@ export declare class DOMTokenList {
    *
    * @param valueAccessor The accessor that reads and writes class string.
    */
-  protected constructor(valueAccessor: ValueAccessor);
+  constructor(valueAccessor: ValueAccessor);
 
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add DOMTokenList.add} on MDN

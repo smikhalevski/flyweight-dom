@@ -5,6 +5,14 @@ describe('CDATASection', () => {
     expect(CDATASection.ELEMENT_NODE).toBe(1);
   });
 
+  test('can extend the constructor', () => {
+    class MyClass {}
+
+    CDATASection.extend(MyClass);
+
+    expect(new MyClass()).toBeInstanceOf(CDATASection);
+  });
+
   test('creates a new CDATASection instance', () => {
     const node = new CDATASection();
 

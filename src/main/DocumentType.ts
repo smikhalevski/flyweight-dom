@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { ChildNode, extendChildNode } from './extendChildNode';
+import { ChildNode, extendChildNode } from './ChildNode';
 import { NodeType } from './NodeType';
 import { extendClass, isEqualConstructor } from './utils';
 
@@ -22,7 +22,7 @@ const prototype = extendClass(DocumentType, Node);
 
 prototype.nodeType = NodeType.DOCUMENT_TYPE_NODE;
 
-extendChildNode(DocumentType);
+extendChildNode(prototype);
 
 prototype.isEqualNode = function (otherNode) {
   return (

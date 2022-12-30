@@ -1,6 +1,6 @@
 import { Constructor, extendClass, isEqualConstructor } from './utils';
 import { Node } from './Node';
-import { ChildNode, extendChildNode } from './extendChildNode';
+import { ChildNode, extendChildNode } from './ChildNode';
 
 export interface CharacterData extends Node, ChildNode {
   readonly length: number;
@@ -23,7 +23,7 @@ export class CharacterData {}
 
 const prototype = extendClass(CharacterData, Node);
 
-extendChildNode(CharacterData);
+extendChildNode(prototype);
 
 const nodeValueDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
   get() {

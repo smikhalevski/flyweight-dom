@@ -1,8 +1,18 @@
-import { Text } from '../main/Text';
-import { Element } from '../main/Element';
-import { Document } from '../main/Document';
+import { Document, Element, extendParentNode, Node, ParentNode, Text } from '../main';
 
-describe('extendParentNode', () => {
+describe('ParentNode', () => {
+  test('extends a class constructor', () => {
+    interface MockNode extends ParentNode {}
+
+    class MockNode extends Node {}
+
+    extendParentNode(MockNode.prototype);
+
+    const mockNode = new Element('aaa').appendChild(new MockNode()).append('ccc');
+
+    expect(mockNode.firstChild).toEqual(new Text('ccc'));
+  });
+
   describe('hasChildNodes', () => {
     test('returns true if has children', () => {
       const parent = new Element('aaa');

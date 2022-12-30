@@ -1,8 +1,8 @@
 import { Node } from './Node';
 import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
 import { NodeType } from './NodeType';
-import { ChildNode, extendChildNode } from './extendChildNode';
-import { extendParentNode, ParentNode } from './extendParentNode';
+import { ChildNode, extendChildNode } from './ChildNode';
+import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DOMTokenList } from './DOMTokenList';
 import { Text } from './Text';
@@ -47,8 +47,8 @@ const prototype = extendClass(Element, Node);
 
 prototype.nodeType = NodeType.ELEMENT_NODE;
 
-extendChildNode(Element);
-extendParentNode(Element);
+extendChildNode(prototype);
+extendParentNode(prototype);
 
 Object.defineProperties(prototype, {
   id: {

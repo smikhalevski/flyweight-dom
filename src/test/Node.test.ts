@@ -1,4 +1,4 @@
-import { Node, Text } from '../main';
+import { Element, Node, Text } from '../main';
 
 describe('Node', () => {
   class MockNode extends Node {}
@@ -39,6 +39,14 @@ describe('Node', () => {
     expect(() => node.insertBefore(text, null)).toThrow(new Error('This node type does not support this method'));
     expect(() => node.removeChild(text)).toThrow(new Error('This node type does not support this method'));
     expect(() => node.replaceChild(text, text)).toThrow(new Error('This node type does not support this method'));
+  });
+
+  test('cloneNode throws', () => {
+    const node = new MockNode();
+    const element = new Element('aaa');
+
+    expect(element.appendChild(node)).toBe(node);
+    expect(element.firstChild).toBe(node);
   });
 
   test('cloneNode throws', () => {

@@ -1,11 +1,11 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { Constructor, die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
+import { die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { NodeType } from './NodeType';
-import { ChildNode } from './extendChildNode';
+import { ChildNode } from './ChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 
 export interface ParentNode extends Node {
@@ -25,9 +25,7 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: Array<Node | string>): this;
 }
 
-export function extendParentNode(constructor: Constructor<ParentNode>): void {
-  const prototype = constructor.prototype;
-
+export function extendParentNode(prototype: ParentNode): void {
   Object.defineProperties(prototype, {
     children: {
       get(this: ParentNode) {

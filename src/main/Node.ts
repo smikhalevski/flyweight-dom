@@ -78,7 +78,9 @@ prototype.textContent = null;
 Object.defineProperties(prototype, {
   childNodes: {
     get(this: Node) {
-      const nodes: ChildNode[] = (this._childNodes = []);
+      const nodes: ChildNode[] = [];
+
+      this._childNodes = nodes;
 
       for (let child = this.firstChild; child != null; child = child.nextSibling) {
         nodes.push(child);

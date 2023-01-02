@@ -29,7 +29,9 @@ export function extendParentNode(prototype: ParentNode): void {
   Object.defineProperties(prototype, {
     children: {
       get(this: ParentNode) {
-        const nodes: Element[] = (this._children = []);
+        const nodes: Element[] = [];
+
+        this._children = nodes;
 
         for (let child = this.firstChild; child != null; child = child.nextSibling) {
           if (isElement(child)) {

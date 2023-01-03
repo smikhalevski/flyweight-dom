@@ -7,6 +7,12 @@ import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DOMTokenList } from './DOMTokenList';
 import { Text } from './Text';
 
+const ATTRIBUTES = Symbol('attributes');
+
+export interface Attributes {
+  [name: string]: string;
+}
+
 export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
 
 export interface Element extends Node, ChildNode, ParentNode {
@@ -17,7 +23,7 @@ export interface Element extends Node, ChildNode, ParentNode {
   classList: DOMTokenList;
 
   // private
-  _attributes: { [name: string]: string } | undefined;
+  [ATTRIBUTES]: Attributes | undefined;
 
   setAttribute(name: string, value: string): this;
 
@@ -37,9 +43,9 @@ export interface Element extends Node, ChildNode, ParentNode {
 }
 
 export class Element {
-  constructor(tagName: string, attributes?: { [name: string]: string }) {
+  constructor(tagName: string, attributes?: Attributes) {
     this.nodeName = this.tagName = tagName;
-    this._attributes = attributes;
+    this[ATTRIBUTES] = attributes;
   }
 }
 
@@ -88,24 +94,24 @@ Object.defineProperties(prototype, {
 });
 
 prototype.setAttribute = function (name, value) {
-  if (this._attributes === undefined) {
-    this._attributes = {};
+  if (this[ATTRIBUTES] === undefined) {
+    this[ATTRIBUTES] = {};
   }
-  this._attributes[name] = '' + value;
+  this[ATTRIBUTES][name] = '' + value;
   return this;
 };
 
 prototype.getAttribute = function (name) {
-  return this._attributes !== undefined && this._attributes[name] !== undefined ? this._attributes[name] : null;
+  return this[ATTRIBUTES] !== undefined && this[ATTRIBUTES][name] !== undefined ? this[ATTRIBUTES][name] : null;
 };
 
 prototype.hasAttribute = function (name) {
-  return this._attributes !== undefined && this._attributes[name] !== undefined;
+  return this[ATTRIBUTES] !== undefined && this[ATTRIBUTES][name] !== undefined;
 };
 
 prototype.removeAttribute = function (name) {
-  if (this._attributes !== undefined) {
-    delete this._attributes[name];
+  if (this[ATTRIBUTES] !== undefined) {
+    delete this[ATTRIBUTES][name];
   }
   return this;
 };
@@ -128,7 +134,7 @@ prototype.toggleAttribute = function (name, force) {
 };
 
 prototype.getAttributeNames = function () {
-  return this._attributes !== undefined ? Object.keys(this._attributes) : [];
+  return this[ATTRIBUTES] !== undefined ? Object.keys(this[ATTRIBUTES]) : [];
 };
 
 prototype.insertAdjacentElement = function (position, element) {
@@ -147,20 +153,20 @@ prototype.isEqualNode = function (otherNode) {
   return (
     isEqualConstructor(this, otherNode) &&
     this.tagName == otherNode.tagName &&
-    isEqualAttributes(this._attributes, otherNode._attributes) &&
+    isEqualAttributes(this[ATTRIBUTES], otherNode[ATTRIBUTES]) &&
     isEqualChildNodes(this, otherNode)
   );
 };
 
 prototype.cloneNode = function (deep) {
-  const node = new Element(this.tagName, Object.assign({}, this._attributes));
+  const node = new Element(this.tagName, Object.assign({}, this[ATTRIBUTES]));
   if (deep) {
     uncheckedCloneChildren(this, node);
   }
   return node;
 };
 
-function isEqualAttributes(attributes: Element['_attributes'], otherAttributes: Element['_attributes']): boolean {
+function isEqualAttributes(attributes: Attributes | undefined, otherAttributes: Attributes | undefined): boolean {
   if (attributes === undefined) {
     return otherAttributes === undefined || Object.keys(otherAttributes).length === 0;
   }

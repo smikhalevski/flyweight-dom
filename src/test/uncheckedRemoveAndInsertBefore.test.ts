@@ -3,6 +3,7 @@ import { Element } from '../main/Element';
 import { DocumentFragment } from '../main/DocumentFragment';
 import { uncheckedRemoveAndInsertBefore } from '../main/uncheckedRemoveAndInsertBefore';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
+import { CHILD_NODES } from '../main/utils';
 
 describe('uncheckedRemoveAndInsertBefore', () => {
   test('appends the first child node to an element', () => {
@@ -13,7 +14,7 @@ describe('uncheckedRemoveAndInsertBefore', () => {
     uncheckedAppendChild(parent, node2);
     uncheckedRemoveAndInsertBefore(parent, node1, node2);
 
-    expect(parent._childNodes).toBe(undefined);
+    expect(parent[CHILD_NODES]).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node2);
 

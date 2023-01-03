@@ -3,6 +3,9 @@ import { Element } from './Element';
 import { NodeType } from './NodeType';
 import { DocumentFragment } from './DocumentFragment';
 
+export const CHILDREN = Symbol('children');
+export const CHILD_NODES = Symbol('childNodes');
+
 export type Constructor<T = any> = new (...args: any[]) => T;
 
 /**

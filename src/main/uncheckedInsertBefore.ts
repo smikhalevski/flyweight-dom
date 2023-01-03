@@ -1,9 +1,11 @@
 import { ParentNode } from './ParentNode';
 import { ChildNode } from './ChildNode';
-import { isElement } from './utils';
+import { CHILD_NODES, CHILDREN, isElement } from './utils';
 
 export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child: ChildNode): void {
-  const { _childNodes, _children } = parent;
+  const childNodes = parent[CHILD_NODES];
+  const children = parent[CHILDREN];
+
   const { previousSibling } = child;
 
   node.parentNode = parent;
@@ -15,20 +17,20 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
     previousSibling.nextSibling = node;
     node.previousSibling = previousSibling;
 
-    _childNodes?.splice(_childNodes.indexOf(child), 0, node);
+    childNodes?.splice(childNodes.indexOf(child), 0, node);
   } else {
     parent.firstChild = node;
 
-    _childNodes?.unshift(node);
+    childNodes?.unshift(node);
   }
 
-  if (_children != null && isElement(node)) {
+  if (children != null && isElement(node)) {
     const childElement = isElement(child) ? child : child.nextElementSibling;
 
     if (childElement != null) {
-      _children.splice(_children.indexOf(childElement), 0, node);
+      children.splice(children.indexOf(childElement), 0, node);
     } else {
-      _children.push(node);
+      children.push(node);
     }
   }
 }

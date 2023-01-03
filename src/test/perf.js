@@ -60,6 +60,26 @@ describe(
 );
 
 describe(
+  'Element.childNodes',
+  () => {
+    beforeBatch(() => {
+      gc();
+    });
+
+    test('lib', measure => {
+      const root = new lib.Element('div');
+
+      root.append(new lib.Element('div'), new lib.Element('div'), new lib.Element('div'));
+
+      measure(() => {
+        root.childNodes.length;
+      });
+    });
+  },
+  { targetRme: 0.001, warmupIterationCount: 5 }
+);
+
+describe(
   'Element.classList.add',
   () => {
     beforeBatch(() => {

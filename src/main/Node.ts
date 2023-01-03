@@ -1,5 +1,5 @@
 import { Element } from './Element';
-import { Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor } from './utils';
+import { CHILD_NODES, Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor } from './utils';
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
 import { NodeType } from './NodeType';
@@ -24,7 +24,7 @@ export interface Node {
   endIndex: number;
 
   // private
-  _childNodes: ChildNode[] | undefined;
+  [CHILD_NODES]: ChildNode[] | undefined;
 
   hasChildNodes(): boolean;
 
@@ -80,7 +80,7 @@ Object.defineProperties(prototype, {
     get(this: Node) {
       const nodes: ChildNode[] = [];
 
-      this._childNodes = nodes;
+      this[CHILD_NODES] = nodes;
 
       for (let child = this.firstChild; child != null; child = child.nextSibling) {
         nodes.push(child);

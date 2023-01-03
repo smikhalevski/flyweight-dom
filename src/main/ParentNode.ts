@@ -1,6 +1,6 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
+import { CHILD_NODES, CHILDREN, die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
@@ -16,7 +16,7 @@ export interface ParentNode extends Node {
   readonly lastElementChild: Element | null;
 
   // private
-  _children: Element[] | undefined;
+  [CHILDREN]: Element[] | undefined;
 
   append(...nodes: Array<Node | string>): this;
 
@@ -31,7 +31,7 @@ export function extendParentNode(prototype: ParentNode): void {
       get(this: ParentNode) {
         const nodes: Element[] = [];
 
-        this._children = nodes;
+        this[CHILDREN] = nodes;
 
         for (let child = this.firstChild; child != null; child = child.nextSibling) {
           if (isElement(child)) {
@@ -46,10 +46,10 @@ export function extendParentNode(prototype: ParentNode): void {
 
     childElementCount: {
       get(this: ParentNode) {
-        const { _children } = this;
+        const children = this[CHILDREN];
 
-        if (_children) {
-          return _children.length;
+        if (children) {
+          return children.length;
         }
 
         let count = 0;
@@ -163,7 +163,8 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
 function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
-  const { _childNodes, _children } = this;
+  const childNodes = this[CHILD_NODES];
+  const children = this[CHILDREN];
 
   for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);
@@ -172,11 +173,11 @@ function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
   for (let child = this.firstChild; child != null; child = child.nextSibling) {
     child.parentNode = child.previousSibling = child.nextSibling = null;
   }
-  if (_childNodes != null) {
-    _childNodes.length = 0;
+  if (childNodes != null) {
+    childNodes.length = 0;
   }
-  if (_children != null) {
-    _children.length = 0;
+  if (children != null) {
+    children.length = 0;
   }
 
   this.firstChild = this.lastChild = null;

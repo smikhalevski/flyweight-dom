@@ -1,5 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { extendClass, NodeType } from './utils';
+import { extendClass, NodeConstants } from './utils';
 
 export interface Comment extends CharacterData {}
 
@@ -10,6 +10,6 @@ export class Comment {
 }
 
 extendClass(Comment, CharacterData, {
-  nodeType: { value: NodeType.COMMENT_NODE },
+  nodeType: { value: NodeConstants.COMMENT_NODE },
   nodeName: { value: '#comment' },
 });

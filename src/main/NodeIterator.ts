@@ -1,6 +1,7 @@
 import { Node } from './Node';
+import { NodeFilterConstants } from './utils';
 
-const FILTER_CALLBACK = Symbol('filterCallback');
+const FILTER = Symbol('filter');
 
 export type NodeFilter = ((node: Node) => number) | { acceptNode(node: Node): number };
 
@@ -20,37 +21,21 @@ export const NodeFilter = {
   SHOW_TEXT: NodeFilterConstants.SHOW_TEXT,
 };
 
-const enum NodeFilterConstants {
-  FILTER_ACCEPT = 1,
-  FILTER_REJECT = 2,
-  FILTER_SKIP = 3,
-  SHOW_ALL = 4294967295,
-  SHOW_ATTRIBUTE = 2,
-  SHOW_CDATA_SECTION = 8,
-  SHOW_COMMENT = 128,
-  SHOW_DOCUMENT = 256,
-  SHOW_DOCUMENT_FRAGMENT = 1024,
-  SHOW_DOCUMENT_TYPE = 512,
-  SHOW_ELEMENT = 1,
-  SHOW_PROCESSING_INSTRUCTION = 64,
-  SHOW_TEXT = 4,
-}
-
 export class NodeIterator {
+  root;
   referenceNode;
   pointerBeforeReferenceNode;
   whatToShow;
   filter;
 
-  constructor(readonly root: Node, whatToShow?: number, filter?: NodeFilter | null) {
-    this.referenceNode = root;
+  constructor(root: Node, whatToShow?: number, filter: NodeFilter | null = null) {
+    this.referenceNode = this.root = root;
     this.pointerBeforeReferenceNode = true;
-    this.whatToShow =
-      whatToShow == null || whatToShow < 0 || whatToShow > 0x7fffffff ? NodeFilterConstants.SHOW_ALL : whatToShow | 0;
-    this.filter = filter == null ? null : filter;
+    this.whatToShow = whatToShow !== undefined ? whatToShow | 0 : NodeFilterConstants.SHOW_ALL;
+    this.filter = filter;
   }
 
-  [FILTER_CALLBACK](node: Node): number {
+  [FILTER](node: Node): number {
     const { whatToShow, filter } = this;
 
     if ((((1 << node.nodeType) >> 1) & whatToShow) === 0) {
@@ -90,7 +75,7 @@ export class NodeIterator {
           node = node.nextSibling;
         }
       }
-      if (node !== null && this[FILTER_CALLBACK](node) === NodeFilterConstants.FILTER_ACCEPT) {
+      if (node !== null && this[FILTER](node) === NodeFilterConstants.FILTER_ACCEPT) {
         this.referenceNode = node;
         return node;
       }

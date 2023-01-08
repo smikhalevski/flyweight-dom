@@ -1,5 +1,13 @@
 import { Element } from './Element';
-import { CHILD_NODES, Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor, NodeType } from './utils';
+import {
+  CHILD_NODES,
+  Constructor,
+  die,
+  extendClass,
+  isEqualChildNodes,
+  isEqualConstructor,
+  NodeConstants,
+} from './utils';
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
 import { uncheckedContains } from './uncheckedContains';
@@ -44,15 +52,15 @@ export interface Node {
 
 // abstract
 export class Node {
-  static readonly ELEMENT_NODE: number = NodeType.ELEMENT_NODE;
-  static readonly ATTRIBUTE_NODE: number = NodeType.ATTRIBUTE_NODE;
-  static readonly TEXT_NODE: number = NodeType.TEXT_NODE;
-  static readonly CDATA_SECTION_NODE: number = NodeType.CDATA_SECTION_NODE;
-  static readonly PROCESSING_INSTRUCTION_NODE: number = NodeType.PROCESSING_INSTRUCTION_NODE;
-  static readonly COMMENT_NODE: number = NodeType.COMMENT_NODE;
-  static readonly DOCUMENT_NODE: number = NodeType.DOCUMENT_NODE;
-  static readonly DOCUMENT_TYPE_NODE: number = NodeType.DOCUMENT_TYPE_NODE;
-  static readonly DOCUMENT_FRAGMENT_NODE: number = NodeType.DOCUMENT_FRAGMENT_NODE;
+  static ELEMENT_NODE = NodeConstants.ELEMENT_NODE;
+  static ATTRIBUTE_NODE = NodeConstants.ATTRIBUTE_NODE;
+  static TEXT_NODE = NodeConstants.TEXT_NODE;
+  static CDATA_SECTION_NODE = NodeConstants.CDATA_SECTION_NODE;
+  static PROCESSING_INSTRUCTION_NODE = NodeConstants.PROCESSING_INSTRUCTION_NODE;
+  static COMMENT_NODE = NodeConstants.COMMENT_NODE;
+  static DOCUMENT_NODE = NodeConstants.DOCUMENT_NODE;
+  static DOCUMENT_TYPE_NODE = NodeConstants.DOCUMENT_TYPE_NODE;
+  static DOCUMENT_FRAGMENT_NODE = NodeConstants.DOCUMENT_FRAGMENT_NODE;
 
   static extend(constructor: Constructor): void {
     extendClass(constructor, this);
@@ -94,7 +102,7 @@ Object.defineProperties(prototype, {
     get(this: Node) {
       let parent = this.parentNode;
 
-      while (parent != null && parent.nodeType !== NodeType.ELEMENT_NODE) {
+      while (parent != null && parent.nodeType !== NodeConstants.ELEMENT_NODE) {
         parent = parent.parentNode;
       }
       return parent as Element | null;

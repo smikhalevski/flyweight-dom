@@ -1,18 +1,18 @@
 import { Element, Node, Text } from '../main';
 import { assertInsertableNode, uncheckedToInsertableNode } from '../main/uncheckedToInsertableNode';
-import { NodeType } from '../main/utils';
+import { NodeConstants } from '../main/utils';
 
 describe('assertInsertableNode', () => {
   test('throws on DOCUMENT_NODE nodes', () => {
     const node = new Node();
-    node.nodeType = NodeType.DOCUMENT_NODE;
+    node.nodeType = NodeConstants.DOCUMENT_NODE;
 
     expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow(new Error('Node cannot be a child'));
   });
 
   test('throws on ATTRIBUTE_NODE nodes', () => {
     const node = new Node();
-    node.nodeType = NodeType.ATTRIBUTE_NODE;
+    node.nodeType = NodeConstants.ATTRIBUTE_NODE;
 
     expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow(new Error('Node cannot be a child'));
   });

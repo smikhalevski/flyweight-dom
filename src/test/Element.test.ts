@@ -1,4 +1,4 @@
-import { DOMTokenList, Element, Node } from '../main';
+import { DOMTokenList, Element, InsertPosition, Node, Text } from '../main';
 
 describe('Element', () => {
   test('creates an Element instance', () => {
@@ -109,10 +109,125 @@ describe('Element', () => {
     expect(element.hasAttribute('bbb')).toBe(false);
   });
 
+  test('toggles an attribute on', () => {
+    const element = new Element('aaa');
+
+    expect(element.toggleAttribute('bbb')).toBe(true);
+    expect(element.getAttribute('bbb')).toBe('');
+  });
+
+  test('toggles an attribute off', () => {
+    const element = new Element('aaa', { bbb: '' });
+
+    expect(element.toggleAttribute('bbb')).toBe(false);
+    expect(element.getAttribute('bbb')).toBe(null);
+  });
+
+  test('force toggles an attribute on', () => {
+    const element = new Element('aaa');
+
+    expect(element.toggleAttribute('bbb', true)).toBe(true);
+    expect(element.getAttribute('bbb')).toBe('');
+
+    expect(element.toggleAttribute('bbb', true)).toBe(true);
+    expect(element.getAttribute('bbb')).toBe('');
+  });
+
+  test('force toggles an attribute off', () => {
+    const element = new Element('aaa', { bbb: '' });
+
+    expect(element.toggleAttribute('bbb', false)).toBe(false);
+    expect(element.getAttribute('bbb')).toBe(null);
+
+    expect(element.toggleAttribute('bbb', false)).toBe(false);
+    expect(element.getAttribute('bbb')).toBe(null);
+  });
+
   test('returns a list of attribute names', () => {
     const element = new Element('aaa', { bbb: '111', ccc: '222' });
 
     expect(element.getAttributeNames()).toEqual(['bbb', 'ccc']);
+  });
+
+  test('inserts adjacent element beforeBegin', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentElement('beforeBegin', element3);
+
+    expect(element1.firstChild).toBe(element3);
+  });
+
+  test('inserts adjacent element afterBegin', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element1.insertAdjacentElement('afterBegin', element3);
+
+    expect(element1.firstChild).toBe(element3);
+    expect(element1.lastElementChild).toBe(element2);
+  });
+
+  test('inserts adjacent element beforeEnd', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element1.insertAdjacentElement('beforeEnd', element3);
+
+    expect(element1.firstChild).toBe(element2);
+    expect(element1.lastElementChild).toBe(element3);
+  });
+
+  test('inserts adjacent element afterEnd', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentElement('afterEnd', element3);
+
+    expect(element1.lastChild).toBe(element3);
+  });
+
+  test('throw is invalid position is provided', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+
+    expect(() => element1.insertAdjacentElement('xxx' as InsertPosition, element2)).toThrow(
+      new Error("The value provided ('xxx') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'")
+    );
+  });
+
+  test('inserts adjacent text', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentText('beforeBegin', ' ccc ');
+
+    expect(element1.firstChild).toEqual(new Text(' ccc '));
+  });
+
+  test('does not insert text if it consists of spaces', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+
+    element1.appendChild(element2);
+
+    element2.insertAdjacentText('beforeBegin', ' \t');
+
+    expect(element1.firstChild).toEqual(element2);
   });
 
   test('shallow clones an Element instance', () => {
@@ -138,5 +253,32 @@ describe('Element', () => {
     expect(node).toBeInstanceOf(Element);
     expect(node.firstChild).not.toBe(element2);
     expect(node.firstChild!.nodeType).toBe(Node.ELEMENT_NODE);
+  });
+
+  test('elements are equal is tags are equal', () => {
+    expect(new Element('aaa').isEqualNode(new Element('aaa'))).toBe(true);
+    expect(new Element('aaa').isEqualNode(new Element('bbb'))).toBe(false);
+  });
+
+  test('elements are equal when attributes are equal', () => {
+    expect(
+      new Element('aaa').setAttribute('xxx', 'yyy').isEqualNode(new Element('aaa').setAttribute('xxx', 'yyy'))
+    ).toBe(true);
+
+    expect(new Element('aaa').setAttribute('xxx', 'yyy').isEqualNode(new Element('aaa'))).toBe(false);
+    expect(new Element('aaa').isEqualNode(new Element('aaa').setAttribute('xxx', 'yyy'))).toBe(false);
+
+    expect(
+      new Element('aaa').setAttribute('qqq', 'ppp').isEqualNode(new Element('aaa').setAttribute('xxx', 'yyy'))
+    ).toBe(false);
+  });
+
+  test('elements are equal when children are equal', () => {
+    expect(new Element('aaa').append('xxx').isEqualNode(new Element('aaa').append('xxx'))).toBe(true);
+
+    expect(new Element('aaa').append('xxx').isEqualNode(new Element('aaa'))).toBe(false);
+    expect(new Element('aaa').isEqualNode(new Element('aaa').append('xxx'))).toBe(false);
+
+    expect(new Element('aaa').append('xxx').isEqualNode(new Element('aaa').append('yyy'))).toBe(false);
   });
 });

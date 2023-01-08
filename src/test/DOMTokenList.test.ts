@@ -1,4 +1,4 @@
-import { DOMTokenList, ValueAccessor } from '../main/DOMTokenList';
+import { DOMTokenList, ValueAccessor } from '../main';
 
 describe('DOMTokenList', () => {
   let valueMock = '';
@@ -59,7 +59,7 @@ describe('DOMTokenList', () => {
 
     tokenList.add('ccc');
     expect(() => tokenList.add('aaa', 'b\tbb')).toThrow(
-      new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens.")
+      new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens")
     );
 
     expect(tokenList.value).toBe('ccc');
@@ -80,7 +80,7 @@ describe('DOMTokenList', () => {
 
     tokenList.add('aaa', 'bbb');
     expect(() => tokenList.remove('aaa', 'b\tbb')).toThrow(
-      new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens.")
+      new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens")
     );
 
     expect(tokenList.value).toBe('aaa bbb');
@@ -125,7 +125,7 @@ describe('DOMTokenList', () => {
       tokenList.add('aaa', 'bbb');
 
       expect(() => tokenList.replace('a\taa', 'ccc')).toThrow(
-        new Error("The token provided ('a\taa') contains HTML space characters, which are not valid in tokens.")
+        new Error("The token provided ('a\taa') contains HTML space characters, which are not valid in tokens")
       );
     });
 
@@ -135,7 +135,7 @@ describe('DOMTokenList', () => {
       tokenList.add('aaa', 'bbb');
 
       expect(() => tokenList.replace('aaa', 'c\tcc')).toThrow(
-        new Error("The token provided ('c\tcc') contains HTML space characters, which are not valid in tokens.")
+        new Error("The token provided ('c\tcc') contains HTML space characters, which are not valid in tokens")
       );
       expect(tokenList.value).toBe('aaa bbb');
     });

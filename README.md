@@ -9,13 +9,22 @@
   </a>
 </p>
 
-The extremely fast DOM implementation in [just 3 kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
+The extremely fast DOM implementation.
+
+- Zero dependencies;
+- [Just 3 kB gzipped;](https://bundlephobia.com/package/flyweight-dom)
+- DOM can be extended with custom nodes;
+- Low memory consumption.
 
 ```sh
 npm install --save-prod flyweight-dom
 ```
 
+# Usage
+
 🔎 [You can find the full API documentation here.](https://smikhalevski.github.io/flyweight-dom/modules.html)
+
+The implementation provides classes for all DOM nodes:
 
 ```ts
 import { Element } from 'flyweight-dom';
@@ -28,5 +37,45 @@ const element = new Element('div').append(
 element.classList.add('red');
 
 element.getAttribute('class');
-// → 'red'
+// ⮕ 'red'
 ```
+
+You can create custom nodes by extending [`Node`](https://smikhalevski.github.io/flyweight-dom/interfaces/Node.html)
+class or its subclasses:
+
+```ts
+import { Element, Node } from 'flyweight-dom';
+
+class MyNode extends Node {}
+
+new Element('div').appendChild(new MyNode());
+```
+
+Or extend your already existing classes using a declaration merging:
+
+```ts
+// Your existing class
+class MyClass {}
+
+// Merge declarations
+interface MyClass extends Node {}
+
+// Extend the prototype
+Node.extend(MyClass);
+
+new Element('div').append(new MyClass());
+```
+
+## Performance considerations
+
+For better performance, prefer `nextSibling` and `previousSibling` over `childNodes` and `children` whenever possible.
+
+```ts
+for (let child = node.firstChild; child !== null; child = child.nextSibling) {
+  // Process the child 
+}
+```
+
+When you read the `childNodes` or `children` properties for the first time an array of nodes is created and when stored
+on the node instance. Later when you modify child nodes using `appendChild`, `removeChild` or any other method, these
+arrays are updated.

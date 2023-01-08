@@ -1,8 +1,6 @@
-import { Text } from '../main/Text';
+import { Element, Node, Text } from '../main';
 import { assertInsertableNode, uncheckedToInsertableNode } from '../main/uncheckedToInsertableNode';
-import { Element } from '../main/Element';
-import { Node } from '../main/Node';
-import { NodeType } from '../main/NodeType';
+import { NodeType } from '../main/utils';
 
 describe('assertInsertableNode', () => {
   test('throws on DOCUMENT_NODE nodes', () => {

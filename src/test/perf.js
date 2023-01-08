@@ -1,5 +1,5 @@
 const domhandler = require('domhandler');
-const lib = require('../../lib/index-cjs');
+const lib = require('../../lib');
 
 describe(
   'Element.appendChild',
@@ -53,6 +53,26 @@ describe(
         root.children.push(new domhandler.Element('div', {}));
         root.children.push(new domhandler.Element('div', {}));
         root.children.push(new domhandler.Element('div', {}));
+      });
+    });
+  },
+  { targetRme: 0.001, warmupIterationCount: 5 }
+);
+
+describe(
+  'Element.childNodes',
+  () => {
+    beforeBatch(() => {
+      gc();
+    });
+
+    test('lib', measure => {
+      const root = new lib.Element('div');
+
+      root.append(new lib.Element('div'), new lib.Element('div'), new lib.Element('div'));
+
+      measure(() => {
+        root.childNodes.length;
       });
     });
   },

@@ -3,6 +3,7 @@
   "out": "./docs",
   "excludePrivate": true,
   "excludeExternals": true,
+  "disableSources": true,
   "visibilityFilters": {
     "inherited": true
   }

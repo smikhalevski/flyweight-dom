@@ -1,8 +1,7 @@
-import { Text } from '../main/Text';
-import { Element } from '../main/Element';
+import { DocumentFragment, Element, Text } from '../main';
 import { uncheckedRemoveAndAppendChild } from '../main/uncheckedRemoveAndAppendChild';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
-import { DocumentFragment } from '../main/DocumentFragment';
+import { CHILD_NODES } from '../main/utils';
 
 describe('uncheckedRemoveAndAppendChild', () => {
   test('appends the first child node to an element', () => {
@@ -11,7 +10,7 @@ describe('uncheckedRemoveAndAppendChild', () => {
 
     uncheckedRemoveAndAppendChild(parent, node);
 
-    expect(parent._childNodes).toBe(undefined);
+    expect(parent[CHILD_NODES]).toBe(undefined);
     expect(parent.firstChild).toBe(node);
     expect(parent.lastChild).toBe(node);
 
@@ -30,7 +29,7 @@ describe('uncheckedRemoveAndAppendChild', () => {
     uncheckedRemoveAndAppendChild(parent, node2);
     uncheckedRemoveAndAppendChild(parent, node3);
 
-    expect(parent._childNodes).toBe(undefined);
+    expect(parent[CHILD_NODES]).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
 

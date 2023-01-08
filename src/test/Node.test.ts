@@ -1,7 +1,19 @@
-import { Node, Text } from '../main';
+import { Element, Node, Text } from '../main';
 
 describe('Node', () => {
   class MockNode extends Node {}
+
+  test('inherits statics from Node', () => {
+    expect(Node.ELEMENT_NODE).toBe(1);
+  });
+
+  test('can extend the constructor', () => {
+    class MyClass {}
+
+    Node.extend(MyClass);
+
+    expect(new MyClass()).toBeInstanceOf(Node);
+  });
 
   test('creates a new MockNode instance', () => {
     const node = new MockNode();
@@ -39,6 +51,14 @@ describe('Node', () => {
     expect(() => node.insertBefore(text, null)).toThrow(new Error('This node type does not support this method'));
     expect(() => node.removeChild(text)).toThrow(new Error('This node type does not support this method'));
     expect(() => node.replaceChild(text, text)).toThrow(new Error('This node type does not support this method'));
+  });
+
+  test('cloneNode throws', () => {
+    const node = new MockNode();
+    const element = new Element('aaa');
+
+    expect(element.appendChild(node)).toBe(node);
+    expect(element.firstChild).toBe(node);
   });
 
   test('cloneNode throws', () => {

@@ -1,7 +1,6 @@
 import { Node } from './Node';
-import { ChildNode, extendChildNode } from './extendChildNode';
-import { NodeType } from './NodeType';
-import { extendClass } from './utils';
+import { ChildNode, extendChildNode } from './ChildNode';
+import { extendClass, isEqualConstructor, NodeType } from './utils';
 
 export interface DocumentType extends Node, ChildNode {
   // public readonly
@@ -18,11 +17,20 @@ export class DocumentType {
   }
 }
 
-const prototype = extendClass(DocumentType, Node);
+const prototype = extendClass(DocumentType, Node, {
+  nodeType: { value: NodeType.DOCUMENT_TYPE_NODE },
+});
 
-prototype.nodeType = NodeType.DOCUMENT_TYPE_NODE;
+extendChildNode(DocumentType);
 
-extendChildNode(prototype);
+prototype.isEqualNode = function (otherNode) {
+  return (
+    isEqualConstructor(this, otherNode) &&
+    this.name === otherNode.name &&
+    this.publicId === otherNode.publicId &&
+    this.systemId === otherNode.systemId
+  );
+};
 
 prototype.cloneNode = function () {
   return new DocumentType(this.name, this.publicId, this.systemId);

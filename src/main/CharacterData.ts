@@ -1,6 +1,6 @@
-import { Constructor, extendClass } from './utils';
+import { Constructor, extendClass, isEqualConstructor, TypedPropertyDescriptor } from './utils';
 import { Node } from './Node';
-import { ChildNode, extendChildNode } from './extendChildNode';
+import { ChildNode, extendChildNode } from './ChildNode';
 
 export interface CharacterData extends Node, ChildNode {
   readonly length: number;
@@ -21,11 +21,7 @@ export interface CharacterData extends Node, ChildNode {
 // abstract
 export class CharacterData {}
 
-const prototype = extendClass(CharacterData, Node);
-
-extendChildNode(prototype);
-
-const nodeValueDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
+const nodeValuePropertyDescriptor: TypedPropertyDescriptor<CharacterData, string | null> = {
   get() {
     return this.data;
   },
@@ -34,16 +30,18 @@ const nodeValueDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
   },
 };
 
-Object.defineProperties(prototype, {
+const prototype = extendClass(CharacterData, Node, {
   length: {
-    get(this: CharacterData) {
+    get() {
       return this.data.length;
     },
   },
 
-  nodeValue: nodeValueDescriptor,
-  textContent: nodeValueDescriptor,
+  nodeValue: nodeValuePropertyDescriptor,
+  textContent: nodeValuePropertyDescriptor,
 });
+
+extendChildNode(CharacterData);
 
 prototype.appendData = function (data) {
   this.data += data;
@@ -67,6 +65,10 @@ prototype.replaceData = function (offset, count, data) {
 
 prototype.substringData = function (offset, count) {
   return this.data.substring(offset, offset + count);
+};
+
+prototype.isEqualNode = function (otherNode) {
+  return isEqualConstructor(this, otherNode) && otherNode.data === this.data;
 };
 
 prototype.cloneNode = function () {

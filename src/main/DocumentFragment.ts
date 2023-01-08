@@ -1,21 +1,18 @@
 import { Node } from './Node';
-import { extendParentNode, ParentNode } from './extendParentNode';
-import { NodeType } from './NodeType';
-import { extendClass } from './utils';
+import { extendParentNode, ParentNode } from './ParentNode';
+import { extendClass, NodeType } from './utils';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
-import { extendNode } from './extendNode';
 
 export interface DocumentFragment extends Node, ParentNode {}
 
 export class DocumentFragment {}
 
-const prototype = extendClass(DocumentFragment, Node);
+const prototype = extendClass(DocumentFragment, Node, {
+  nodeType: { value: NodeType.DOCUMENT_FRAGMENT_NODE },
+  nodeName: { value: '#document-fragment' },
+});
 
-prototype.nodeType = NodeType.DOCUMENT_FRAGMENT_NODE;
-prototype.nodeName = '#document-fragment';
-
-extendNode(prototype);
-extendParentNode(prototype);
+extendParentNode(DocumentFragment);
 
 prototype.cloneNode = function (deep) {
   const node = new DocumentFragment();

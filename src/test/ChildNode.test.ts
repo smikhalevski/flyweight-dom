@@ -1,6 +1,18 @@
-import { Element, Text } from '../main';
+import { ChildNode, Element, Node, Text } from '../main';
 
-describe('extendChildNode', () => {
+describe('ChildNode', () => {
+  test('extends a class constructor', () => {
+    interface MockNode extends ChildNode {}
+
+    class MockNode extends Node {}
+
+    ChildNode.extend(MockNode);
+
+    const mockNode = new Element('aaa').appendChild(new MockNode()).after('ccc');
+
+    expect(mockNode.nextSibling).toEqual(new Text('ccc'));
+  });
+
   describe('after', () => {
     test('does nothing if there is no parent', () => {
       const text1 = new Text('text1');

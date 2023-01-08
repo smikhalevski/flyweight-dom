@@ -1,8 +1,7 @@
 import { Element } from './Element';
-import { die } from './utils';
-import { ChildNode } from './extendChildNode';
-import { ParentNode } from './extendParentNode';
-import { NodeType } from './NodeType';
+import { CHILD_NODES, Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor, NodeType } from './utils';
+import { ChildNode } from './ChildNode';
+import { ParentNode } from './ParentNode';
 import { uncheckedContains } from './uncheckedContains';
 
 export interface Node {
@@ -11,7 +10,7 @@ export interface Node {
   nodeName: string;
   childNodes: readonly ChildNode[];
   parentNode: ParentNode | null;
-  readonly parentElement: Element | null;
+  parentElement: Element | null;
   previousSibling: ChildNode | null;
   nextSibling: ChildNode | null;
   firstChild: ChildNode | null;
@@ -24,7 +23,7 @@ export interface Node {
   endIndex: number;
 
   // private
-  _childNodes: ChildNode[] | undefined;
+  [CHILD_NODES]: ChildNode[] | undefined;
 
   hasChildNodes(): boolean;
 
@@ -37,6 +36,8 @@ export interface Node {
   removeChild<T extends Node>(child: T): T;
 
   replaceChild<T extends Node>(node: Node, child: T): T;
+
+  isEqualNode(otherNode: Node | null | undefined): boolean;
 
   cloneNode(deep?: boolean): this;
 }
@@ -52,6 +53,10 @@ export class Node {
   static readonly DOCUMENT_NODE: number = NodeType.DOCUMENT_NODE;
   static readonly DOCUMENT_TYPE_NODE: number = NodeType.DOCUMENT_TYPE_NODE;
   static readonly DOCUMENT_FRAGMENT_NODE: number = NodeType.DOCUMENT_FRAGMENT_NODE;
+
+  static extend(constructor: Constructor): void {
+    extendClass(constructor, this);
+  }
 }
 
 const prototype = Node.prototype;
@@ -61,19 +66,20 @@ prototype.startIndex = prototype.endIndex = -1;
 prototype.nodeType = -1;
 prototype.nodeName = '';
 
-prototype.parentNode =
-  prototype.previousSibling =
-  prototype.nextSibling =
-  prototype.firstChild =
-  prototype.lastChild =
-  prototype.nodeValue =
-  prototype.textContent =
-    null;
+prototype.parentNode = null;
+prototype.previousSibling = null;
+prototype.nextSibling = null;
+prototype.firstChild = null;
+prototype.lastChild = null;
+prototype.nodeValue = null;
+prototype.textContent = null;
 
 Object.defineProperties(prototype, {
   childNodes: {
     get(this: Node) {
-      const nodes: ChildNode[] = (this._childNodes = []);
+      const nodes: ChildNode[] = [];
+
+      this[CHILD_NODES] = nodes;
 
       for (let child = this.firstChild; child != null; child = child.nextSibling) {
         nodes.push(child);
@@ -97,20 +103,25 @@ Object.defineProperties(prototype, {
 });
 
 prototype.hasChildNodes = function () {
-  return this._childNodes != null && this._childNodes.length !== 0;
+  return this.firstChild != null;
 };
 
 prototype.contains = function (node) {
   return node != null ? uncheckedContains(this, node) : false;
 };
 
-prototype.appendChild =
-  prototype.insertBefore =
-  prototype.removeChild =
-  prototype.replaceChild =
-    () => {
-      die('This node type does not support this method');
-    };
+function unsupported(): never {
+  die('This node type does not support this method');
+}
+
+prototype.appendChild = unsupported;
+prototype.insertBefore = unsupported;
+prototype.removeChild = unsupported;
+prototype.replaceChild = unsupported;
+
+prototype.isEqualNode = function (otherNode) {
+  return isEqualConstructor(this, otherNode) && isEqualChildNodes(this, otherNode);
+};
 
 prototype.cloneNode = () => {
   die('Abstract method');

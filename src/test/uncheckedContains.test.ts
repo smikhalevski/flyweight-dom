@@ -1,5 +1,4 @@
-import { Text } from '../main/Text';
-import { Element } from '../main/Element';
+import { Element, Text } from '../main';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
 import { uncheckedContains } from '../main/uncheckedContains';
 

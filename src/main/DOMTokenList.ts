@@ -1,4 +1,8 @@
-import { die } from './utils';
+import { die, isSpaceChar } from './utils';
+
+const VALUE_ACCESSOR = Symbol('valueAccessor');
+const TOKENIZED_VALUE = Symbol('tokenizedValue');
+const TOKENS = Symbol('tokens');
 
 const separatorRegex = /\s+/;
 const SEPARATOR = ' ';
@@ -10,12 +14,13 @@ export interface ValueAccessor {
 }
 
 export interface DOMTokenList {
-  readonly length: number;
+  length: number;
   value: string;
 
   // private
-  _tokenizedValue: string;
-  _tokens: string[];
+  [VALUE_ACCESSOR]: ValueAccessor;
+  [TOKENIZED_VALUE]: string;
+  [TOKENS]: string[];
 
   add(...tokens: string[]): void;
 
@@ -33,7 +38,9 @@ export interface DOMTokenList {
 }
 
 export class DOMTokenList {
-  constructor(readonly _valueAccessor: ValueAccessor) {}
+  constructor(valueAccessor: ValueAccessor) {
+    this[VALUE_ACCESSOR] = valueAccessor;
+  }
 }
 
 const prototype = DOMTokenList.prototype;
@@ -47,10 +54,10 @@ Object.defineProperties(prototype, {
 
   value: {
     get(this: DOMTokenList) {
-      return this._valueAccessor.get();
+      return this[VALUE_ACCESSOR].get();
     },
     set(this: DOMTokenList, value) {
-      this._valueAccessor.set(value);
+      this[VALUE_ACCESSOR].set(value);
     },
   },
 });
@@ -151,16 +158,16 @@ prototype.forEach = function (callback, thisArg) {
 };
 
 prototype.toString = function () {
-  return this._valueAccessor.get();
+  return this[VALUE_ACCESSOR].get();
 };
 
 function getTokens(tokenList: DOMTokenList): string[] {
-  const { _valueAccessor } = tokenList;
+  const valueAccessor = tokenList[VALUE_ACCESSOR];
 
-  let value = _valueAccessor.get();
+  let value = valueAccessor.get();
 
-  if (value === tokenList._tokenizedValue) {
-    return tokenList._tokens;
+  if (value === tokenList[TOKENIZED_VALUE]) {
+    return tokenList[TOKENS];
   }
 
   value = value.trim();
@@ -176,8 +183,8 @@ function getTokens(tokenList: DOMTokenList): string[] {
     }
   }
 
-  tokenList._tokenizedValue = value;
-  tokenList._tokens = tokens;
+  tokenList[TOKENIZED_VALUE] = value;
+  tokenList[TOKENS] = tokens;
 
   return tokens;
 }
@@ -185,9 +192,9 @@ function getTokens(tokenList: DOMTokenList): string[] {
 function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
   const value = tokens.join(SEPARATOR);
 
-  tokenList._valueAccessor.set(value);
-  tokenList._tokenizedValue = value;
-  tokenList._tokens = tokens;
+  tokenList[VALUE_ACCESSOR].set(value);
+  tokenList[TOKENIZED_VALUE] = value;
+  tokenList[TOKENS] = tokens;
 }
 
 function assertToken(token: string): void {
@@ -197,11 +204,8 @@ function assertToken(token: string): void {
     die('The token provided must not be empty');
   }
   for (let i = 0; i < tokenLength; ++i) {
-    const charCode = token.charCodeAt(i);
-
-    // https://www.w3.org/TR/2009/WD-html5-20090212/infrastructure.html#space-character
-    if (charCode === 32 || charCode === 9 || charCode === 10 || charCode === 12 || charCode === 13) {
-      die("The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens.");
+    if (isSpaceChar(token.charCodeAt(i))) {
+      die("The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens");
     }
   }
 }

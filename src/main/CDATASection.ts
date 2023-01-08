@@ -1,6 +1,5 @@
 import { Text } from './Text';
-import { extendClass } from './utils';
-import { NodeType } from './NodeType';
+import { extendClass, NodeType } from './utils';
 
 export interface CDATASection extends Text {}
 

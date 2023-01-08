@@ -1,5 +1,4 @@
-import { Text } from '../main/Text';
-import { Element } from '../main/Element';
+import { Element, Text } from '../main';
 import { uncheckedCloneChildren } from '../main/uncheckedCloneChildren';
 
 describe('uncheckedCloneChildren', () => {

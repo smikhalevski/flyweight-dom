@@ -1,7 +1,6 @@
 import { Node } from './Node';
 import { extendParentNode, ParentNode } from './ParentNode';
-import { NodeType } from './NodeType';
-import { extendClass } from './utils';
+import { extendClass, NodeType } from './utils';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 
 export interface DocumentFragment extends Node, ParentNode {}

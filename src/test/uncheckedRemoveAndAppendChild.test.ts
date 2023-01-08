@@ -1,8 +1,6 @@
-import { Text } from '../main/Text';
-import { Element } from '../main/Element';
+import { DocumentFragment, Element, Text } from '../main';
 import { uncheckedRemoveAndAppendChild } from '../main/uncheckedRemoveAndAppendChild';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
-import { DocumentFragment } from '../main/DocumentFragment';
 import { CHILD_NODES } from '../main/utils';
 
 describe('uncheckedRemoveAndAppendChild', () => {

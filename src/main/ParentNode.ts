@@ -1,10 +1,17 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { CHILD_NODES, CHILDREN, die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
+import {
+  CHILD_NODES,
+  CHILDREN,
+  die,
+  getNextSiblingOrSelf,
+  getPreviousSiblingOrSelf,
+  isElement,
+  NodeType,
+} from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
-import { NodeType } from './NodeType';
 import { ChildNode } from './ChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 

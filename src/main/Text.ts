@@ -1,6 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { Constructor, extendClass } from './utils';
-import { NodeType } from './NodeType';
+import { Constructor, extendClass, NodeType } from './utils';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 

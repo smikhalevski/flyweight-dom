@@ -1,8 +1,7 @@
 import { Element } from './Element';
-import { CHILD_NODES, Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor } from './utils';
+import { CHILD_NODES, Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor, NodeType } from './utils';
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
-import { NodeType } from './NodeType';
 import { uncheckedContains } from './uncheckedContains';
 
 export interface Node {

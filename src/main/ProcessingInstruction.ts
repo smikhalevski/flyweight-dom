@@ -1,6 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { extendClass, isEqualConstructor } from './utils';
-import { NodeType } from './NodeType';
+import { extendClass, isEqualConstructor, NodeType } from './utils';
 
 export interface ProcessingInstruction extends CharacterData {}
 

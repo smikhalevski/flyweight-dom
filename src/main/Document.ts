@@ -1,8 +1,7 @@
 import { Node } from './Node';
 import { extendParentNode, ParentNode } from './ParentNode';
-import { NodeType } from './NodeType';
 import { Element } from './Element';
-import { extendClass, getNextSiblingOrSelf } from './utils';
+import { extendClass, getNextSiblingOrSelf, NodeType } from './utils';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 
 export interface Document extends Node, ParentNode {

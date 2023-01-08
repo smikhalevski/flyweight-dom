@@ -1,7 +1,6 @@
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
-import { NodeType } from './NodeType';
-import { extendClass, isEqualConstructor } from './utils';
+import { extendClass, isEqualConstructor, NodeType } from './utils';
 
 export interface DocumentType extends Node, ChildNode {
   // public readonly

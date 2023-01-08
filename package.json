@@ -2,19 +2,18 @@
   "name": "flyweight-dom",
   "version": "1.0.0",
   "description": "The extremely fast DOM implementation.",
-  "main": "./lib/index-cjs.js",
-  "module": "./lib/index.js",
+  "main": "./lib/index.js",
+  "module": "./lib/index.mjs",
   "types": "./lib/index.d.ts",
-  "sideEffects": false,
   "files": [
     "lib"
   ],
   "scripts": {
-    "build": "tsc --project tsconfig.build.json && rollup --input ./lib/index.js --file ./lib/index-cjs.js --format cjs --plugin @rollup/plugin-node-resolve",
+    "build": "rollup --config rollup.config.ts --configPlugin typescript && cp ./src/main/index-d.ts ./lib/index.d.ts",
     "clean": "rimraf ./lib ./docs",
     "test": "jest",
     "perf": "[ -d ./lib ] || npm run build && node --expose-gc --max-old-space-size=4096 ./node_modules/.bin/toofast ./src/test/perf.js",
-    "docs:build": "typedoc './src/main/index.ts' && cp -R ./images ./docs",
+    "docs:build": "typedoc './src/main/index-d.ts' && cp -R ./images ./docs",
     "docs:release": "npm run docs:build && SHA=$(git rev-parse --short HEAD) && ORIGIN=$(git config --get remote.origin.url) && TEMP=$(mktemp -d) && FROM=$(pwd) && git clone -b ghpages --single-branch $ORIGIN $TEMP && cd $TEMP && ls -A | grep -wv .git | xargs rm -rf && cp -R $FROM/docs/ $TEMP && git add . && git commit -m \"Updated docs ($SHA)\" && git push && rm -rf $TEMP"
   },
   "repository": {
@@ -32,15 +31,17 @@
   "homepage": "https://github.com/smikhalevski/flyweight-dom#readme",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "@types/jest": "^29.2.4",
+    "@rollup/plugin-typescript": "^10.0.1",
+    "@types/jest": "^29.2.5",
     "domhandler": "^5.0.3",
     "jest": "^29.3.1",
-    "prettier": "^2.8.0",
+    "prettier": "^2.8.1",
     "rimraf": "^3.0.2",
-    "rollup": "^3.6.0",
+    "rollup": "^3.9.1",
     "toofast": "^1.3.1",
     "ts-jest": "^29.0.3",
-    "typedoc": "^0.23.21",
-    "typescript": "^4.9.3"
+    "tslib": "^2.4.1",
+    "typedoc": "^0.23.23",
+    "typescript": "^4.9.4"
   }
 }

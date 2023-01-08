@@ -1,21 +1,49 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { NodeType } from './NodeType';
 import { DocumentFragment } from './DocumentFragment';
 
 export const CHILDREN = Symbol('children');
 export const CHILD_NODES = Symbol('childNodes');
 
+export const enum NodeType {
+  ELEMENT_NODE = 1,
+  ATTRIBUTE_NODE = 2,
+  TEXT_NODE = 3,
+  CDATA_SECTION_NODE = 4,
+  PROCESSING_INSTRUCTION_NODE = 7,
+  COMMENT_NODE = 8,
+  DOCUMENT_NODE = 9,
+  DOCUMENT_TYPE_NODE = 10,
+  DOCUMENT_FRAGMENT_NODE = 11,
+}
+
 export type Constructor<T = any> = new (...args: any[]) => T;
+
+interface TypedPropertyDescriptor<T, V> {
+  configurable?: boolean;
+  enumerable?: boolean;
+  value?: any;
+  writable?: boolean;
+
+  get?(this: T): V;
+
+  set?(this: T, value: V): void;
+}
+
+type TypedPropertyDescriptorMap<T> = { [K in keyof T]?: TypedPropertyDescriptor<T, T[K]> };
 
 /**
  * `extendClass` is used instead of `extends` syntax to avoid excessive super constructor calls and speed up
  * instantiation.
  */
-export function extendClass<T>(constructor: Constructor<T>, superConstructor: Constructor): T {
-  Object.assign(constructor, superConstructor);
+export function extendClass<T>(
+  constructor: Constructor<T>,
+  superConstructor: Constructor,
+  properties?: TypedPropertyDescriptorMap<T>
+): T {
+  Object.setPrototypeOf(constructor, superConstructor);
 
-  const prototype = Object.create(superConstructor.prototype);
+  const prototype = Object.create(superConstructor.prototype, properties as PropertyDescriptorMap);
   constructor.prototype = prototype;
   prototype.constructor = constructor;
 

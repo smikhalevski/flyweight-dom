@@ -1,6 +1,4 @@
-import { Text } from '../main/Text';
-import { Element } from '../main/Element';
-import { DocumentFragment } from '../main/DocumentFragment';
+import { DocumentFragment, Element, Text } from '../main';
 import { uncheckedRemoveAndInsertBefore } from '../main/uncheckedRemoveAndInsertBefore';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
 import { CHILD_NODES } from '../main/utils';

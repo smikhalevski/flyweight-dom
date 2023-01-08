@@ -4,8 +4,7 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils';
-import { NodeType } from './NodeType';
+import { getNextSiblingOrSelf, getPreviousSiblingOrSelf, NodeType } from './utils';
 
 export interface ChildNode extends Node {
   // public readonly

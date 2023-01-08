@@ -1,6 +1,5 @@
 import { Node } from './Node';
-import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
-import { NodeType } from './NodeType';
+import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar, NodeType } from './utils';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';

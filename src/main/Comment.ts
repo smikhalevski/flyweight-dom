@@ -1,6 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { extendClass } from './utils';
-import { NodeType } from './NodeType';
+import { extendClass, NodeType } from './utils';
 
 export interface Comment extends CharacterData {}
 

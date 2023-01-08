@@ -3,6 +3,18 @@ import { Element, Node, Text } from '../main';
 describe('Node', () => {
   class MockNode extends Node {}
 
+  test('inherits statics from Node', () => {
+    expect(Node.ELEMENT_NODE).toBe(1);
+  });
+
+  test('can extend the constructor', () => {
+    class MyClass {}
+
+    Node.extend(MyClass);
+
+    expect(new MyClass()).toBeInstanceOf(Node);
+  });
+
   test('creates a new MockNode instance', () => {
     const node = new MockNode();
 

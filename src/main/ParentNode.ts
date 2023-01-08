@@ -8,7 +8,7 @@ import {
   getNextSiblingOrSelf,
   getPreviousSiblingOrSelf,
   isElement,
-  NodeType,
+  NodeConstants,
 } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
@@ -77,13 +77,13 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
 
     firstElementChild: {
       get(this: ParentNode) {
-        return getNextSiblingOrSelf(this.firstChild, NodeType.ELEMENT_NODE);
+        return getNextSiblingOrSelf(this.firstChild, NodeConstants.ELEMENT_NODE);
       },
     },
 
     lastElementChild: {
       get(this: ParentNode) {
-        return getPreviousSiblingOrSelf(this.lastChild, NodeType.ELEMENT_NODE);
+        return getPreviousSiblingOrSelf(this.lastChild, NodeConstants.ELEMENT_NODE);
       },
     },
   });

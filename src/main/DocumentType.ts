@@ -1,6 +1,6 @@
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
-import { extendClass, isEqualConstructor, NodeType } from './utils';
+import { extendClass, isEqualConstructor, NodeConstants } from './utils';
 
 export interface DocumentType extends Node, ChildNode {
   // public readonly
@@ -18,7 +18,7 @@ export class DocumentType {
 }
 
 const prototype = extendClass(DocumentType, Node, {
-  nodeType: { value: NodeType.DOCUMENT_TYPE_NODE },
+  nodeType: { value: NodeConstants.DOCUMENT_TYPE_NODE },
 });
 
 extendChildNode(DocumentType);

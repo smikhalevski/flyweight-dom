@@ -1,5 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { Constructor, extendClass, NodeType } from './utils';
+import { Constructor, extendClass, NodeConstants } from './utils';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 
@@ -16,7 +16,7 @@ export class Text {
 }
 
 const prototype = extendClass(Text, CharacterData, {
-  nodeType: { value: NodeType.TEXT_NODE },
+  nodeType: { value: NodeConstants.TEXT_NODE },
   nodeName: { value: '#text' },
 
   wholeText: {

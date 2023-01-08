@@ -48,34 +48,29 @@ export class Element {
   }
 }
 
-const prototype = extendClass(Element, Node);
+const prototype = extendClass(Element, Node, {
+  nodeType: { value: NodeType.ELEMENT_NODE },
 
-prototype.nodeType = NodeType.ELEMENT_NODE;
-
-extendChildNode(prototype);
-extendParentNode(prototype);
-
-Object.defineProperties(prototype, {
   id: {
-    get(this: Element) {
+    get() {
       return this.getAttribute('id') || '';
     },
-    set(this: Element, value) {
+    set(value) {
       this.setAttribute('id', value);
     },
   },
 
   className: {
-    get(this: Element) {
+    get() {
       return this.getAttribute('class') || '';
     },
-    set(this: Element, value) {
+    set(value) {
       this.setAttribute('class', value);
     },
   },
 
   classList: {
-    get(this: Element) {
+    get() {
       const tokenList = new DOMTokenList({
         get: () => {
           return this.getAttribute('class') || '';
@@ -91,6 +86,9 @@ Object.defineProperties(prototype, {
     },
   },
 });
+
+extendChildNode(prototype);
+extendParentNode(prototype);
 
 prototype.setAttribute = function (name, value) {
   if (this[ATTRIBUTES] === undefined) {

@@ -7,10 +7,10 @@ export interface DocumentFragment extends Node, ParentNode {}
 
 export class DocumentFragment {}
 
-const prototype = extendClass(DocumentFragment, Node);
-
-prototype.nodeType = NodeType.DOCUMENT_FRAGMENT_NODE;
-prototype.nodeName = '#document-fragment';
+const prototype = extendClass(DocumentFragment, Node, {
+  nodeType: { value: NodeType.DOCUMENT_FRAGMENT_NODE },
+  nodeName: { value: '#document-fragment' },
+});
 
 extendParentNode(prototype);
 

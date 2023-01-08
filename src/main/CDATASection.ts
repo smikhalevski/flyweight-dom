@@ -9,7 +9,7 @@ export class CDATASection {
   }
 }
 
-const prototype = extendClass(CDATASection, Text);
-
-prototype.nodeType = NodeType.CDATA_SECTION_NODE;
-prototype.nodeName = '#cdata-section';
+extendClass(CDATASection, Text, {
+  nodeType: { value: NodeType.CDATA_SECTION_NODE },
+  nodeName: { value: '#cdata-section' },
+});

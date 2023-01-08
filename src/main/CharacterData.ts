@@ -1,4 +1,4 @@
-import { Constructor, extendClass, isEqualConstructor } from './utils';
+import { Constructor, extendClass, isEqualConstructor, TypedPropertyDescriptor } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
 
@@ -21,11 +21,7 @@ export interface CharacterData extends Node, ChildNode {
 // abstract
 export class CharacterData {}
 
-const prototype = extendClass(CharacterData, Node);
-
-extendChildNode(prototype);
-
-const nodeValueDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
+const nodeValuePropertyDescriptor: TypedPropertyDescriptor<CharacterData, string | null> = {
   get() {
     return this.data;
   },
@@ -34,16 +30,18 @@ const nodeValueDescriptor: PropertyDescriptor & ThisType<CharacterData> = {
   },
 };
 
-Object.defineProperties(prototype, {
+const prototype = extendClass(CharacterData, Node, {
   length: {
-    get(this: CharacterData) {
+    get() {
       return this.data.length;
     },
   },
 
-  nodeValue: nodeValueDescriptor,
-  textContent: nodeValueDescriptor,
+  nodeValue: nodeValuePropertyDescriptor,
+  textContent: nodeValuePropertyDescriptor,
 });
+
+extendChildNode(prototype);
 
 prototype.appendData = function (data) {
   this.data += data;

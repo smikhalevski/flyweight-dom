@@ -15,28 +15,28 @@ export class Text {
   }
 }
 
-const prototype = extendClass(Text, CharacterData);
+const prototype = extendClass(Text, CharacterData, {
+  nodeType: { value: NodeType.TEXT_NODE },
+  nodeName: { value: '#text' },
 
-prototype.nodeType = NodeType.TEXT_NODE;
-prototype.nodeName = '#text';
+  wholeText: {
+    get() {
+      const { nodeType } = this;
 
-Object.defineProperty(prototype, 'wholeText', {
-  get(this: Text) {
-    const { nodeType } = this;
+      let text = this;
 
-    let text = this;
+      for (let node = text.previousSibling; node != null && node.nodeType === nodeType; node = node.previousSibling) {
+        text = node as Text;
+      }
 
-    for (let node = text.previousSibling; node != null && node.nodeType === nodeType; node = node.previousSibling) {
-      text = node as Text;
-    }
+      let str = '';
 
-    let str = '';
+      for (let node: Text | null = text; node != null && node.nodeType === nodeType; node = node.nextSibling as Text) {
+        str += node.data;
+      }
 
-    for (let node: Text | null = text; node != null && node.nodeType === nodeType; node = node.nextSibling as Text) {
-      str += node.data;
-    }
-
-    return str;
+      return str;
+    },
   },
 });
 

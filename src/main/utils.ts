@@ -19,7 +19,7 @@ export const enum NodeType {
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
-interface TypedPropertyDescriptor<T, V> {
+export interface TypedPropertyDescriptor<T, V> {
   configurable?: boolean;
   enumerable?: boolean;
   value?: any;
@@ -30,7 +30,7 @@ interface TypedPropertyDescriptor<T, V> {
   set?(this: T, value: V): void;
 }
 
-type TypedPropertyDescriptorMap<T> = { [K in keyof T]?: TypedPropertyDescriptor<T, T[K]> };
+export type TypedPropertyDescriptorMap<T> = { [K in keyof T]?: TypedPropertyDescriptor<T, T[K]> };
 
 /**
  * `extendClass` is used instead of `extends` syntax to avoid excessive super constructor calls and speed up
@@ -62,18 +62,18 @@ export function isDocumentFragment(node: Node): node is DocumentFragment {
   return node.nodeType === NodeType.DOCUMENT_FRAGMENT_NODE;
 }
 
-export function getPreviousSiblingOrSelf(node: Node | null, nodeType: NodeType): Element | null {
+export function getPreviousSiblingOrSelf(node: Node | null, nodeType: NodeType): Node | null {
   while (node != null && node.nodeType !== nodeType) {
     node = node.previousSibling;
   }
-  return node as Element | null;
+  return node;
 }
 
-export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeType): Element | null {
+export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeType): Node | null {
   while (node != null && node.nodeType !== nodeType) {
     node = node.nextSibling;
   }
-  return node as Element | null;
+  return node;
 }
 
 // https://www.w3.org/TR/2009/WD-html5-20090212/infrastructure.html#space-character

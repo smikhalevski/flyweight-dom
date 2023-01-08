@@ -9,7 +9,7 @@ export class Comment {
   }
 }
 
-const prototype = extendClass(Comment, CharacterData);
-
-prototype.nodeType = NodeType.COMMENT_NODE;
-prototype.nodeName = '#comment';
+extendClass(Comment, CharacterData, {
+  nodeType: { value: NodeType.COMMENT_NODE },
+  nodeName: { value: '#comment' },
+});

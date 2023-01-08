@@ -17,9 +17,9 @@ export class DocumentType {
   }
 }
 
-const prototype = extendClass(DocumentType, Node);
-
-prototype.nodeType = NodeType.DOCUMENT_TYPE_NODE;
+const prototype = extendClass(DocumentType, Node, {
+  nodeType: { value: NodeType.DOCUMENT_TYPE_NODE },
+});
 
 extendChildNode(prototype);
 

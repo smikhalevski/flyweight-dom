@@ -1,5 +1,5 @@
 const domhandler = require('domhandler');
-const lib = require('../../lib/index-cjs');
+const lib = require('../../lib');
 
 describe(
   'Element.appendChild',

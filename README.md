@@ -65,3 +65,17 @@ Node.extend(MyClass);
 
 new Element('div').append(new MyClass());
 ```
+
+## Performance considerations
+
+For better performance, prefer `nextSibling` and `previousSibling` over `childNodes` and `children` whenever possible.
+
+```ts
+for (let child = node.firstChild; child !== null; child = child.nextSibling) {
+  // Process the child 
+}
+```
+
+When you read the `childNodes` or `children` properties for the first time an array of nodes is created and when stored
+on the node instance. Later when you modify child nodes using `appendChild`, `removeChild` or any other method, these
+arrays are updated.

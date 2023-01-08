@@ -65,27 +65,3 @@ Node.extend(MyClass);
 
 new Element('div').append(new MyClass());
 ```
-
-You can extend classes with any `Node` subclass:
-
-```ts
-Element.extend(MyClass);
-
-new MyClass().setAttribute('title', 'Okay');
-```
-
-There are [`ChildNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/ChildNode.html) and
-[`ParentNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/ParentNode.html) interfaces that you can use to
-create a custom node containers or child nodes:
-
-```ts
-import { extendParentNode, Node, ParentNode } from 'flyweight-dom';
-
-class MyClass extends Node {}
-
-interface MyClass extends ParentNode {}
-
-extendParentNode(MyClass.prototype);
-
-new MyClass().append('Hello');
-```

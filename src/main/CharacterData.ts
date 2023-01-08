@@ -41,7 +41,7 @@ const prototype = extendClass(CharacterData, Node, {
   textContent: nodeValuePropertyDescriptor,
 });
 
-extendChildNode(prototype);
+extendChildNode(CharacterData);
 
 prototype.appendData = function (data) {
   this.data += data;

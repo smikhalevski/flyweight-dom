@@ -6,10 +6,6 @@ export interface ValueAccessor {
   set(value: string): void;
 }
 
-export declare function extendParentNode(prototype: ParentNode): void;
-
-export declare function extendChildNode(prototype: ChildNode): void;
-
 /**
  * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
  */
@@ -151,6 +147,16 @@ export interface ChildNode extends Node {
   replaceWith(...nodes: Array<Node | string>): this;
 }
 
+/**
+ * The mixin that can extend the constructor prototype with properties and methods of the {@linkcode ChildNode}.
+ */
+export declare const ChildNode: {
+  /**
+   * Extends the constructor prototype with properties and methods of the {@linkcode ChildNode}.
+   */
+  extend(constructor: new (...args: any[]) => any): void;
+};
+
 export interface ParentNode extends Node {
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children} on MDN
@@ -187,6 +193,16 @@ export interface ParentNode extends Node {
    */
   replaceChildren(...nodes: Array<Node | string>): this;
 }
+
+/**
+ * The mixin that can extend the constructor prototype with properties and methods of the {@linkcode ParentNode}.
+ */
+export declare const ParentNode: {
+  /**
+   * Extends the constructor prototype with properties and methods of the {@linkcode ParentNode}.
+   */
+  extend(constructor: new (...args: any[]) => any): void;
+};
 
 /**
  * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList} on MDN

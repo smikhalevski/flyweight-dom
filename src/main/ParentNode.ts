@@ -3,6 +3,7 @@ import { Element } from './Element';
 import {
   CHILD_NODES,
   CHILDREN,
+  Constructor,
   die,
   getNextSiblingOrSelf,
   getPreviousSiblingOrSelf,
@@ -32,7 +33,11 @@ export interface ParentNode extends Node {
   replaceChildren(...nodes: Array<Node | string>): this;
 }
 
-export function extendParentNode(prototype: ParentNode): void {
+export const ParentNode = { extend: extendParentNode };
+
+export function extendParentNode(constructor: Constructor<ParentNode>): void {
+  const prototype = constructor.prototype;
+
   Object.defineProperties(prototype, {
     children: {
       get(this: ParentNode) {

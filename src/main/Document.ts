@@ -29,7 +29,7 @@ const prototype = extendClass(Document, Node, {
   },
 });
 
-extendParentNode(prototype);
+extendParentNode(Document);
 
 prototype.cloneNode = function (deep) {
   const node = new Document();

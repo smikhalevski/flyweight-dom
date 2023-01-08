@@ -21,7 +21,7 @@ const prototype = extendClass(DocumentType, Node, {
   nodeType: { value: NodeType.DOCUMENT_TYPE_NODE },
 });
 
-extendChildNode(prototype);
+extendChildNode(DocumentType);
 
 prototype.isEqualNode = function (otherNode) {
   return (

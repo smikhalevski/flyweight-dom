@@ -1,4 +1,4 @@
-import { Document, Element, extendParentNode, Node, ParentNode, Text } from '../main';
+import { Document, Element, Node, ParentNode, Text } from '../main';
 
 describe('ParentNode', () => {
   test('extends a class constructor', () => {
@@ -6,7 +6,7 @@ describe('ParentNode', () => {
 
     class MockNode extends Node {}
 
-    extendParentNode(MockNode.prototype);
+    ParentNode.extend(MockNode);
 
     const mockNode = new Element('aaa').appendChild(new MockNode()).append('ccc');
 

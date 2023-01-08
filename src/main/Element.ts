@@ -87,8 +87,8 @@ const prototype = extendClass(Element, Node, {
   },
 });
 
-extendChildNode(prototype);
-extendParentNode(prototype);
+extendChildNode(Element);
+extendParentNode(Element);
 
 prototype.setAttribute = function (name, value) {
   if (this[ATTRIBUTES] === undefined) {

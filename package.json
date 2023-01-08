@@ -8,6 +8,7 @@
   "files": [
     "lib"
   ],
+  "sideEffects": false,
   "scripts": {
     "build": "rollup --config rollup.config.ts --configPlugin typescript && cp ./src/main/index-d.ts ./lib/index.d.ts",
     "clean": "rimraf ./lib ./docs",

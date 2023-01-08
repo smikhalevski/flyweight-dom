@@ -12,7 +12,7 @@ const prototype = extendClass(DocumentFragment, Node, {
   nodeName: { value: '#document-fragment' },
 });
 
-extendParentNode(prototype);
+extendParentNode(DocumentFragment);
 
 prototype.cloneNode = function (deep) {
   const node = new DocumentFragment();

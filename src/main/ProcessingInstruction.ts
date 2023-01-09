@@ -1,5 +1,5 @@
 import { CharacterData } from './CharacterData';
-import { extendClass, isEqualConstructor, NodeType } from './utils';
+import { extendClass, isEqualConstructor, NodeConstants } from './utils';
 
 export interface ProcessingInstruction extends CharacterData {}
 
@@ -13,7 +13,7 @@ export class ProcessingInstruction {
 }
 
 const prototype = extendClass(ProcessingInstruction, CharacterData, {
-  nodeType: { value: NodeType.PROCESSING_INSTRUCTION_NODE },
+  nodeType: { value: NodeConstants.PROCESSING_INSTRUCTION_NODE },
 });
 
 prototype.isEqualNode = function (otherNode) {

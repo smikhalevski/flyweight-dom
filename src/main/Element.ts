@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar, NodeType } from './utils';
+import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar, NodeConstants } from './utils';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
@@ -49,7 +49,7 @@ export class Element {
 }
 
 const prototype = extendClass(Element, Node, {
-  nodeType: { value: NodeType.ELEMENT_NODE },
+  nodeType: { value: NodeConstants.ELEMENT_NODE },
 
   id: {
     get() {

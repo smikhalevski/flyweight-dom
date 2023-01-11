@@ -1,10 +1,11 @@
 {
+  "name": "Flyweight DOM",
   "includeVersion": true,
-  "out": "./docs",
   "excludePrivate": true,
   "excludeExternals": true,
   "disableSources": true,
   "visibilityFilters": {
     "inherited": true
-  }
+  },
+  "out": "./docs"
 }

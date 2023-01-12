@@ -1,6 +1,6 @@
 {
   "name": "flyweight-dom",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The extremely fast DOM implementation.",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",

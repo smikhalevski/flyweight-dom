@@ -57,13 +57,23 @@ export function extendClass<T>(
   superConstructor: Constructor,
   properties?: TypedPropertyDescriptorMap<T>
 ): T {
+  const Super = class {
+    constructor() {
+      this.constructor = constructor;
+    }
+  };
+
+  Super.prototype = superConstructor.prototype;
+
   Object.setPrototypeOf(constructor, superConstructor);
 
-  const prototype = Object.create(superConstructor.prototype, properties as PropertyDescriptorMap);
-  constructor.prototype = prototype;
-  prototype.constructor = constructor;
+  constructor.prototype = new Super();
 
-  return prototype;
+  if (properties !== undefined) {
+    Object.defineProperties(constructor.prototype, properties as PropertyDescriptorMap);
+  }
+
+  return constructor.prototype;
 }
 
 export function die(message: string): never {

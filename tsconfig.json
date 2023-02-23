@@ -7,7 +7,6 @@
     "module": "ESNext"
   },
   "include": [
-    "rollup.config.ts",
-    "./src/**/*"
+    "./src/main/**/*"
   ]
 }

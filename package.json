@@ -14,7 +14,7 @@
     "clean": "rimraf ./lib ./docs",
     "test": "jest",
     "perf": "[ -d ./lib ] || npm run build && node --expose-gc --max-old-space-size=4096 ./node_modules/.bin/toofast ./src/test/perf.js",
-    "docs": "typedoc --name 'Flyweight DOM' --readme none ./src/main/index-d.ts"
+    "docs": "typedoc --name 'Flyweight DOM 🍃' --readme none ./src/main/index-d.ts"
   },
   "repository": {
     "type": "git",

@@ -19,54 +19,67 @@ export declare abstract class Node {
   static readonly DOCUMENT_NODE: number;
   static readonly DOCUMENT_TYPE_NODE: number;
   static readonly DOCUMENT_FRAGMENT_NODE: number;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType} on MDN
    */
   readonly nodeType: number;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName Node.nodeName} on MDN
    */
   readonly nodeName: string;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode Node.parentNode} on MDN
    */
   readonly parentNode: ParentNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement Node.parentElement} on MDN
    */
   readonly parentElement: Element | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling Node.previousSibling} on MDN
    */
   readonly previousSibling: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling Node.nextSibling} on MDN
    */
   readonly nextSibling: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild Node.firstChild} on MDN
    */
   readonly firstChild: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild Node.lastChild} on MDN
    */
   readonly lastChild: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes Node.childNodes} on MDN
    */
   readonly childNodes: readonly ChildNode[];
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue Node.nodeValue} on MDN
    */
   nodeValue: string | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent Node.textContent} on MDN
    */
   textContent: string | null;
+
   /**
    * The index at which the node starts in the input stream.
    */
   startIndex: number;
+
   /**
    * The index at which the node ends in the input stream.
    */
@@ -220,7 +233,7 @@ export declare class DOMTokenList {
   /**
    * Creates a new instance of {@linkcode DOMTokenList}.
    *
-   * @param valueAccessor The accessor that reads and writes class string.
+   * @param valueAccessor The accessor that reads and writes the class string to the element.
    */
   constructor(valueAccessor: ValueAccessor);
 

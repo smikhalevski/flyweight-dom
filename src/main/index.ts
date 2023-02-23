@@ -11,3 +11,4 @@ export { Element, InsertPosition, Attributes } from './Element';
 export { Node } from './Node';
 export { ParentNode } from './ParentNode';
 export { ProcessingInstruction } from './ProcessingInstruction';
+export { TreeWalker } from './TreeWalker';

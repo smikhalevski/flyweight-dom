@@ -75,16 +75,6 @@ export declare abstract class Node {
    */
   textContent: string | null;
 
-  /**
-   * The index at which the node starts in the input stream.
-   */
-  startIndex: number;
-
-  /**
-   * The index at which the node ends in the input stream.
-   */
-  endIndex: number;
-
   static extend(constructor: new (...args: any[]) => any): void;
 
   /**

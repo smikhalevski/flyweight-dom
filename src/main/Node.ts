@@ -27,8 +27,6 @@ export interface Node {
   // public
   nodeValue: string | null;
   textContent: string | null;
-  startIndex: number;
-  endIndex: number;
 
   // private
   [CHILD_NODES]: ChildNode[] | undefined;
@@ -68,8 +66,6 @@ export class Node {
 }
 
 const prototype = Node.prototype;
-
-prototype.startIndex = prototype.endIndex = -1;
 
 prototype.nodeType = -1;
 prototype.nodeName = '';

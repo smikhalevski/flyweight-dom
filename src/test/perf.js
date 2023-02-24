@@ -80,13 +80,13 @@ describe(
 );
 
 describe(
-  'Element.classList.add',
+  'Element.classList',
   () => {
     beforeBatch(() => {
       gc();
     });
 
-    test('lib', measure => {
+    test('add', measure => {
       let element;
 
       beforeIteration(() => {
@@ -95,6 +95,59 @@ describe(
 
       measure(() => {
         element.classList.add('aaa', 'bbb');
+      });
+    });
+  },
+  { targetRme: 0.001, warmupIterationCount: 5 }
+);
+
+describe(
+  'TreeWalker.nextNode()',
+  () => {
+    /*
+     * <document>
+     *   <element1>
+     *     <element2>
+     *       #text1
+     *     </element2>
+     *   </element1>
+     *   <element3>
+     *     #text2
+     *   </element3>
+     *   <element4/>
+     * </document>
+     */
+    const document = new lib.Document();
+    const element1 = new lib.Element('element1');
+    const element2 = new lib.Element('element2');
+    const element3 = new lib.Element('element3');
+    const element4 = new lib.Element('element4');
+    const text1 = new lib.Text('text1');
+    const text2 = new lib.Text('text2');
+
+    document.append(element1.append(element2.append(text1)), element3.append(text2), element4);
+
+    test('firstChild', measure => {
+      const treeWalker = new lib.TreeWalker(document);
+
+      beforeIteration(() => {
+        treeWalker.currentNode = document;
+      });
+
+      measure(() => {
+        treeWalker.nextNode();
+      });
+    });
+
+    test('filter', measure => {
+      const treeWalker = new lib.TreeWalker(document, undefined, node => (node.nodeType !== 3 ? 3 : 1));
+
+      beforeIteration(() => {
+        treeWalker.currentNode = text1;
+      });
+
+      measure(() => {
+        treeWalker.nextNode();
       });
     });
   },

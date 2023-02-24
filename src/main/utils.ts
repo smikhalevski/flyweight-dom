@@ -5,7 +5,7 @@ import { DocumentFragment } from './DocumentFragment';
 export const CHILDREN = Symbol('children');
 export const CHILD_NODES = Symbol('childNodes');
 
-export const enum NodeType {
+export const enum NodeConstants {
   ELEMENT_NODE = 1,
   ATTRIBUTE_NODE = 2,
   TEXT_NODE = 3,
@@ -15,6 +15,22 @@ export const enum NodeType {
   DOCUMENT_NODE = 9,
   DOCUMENT_TYPE_NODE = 10,
   DOCUMENT_FRAGMENT_NODE = 11,
+}
+
+export const enum NodeFilterConstants {
+  FILTER_ACCEPT = 1,
+  FILTER_REJECT = 2,
+  FILTER_SKIP = 3,
+  SHOW_ALL = 0xffffffff,
+  SHOW_ATTRIBUTE = 2,
+  SHOW_CDATA_SECTION = 8,
+  SHOW_COMMENT = 128,
+  SHOW_DOCUMENT = 256,
+  SHOW_DOCUMENT_FRAGMENT = 1024,
+  SHOW_DOCUMENT_TYPE = 512,
+  SHOW_ELEMENT = 1,
+  SHOW_PROCESSING_INSTRUCTION = 64,
+  SHOW_TEXT = 4,
 }
 
 export type Constructor<T = any> = new (...args: any[]) => T;
@@ -41,13 +57,23 @@ export function extendClass<T>(
   superConstructor: Constructor,
   properties?: TypedPropertyDescriptorMap<T>
 ): T {
+  const Super = class {
+    constructor() {
+      this.constructor = constructor;
+    }
+  };
+
+  Super.prototype = superConstructor.prototype;
+
   Object.setPrototypeOf(constructor, superConstructor);
 
-  const prototype = Object.create(superConstructor.prototype, properties as PropertyDescriptorMap);
-  constructor.prototype = prototype;
-  prototype.constructor = constructor;
+  constructor.prototype = new Super();
 
-  return prototype;
+  if (properties !== undefined) {
+    Object.defineProperties(constructor.prototype, properties as PropertyDescriptorMap);
+  }
+
+  return constructor.prototype;
 }
 
 export function die(message: string): never {
@@ -55,21 +81,21 @@ export function die(message: string): never {
 }
 
 export function isElement(node: Node): node is Element {
-  return node.nodeType === NodeType.ELEMENT_NODE;
+  return node.nodeType === NodeConstants.ELEMENT_NODE;
 }
 
 export function isDocumentFragment(node: Node): node is DocumentFragment {
-  return node.nodeType === NodeType.DOCUMENT_FRAGMENT_NODE;
+  return node.nodeType === NodeConstants.DOCUMENT_FRAGMENT_NODE;
 }
 
-export function getPreviousSiblingOrSelf(node: Node | null, nodeType: NodeType): Node | null {
+export function getPreviousSiblingOrSelf(node: Node | null, nodeType: NodeConstants): Node | null {
   while (node != null && node.nodeType !== nodeType) {
     node = node.previousSibling;
   }
   return node;
 }
 
-export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeType): Node | null {
+export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeConstants): Node | null {
   while (node != null && node.nodeType !== nodeType) {
     node = node.nextSibling;
   }
@@ -93,5 +119,5 @@ export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
     child = child.nextSibling;
     otherChild = otherNode.nextSibling;
   }
-  return child === null && otherChild === null;
+  return child == null && otherChild == null;
 }

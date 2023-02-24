@@ -17,9 +17,6 @@ export interface DOMTokenList {
   length: number;
   value: string;
 
-  // private
-  [VALUE_ACCESSOR]: ValueAccessor;
-  [TOKENIZED_VALUE]: string;
   [TOKENS]: string[];
 
   add(...tokens: string[]): void;
@@ -38,6 +35,9 @@ export interface DOMTokenList {
 }
 
 export class DOMTokenList {
+  [VALUE_ACCESSOR]: ValueAccessor;
+  [TOKENIZED_VALUE]: string | undefined;
+
   constructor(valueAccessor: ValueAccessor) {
     this[VALUE_ACCESSOR] = valueAccessor;
   }

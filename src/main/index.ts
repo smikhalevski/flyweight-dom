@@ -1,4 +1,3 @@
-export { Text } from './Text';
 export { CDATASection } from './CDATASection';
 export { CharacterData } from './CharacterData';
 export { ChildNode } from './ChildNode';
@@ -9,5 +8,8 @@ export { DocumentType } from './DocumentType';
 export { DOMTokenList, ValueAccessor } from './DOMTokenList';
 export { Element, InsertPosition, Attributes } from './Element';
 export { Node } from './Node';
+export { NodeFilter } from './NodeFilter';
 export { ParentNode } from './ParentNode';
 export { ProcessingInstruction } from './ProcessingInstruction';
+export { Text } from './Text';
+export { TreeWalker } from './TreeWalker';

@@ -1,13 +1,4 @@
-<p align="center">
-  <a href="#readme">
-    <img width="400" src="./images/logo.png" alt="Flyweight DOM">
-  </a>
-  <br>
-  <br>
-  <a href="https://github.com/smikhalevski/flyweight-dom/actions/workflows/master.yml">
-    <img src="https://github.com/smikhalevski/flyweight-dom/actions/workflows/master.yml/badge.svg?branch=master&event=push" alt="build">
-  </a>
-</p>
+# Flyweight DOM&ensp;🍃&ensp;[![build](https://github.com/smikhalevski/flyweight-dom/actions/workflows/test.yml/badge.svg?branch=master&event=push)](https://github.com/smikhalevski/flyweight-dom/actions/workflows/test.yml)
 
 The extremely fast DOM implementation.
 
@@ -22,7 +13,7 @@ npm install --save-prod flyweight-dom
 
 # Usage
 
-🔎 [You can find the full API documentation here.](https://smikhalevski.github.io/flyweight-dom/modules.html)
+🔎 [API documentation is available here.](https://smikhalevski.github.io/flyweight-dom/modules.html)
 
 The implementation provides classes for all DOM nodes:
 
@@ -76,6 +67,6 @@ for (let child = node.firstChild; child !== null; child = child.nextSibling) {
 }
 ```
 
-When you read the `childNodes` or `children` properties for the first time an array of nodes is created and when stored
+When you read the `childNodes` or `children` properties for the first time an array of nodes is created and then stored
 on the node instance. Later when you modify child nodes using `appendChild`, `removeChild` or any other method, these
 arrays are updated.

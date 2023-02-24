@@ -3,7 +3,7 @@ import { ParentNode } from './ParentNode';
 import { Text } from './Text';
 import { DocumentFragment } from './DocumentFragment';
 import { ChildNode } from './ChildNode';
-import { die, NodeType } from './utils';
+import { die, NodeConstants } from './utils';
 import { uncheckedContains } from './uncheckedContains';
 
 export type InsertableNode = DocumentFragment | ChildNode;
@@ -11,7 +11,7 @@ export type InsertableNode = DocumentFragment | ChildNode;
 export function assertInsertableNode(parent: ParentNode, node: Node): asserts node is InsertableNode {
   const { nodeType } = node;
 
-  if (nodeType === NodeType.DOCUMENT_NODE || nodeType === NodeType.ATTRIBUTE_NODE) {
+  if (nodeType === NodeConstants.DOCUMENT_NODE || nodeType === NodeConstants.ATTRIBUTE_NODE) {
     die('Node cannot be a child');
   }
   if (uncheckedContains(node, parent)) {

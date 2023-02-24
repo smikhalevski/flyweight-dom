@@ -19,58 +19,61 @@ export declare abstract class Node {
   static readonly DOCUMENT_NODE: number;
   static readonly DOCUMENT_TYPE_NODE: number;
   static readonly DOCUMENT_FRAGMENT_NODE: number;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType} on MDN
    */
   readonly nodeType: number;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName Node.nodeName} on MDN
    */
   readonly nodeName: string;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode Node.parentNode} on MDN
    */
   readonly parentNode: ParentNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement Node.parentElement} on MDN
    */
   readonly parentElement: Element | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling Node.previousSibling} on MDN
    */
   readonly previousSibling: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling Node.nextSibling} on MDN
    */
   readonly nextSibling: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild Node.firstChild} on MDN
    */
   readonly firstChild: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild Node.lastChild} on MDN
    */
   readonly lastChild: ChildNode | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes Node.childNodes} on MDN
    */
   readonly childNodes: readonly ChildNode[];
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue Node.nodeValue} on MDN
    */
   nodeValue: string | null;
+
   /**
    * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent Node.textContent} on MDN
    */
   textContent: string | null;
-  /**
-   * The index at which the node starts in the input stream.
-   */
-  startIndex: number;
-  /**
-   * The index at which the node ends in the input stream.
-   */
-  endIndex: number;
 
   static extend(constructor: new (...args: any[]) => any): void;
 
@@ -220,7 +223,7 @@ export declare class DOMTokenList {
   /**
    * Creates a new instance of {@linkcode DOMTokenList}.
    *
-   * @param valueAccessor The accessor that reads and writes class string.
+   * @param valueAccessor The accessor that reads and writes the class string to the element.
    */
   constructor(valueAccessor: ValueAccessor);
 
@@ -526,4 +529,99 @@ export declare class Document extends Node implements ParentNode {
   prepend(...nodes: Array<Node | string>): this;
 
   replaceChildren(...nodes: Array<Node | string>): this;
+}
+
+/**
+ * See {@linkcode https://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter NodeFilter} on W3C
+ */
+export type NodeFilter = ((node: Node) => number) | { acceptNode(node: Node): number };
+
+/**
+ * See {@linkcode https://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter NodeFilter} on W3C
+ */
+export declare const NodeFilter: {
+  FILTER_ACCEPT: number;
+  FILTER_REJECT: number;
+  FILTER_SKIP: number;
+  SHOW_ALL: number;
+  SHOW_ATTRIBUTE: number;
+  SHOW_CDATA_SECTION: number;
+  SHOW_COMMENT: number;
+  SHOW_DOCUMENT: number;
+  SHOW_DOCUMENT_FRAGMENT: number;
+  SHOW_DOCUMENT_TYPE: number;
+  SHOW_ELEMENT: number;
+  SHOW_PROCESSING_INSTRUCTION: number;
+  SHOW_TEXT: number;
+};
+
+/**
+ * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker TreeWalker} on MDN
+ */
+export declare class TreeWalker {
+  /**
+   * Creates a new {@linkcode TreeWalker} instance.
+   *
+   * @param root A root {@linkcode Node} of this {@linkcode TreeWalker} traversal.
+   * @param whatToShow A unsigned long representing a bitmask created by combining the constant properties of
+   * {@linkcode NodeFilter}.
+   * @param filter A {@linkcode NodeFilter}, that is an object with a method `acceptNode`, which is called by the
+   * {@linkcode TreeWalker} to determine whether to accept a node that has passed the `whatToShow` check.
+   */
+  constructor(root: Node, whatToShow?: number, filter?: NodeFilter | null);
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/currentNode TreeWalker.currentNode} on MDN
+   */
+  currentNode: Node;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter TreeWalker.filter} on MDN
+   */
+  readonly filter: NodeFilter | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/root TreeWalker.root} on MDN
+   */
+  readonly root: Node;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow TreeWalker.whatToShow} on MDN
+   */
+  readonly whatToShow: number;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/parentNode TreeWalker.parentNode} on MDN
+   */
+  parentNode(): Node | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/firstChild TreeWalker.firstChild} on MDN
+   */
+  firstChild(): Node | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/lastChild TreeWalker.lastChild} on MDN
+   */
+  lastChild(): Node | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextNode TreeWalker.nextNode} on MDN
+   */
+  nextNode(): Node | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousNode TreeWalker.previousNode} on MDN
+   */
+  previousNode(): Node | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextSibling TreeWalker.nextSibling} on MDN
+   */
+  nextSibling(): Node | null;
+
+  /**
+   * See {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousSibling TreeWalker.previousSibling} on MDN
+   */
+  previousSibling(): Node | null;
 }

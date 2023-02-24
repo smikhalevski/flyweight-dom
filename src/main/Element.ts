@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar, NodeType } from './utils';
+import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar, NodeConstants } from './utils';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
@@ -49,7 +49,7 @@ export class Element {
 }
 
 const prototype = extendClass(Element, Node, {
-  nodeType: { value: NodeType.ELEMENT_NODE },
+  nodeType: { value: NodeConstants.ELEMENT_NODE },
 
   id: {
     get() {
@@ -184,7 +184,7 @@ function isEqualAttributes(attributes: Attributes | undefined, otherAttributes: 
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {
   if (position === 'beforeBegin') {
-    if (element.parentNode === null) {
+    if (element.parentNode == null) {
       return null;
     }
     element.before(node);
@@ -199,7 +199,7 @@ function insertAdjacentNode<T extends Node>(element: Element, position: InsertPo
     return node;
   }
   if (position === 'afterEnd') {
-    if (element.parentNode === null) {
+    if (element.parentNode == null) {
       return null;
     }
     element.after(node);

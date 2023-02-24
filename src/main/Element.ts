@@ -184,7 +184,7 @@ function isEqualAttributes(attributes: Attributes | undefined, otherAttributes: 
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {
   if (position === 'beforeBegin') {
-    if (element.parentNode === null) {
+    if (element.parentNode == null) {
       return null;
     }
     element.before(node);
@@ -199,7 +199,7 @@ function insertAdjacentNode<T extends Node>(element: Element, position: InsertPo
     return node;
   }
   if (position === 'afterEnd') {
-    if (element.parentNode === null) {
+    if (element.parentNode == null) {
       return null;
     }
     element.after(node);

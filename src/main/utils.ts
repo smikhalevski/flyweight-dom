@@ -119,5 +119,5 @@ export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
     child = child.nextSibling;
     otherChild = otherNode.nextSibling;
   }
-  return child === null && otherChild === null;
+  return child == null && otherChild == null;
 }

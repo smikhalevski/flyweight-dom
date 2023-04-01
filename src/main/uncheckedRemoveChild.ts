@@ -1,10 +1,10 @@
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
-import { CHILD_NODES, CHILDREN, isElement } from './utils';
+import { isElement } from './utils';
 
 export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
-  const childNodes = parent[CHILD_NODES];
-  const children = parent[CHILDREN];
+  const childNodes = parent._childNodes;
+  const children = parent._children;
 
   const { previousSibling, nextSibling } = child;
 
@@ -16,14 +16,14 @@ export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void
 
   child.parentNode = null;
 
-  if (previousSibling != null) {
+  if (previousSibling !== null) {
     previousSibling.nextSibling = nextSibling;
     child.previousSibling = null;
   } else {
     parent.firstChild = nextSibling;
   }
 
-  if (nextSibling != null) {
+  if (nextSibling !== null) {
     nextSibling.previousSibling = previousSibling;
     child.nextSibling = null;
   } else {

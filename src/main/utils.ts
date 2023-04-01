@@ -2,9 +2,6 @@ import { Node } from './Node';
 import { Element } from './Element';
 import { DocumentFragment } from './DocumentFragment';
 
-export const CHILDREN = Symbol('children');
-export const CHILD_NODES = Symbol('childNodes');
-
 export const enum NodeConstants {
   ELEMENT_NODE = 1,
   ATTRIBUTE_NODE = 2,
@@ -89,14 +86,14 @@ export function isDocumentFragment(node: Node): node is DocumentFragment {
 }
 
 export function getPreviousSiblingOrSelf(node: Node | null, nodeType: NodeConstants): Node | null {
-  while (node != null && node.nodeType !== nodeType) {
+  while (node !== null && node.nodeType !== nodeType) {
     node = node.previousSibling;
   }
   return node;
 }
 
 export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeConstants): Node | null {
-  while (node != null && node.nodeType !== nodeType) {
+  while (node !== null && node.nodeType !== nodeType) {
     node = node.nextSibling;
   }
   return node;
@@ -108,16 +105,16 @@ export function isSpaceChar(charCode: number): boolean {
 }
 
 export function isEqualConstructor<T extends Node>(node: T, otherNode: Node | null | undefined): otherNode is T {
-  return otherNode != null && otherNode.constructor === node.constructor;
+  return otherNode !== null && otherNode !== undefined && otherNode.constructor === node.constructor;
 }
 
 export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
   let child = node.firstChild;
   let otherChild = otherNode.firstChild;
 
-  while (child != null && otherNode != null && child.isEqualNode(otherChild)) {
+  while (child !== null && otherNode !== null && child.isEqualNode(otherChild)) {
     child = child.nextSibling;
     otherChild = otherNode.nextSibling;
   }
-  return child == null && otherChild == null;
+  return child === null && otherChild === null;
 }

@@ -26,7 +26,7 @@ const nodeValuePropertyDescriptor: TypedPropertyDescriptor<CharacterData, string
     return this.data;
   },
   set(value) {
-    this.data = value != null ? value : '';
+    this.data = value !== null && value !== undefined ? value : '';
   },
 };
 

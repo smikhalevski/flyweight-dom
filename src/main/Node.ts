@@ -1,13 +1,5 @@
 import { Element } from './Element';
-import {
-  CHILD_NODES,
-  Constructor,
-  die,
-  extendClass,
-  isEqualChildNodes,
-  isEqualConstructor,
-  NodeConstants,
-} from './utils';
+import { Constructor, die, extendClass, isEqualChildNodes, isEqualConstructor, NodeConstants } from './utils';
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
 import { uncheckedContains } from './uncheckedContains';
@@ -29,7 +21,7 @@ export interface Node {
   textContent: string | null;
 
   // private
-  [CHILD_NODES]: ChildNode[] | undefined;
+  _childNodes: ChildNode[] | undefined;
 
   hasChildNodes(): boolean;
 
@@ -83,9 +75,9 @@ Object.defineProperties(prototype, {
     get(this: Node) {
       const nodes: ChildNode[] = [];
 
-      this[CHILD_NODES] = nodes;
+      this._childNodes = nodes;
 
-      for (let child = this.firstChild; child != null; child = child.nextSibling) {
+      for (let child = this.firstChild; child !== null; child = child.nextSibling) {
         nodes.push(child);
       }
       Object.defineProperty(this, 'childNodes', { value: nodes });
@@ -98,7 +90,7 @@ Object.defineProperties(prototype, {
     get(this: Node) {
       let parent = this.parentNode;
 
-      while (parent != null && parent.nodeType !== NodeConstants.ELEMENT_NODE) {
+      while (parent !== null && parent.nodeType !== NodeConstants.ELEMENT_NODE) {
         parent = parent.parentNode;
       }
       return parent as Element | null;
@@ -107,11 +99,11 @@ Object.defineProperties(prototype, {
 });
 
 prototype.hasChildNodes = function () {
-  return this.firstChild != null;
+  return this.firstChild !== null;
 };
 
 prototype.contains = function (node) {
-  return node != null ? uncheckedContains(this, node) : false;
+  return node !== null && node !== undefined ? uncheckedContains(this, node) : false;
 };
 
 function unsupported(): never {

@@ -1,6 +1,5 @@
 import { Element, Text } from '../main';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
-import { CHILD_NODES, CHILDREN } from '../main/utils';
 
 describe('uncheckedAppendChild', () => {
   test('appends the first child node to an element', () => {
@@ -9,7 +8,7 @@ describe('uncheckedAppendChild', () => {
 
     uncheckedAppendChild(parent, node);
 
-    expect(parent[CHILD_NODES]).toBe(undefined);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(node);
     expect(parent.lastChild).toBe(node);
     expect(parent.firstElementChild).toBe(null);
@@ -33,7 +32,7 @@ describe('uncheckedAppendChild', () => {
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
 
-    expect(parent[CHILD_NODES]).toBe(undefined);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
     expect(parent.firstElementChild).toBe(null);
@@ -81,7 +80,7 @@ describe('uncheckedAppendChild', () => {
 
     uncheckedAppendChild(parent, node);
 
-    expect(parent[CHILDREN]).toBe(undefined);
+    expect(parent._children).toBe(undefined);
     expect(parent.firstChild).toBe(node);
     expect(parent.lastChild).toBe(node);
     expect(parent.firstElementChild).toBe(node);
@@ -105,7 +104,7 @@ describe('uncheckedAppendChild', () => {
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
 
-    expect(parent[CHILDREN]).toBe(undefined);
+    expect(parent._children).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
     expect(parent.firstElementChild).toBe(node1);
@@ -158,7 +157,7 @@ describe('uncheckedAppendChild', () => {
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
 
-    expect(parent[CHILDREN]).toBe(undefined);
+    expect(parent._children).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
     expect(parent.firstElementChild).toBe(node1);

@@ -24,10 +24,10 @@ export class TreeWalker {
 
     let node: Node | null = this.currentNode;
 
-    while (node != null && node !== root) {
+    while (node !== null && node !== root) {
       node = node.parentNode;
 
-      if (node != null && filterNode(this, node) === NodeFilterConstants.FILTER_ACCEPT) {
+      if (node !== null && filterNode(this, node) === NodeFilterConstants.FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
     }
@@ -41,23 +41,23 @@ export class TreeWalker {
     let result;
     let candidate;
 
-    while (node != null) {
+    while (node !== null) {
       result = filterNode(this, node);
 
       if (result === NodeFilterConstants.FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
-      if (result === NodeFilterConstants.FILTER_SKIP && (candidate = node.firstChild) != null) {
+      if (result === NodeFilterConstants.FILTER_SKIP && (candidate = node.firstChild) !== null) {
         node = candidate;
         continue;
       }
 
-      while (node != null) {
-        if ((candidate = node.nextSibling) != null) {
+      while (node !== null) {
+        if ((candidate = node.nextSibling) !== null) {
           node = candidate;
           break;
         }
-        if ((candidate = node.parentNode) != null && candidate !== root && candidate !== currentNode) {
+        if ((candidate = node.parentNode) !== null && candidate !== root && candidate !== currentNode) {
           node = candidate;
           continue;
         }
@@ -74,23 +74,23 @@ export class TreeWalker {
     let result;
     let candidate;
 
-    while (node != null) {
+    while (node !== null) {
       result = filterNode(this, node);
 
       if (result === NodeFilterConstants.FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
-      if (result === NodeFilterConstants.FILTER_SKIP && (candidate = node.lastChild) != null) {
+      if (result === NodeFilterConstants.FILTER_SKIP && (candidate = node.lastChild) !== null) {
         node = candidate;
         continue;
       }
 
-      while (node != null) {
-        if ((candidate = node.previousSibling) != null) {
+      while (node !== null) {
+        if ((candidate = node.previousSibling) !== null) {
           node = candidate;
           break;
         }
-        if ((candidate = node.parentNode) != null && candidate !== root && candidate !== currentNode) {
+        if ((candidate = node.parentNode) !== null && candidate !== root && candidate !== currentNode) {
           node = candidate;
           continue;
         }
@@ -114,14 +114,14 @@ export class TreeWalker {
     while (true) {
       candidate = node.nextSibling;
 
-      while (candidate != null) {
+      while (candidate !== null) {
         node = candidate;
         result = filterNode(this, node);
 
         if (result === NodeFilterConstants.FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
-        if (result === NodeFilterConstants.FILTER_REJECT || (candidate = node.firstChild) == null) {
+        if (result === NodeFilterConstants.FILTER_REJECT || (candidate = node.firstChild) === null) {
           candidate = node.nextSibling;
         }
       }
@@ -129,7 +129,7 @@ export class TreeWalker {
       candidate = node.parentNode;
 
       if (
-        candidate == null ||
+        candidate === null ||
         candidate === root ||
         filterNode(this, candidate) === NodeFilterConstants.FILTER_ACCEPT
       ) {
@@ -154,14 +154,14 @@ export class TreeWalker {
     while (true) {
       candidate = node.previousSibling;
 
-      while (candidate != null) {
+      while (candidate !== null) {
         node = candidate;
         result = filterNode(this, node);
 
         if (result === NodeFilterConstants.FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
-        if (result === NodeFilterConstants.FILTER_REJECT || (candidate = node.lastChild) == null) {
+        if (result === NodeFilterConstants.FILTER_REJECT || (candidate = node.lastChild) === null) {
           candidate = node.previousSibling;
         }
       }
@@ -169,7 +169,7 @@ export class TreeWalker {
       candidate = node.parentNode;
 
       if (
-        candidate == null ||
+        candidate === null ||
         candidate === root ||
         filterNode(this, candidate) === NodeFilterConstants.FILTER_ACCEPT
       ) {
@@ -188,7 +188,7 @@ export class TreeWalker {
     let candidate;
 
     while (true) {
-      while (result !== NodeFilterConstants.FILTER_REJECT && (candidate = node.firstChild) != null) {
+      while (result !== NodeFilterConstants.FILTER_REJECT && (candidate = node.firstChild) !== null) {
         node = candidate;
         result = filterNode(this, candidate);
 
@@ -197,11 +197,11 @@ export class TreeWalker {
         }
       }
 
-      for (let parent: Node | null = node; parent != null; parent = parent.parentNode) {
+      for (let parent: Node | null = node; parent !== null; parent = parent.parentNode) {
         if (parent === root) {
           return null;
         }
-        if ((candidate = parent.nextSibling) != null) {
+        if ((candidate = parent.nextSibling) !== null) {
           node = candidate;
           break;
         }
@@ -223,18 +223,18 @@ export class TreeWalker {
     let candidate;
 
     while (node !== root) {
-      for (candidate = node.previousSibling; candidate != null; candidate = node.previousSibling) {
+      for (candidate = node.previousSibling; candidate !== null; candidate = node.previousSibling) {
         do {
           node = candidate;
           result = filterNode(this, candidate);
-        } while (result !== NodeFilterConstants.FILTER_REJECT && (candidate = node.lastChild) != null);
+        } while (result !== NodeFilterConstants.FILTER_REJECT && (candidate = node.lastChild) !== null);
 
         if (result === NodeFilterConstants.FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
       }
 
-      if (node === root || (candidate = node.parentNode) == null) {
+      if (node === root || (candidate = node.parentNode) === null) {
         break;
       }
       if (filterNode(this, candidate) === NodeFilterConstants.FILTER_ACCEPT) {
@@ -254,7 +254,7 @@ export function filterNode(treeWalker: TreeWalker, node: Node): number {
   if ((((1 << node.nodeType) >> 1) & treeWalker.whatToShow) === 0) {
     return NodeFilterConstants.FILTER_SKIP;
   }
-  if (filter != null) {
+  if (filter !== null) {
     result = typeof filter === 'function' ? filter(node) : filter.acceptNode(node);
 
     if (result === NodeFilterConstants.FILTER_SKIP || result === NodeFilterConstants.FILTER_REJECT) {

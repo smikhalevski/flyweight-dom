@@ -50,13 +50,13 @@ function after(this: ChildNode /*...nodes: Array<Node | string>*/) {
 
   const { parentNode, nextSibling } = this;
 
-  if (parentNode == null) {
+  if (parentNode === null) {
     return this;
   }
   for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(parentNode, arguments[i]);
   }
-  if (nextSibling != null) {
+  if (nextSibling !== null) {
     for (let i = 0; i < argumentsLength; ++i) {
       uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), nextSibling);
     }
@@ -73,7 +73,7 @@ function before(this: ChildNode /*...nodes: Array<Node | string>*/) {
 
   const { parentNode } = this;
 
-  if (parentNode == null) {
+  if (parentNode === null) {
     return this;
   }
   for (let i = 0; i < argumentsLength; ++i) {
@@ -88,7 +88,7 @@ function before(this: ChildNode /*...nodes: Array<Node | string>*/) {
 function remove(this: ChildNode) {
   const { parentNode } = this;
 
-  if (parentNode != null) {
+  if (parentNode !== null) {
     parentNode.removeChild(this);
   }
   return this;
@@ -99,7 +99,7 @@ function replaceWith(this: ChildNode /*...nodes: Array<Node | string>*/) {
 
   const { parentNode } = this;
 
-  if (parentNode == null) {
+  if (parentNode === null) {
     return this;
   }
   for (let i = 0; i < argumentsLength; ++i) {

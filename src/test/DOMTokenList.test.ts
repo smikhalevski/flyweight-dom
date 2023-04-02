@@ -1,4 +1,5 @@
-import { DOMTokenList, ValueAccessor } from '../main';
+import { DOMTokenList } from '../main';
+import { ValueAccessor } from '../main/DOMTokenList';
 
 describe('DOMTokenList', () => {
   let valueMock = '';

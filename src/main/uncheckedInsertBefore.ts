@@ -1,10 +1,10 @@
 import { ParentNode } from './ParentNode';
 import { ChildNode } from './ChildNode';
-import { CHILD_NODES, CHILDREN, isElement } from './utils';
+import { isElement } from './utils';
 
 export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child: ChildNode): void {
-  const childNodes = parent[CHILD_NODES];
-  const children = parent[CHILDREN];
+  const childNodes = parent._childNodes;
+  const children = parent._children;
 
   const { previousSibling } = child;
 
@@ -13,7 +13,7 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
   node.nextSibling = child;
   child.previousSibling = node;
 
-  if (previousSibling != null) {
+  if (previousSibling !== null) {
     previousSibling.nextSibling = node;
     node.previousSibling = previousSibling;
 
@@ -24,10 +24,10 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child
     childNodes?.unshift(node);
   }
 
-  if (children != null && isElement(node)) {
+  if (children !== undefined && isElement(node)) {
     const childElement = isElement(child) ? child : child.nextElementSibling;
 
-    if (childElement != null) {
+    if (childElement !== null) {
       children.splice(children.indexOf(childElement), 0, node);
     } else {
       children.push(node);

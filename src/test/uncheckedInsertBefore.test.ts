@@ -1,7 +1,6 @@
 import { Element, Text } from '../main';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
 import { uncheckedInsertBefore } from '../main/uncheckedInsertBefore';
-import { CHILD_NODES, CHILDREN } from '../main/utils';
 
 describe('uncheckedInsertBefore', () => {
   test('inserts an element before another element', () => {
@@ -12,8 +11,8 @@ describe('uncheckedInsertBefore', () => {
     uncheckedAppendChild(parent, node2);
     uncheckedInsertBefore(parent, node1, node2);
 
-    expect(parent[CHILD_NODES]).toBe(undefined);
-    expect(parent[CHILDREN]).toBe(undefined);
+    expect(parent._childNodes).toBe(undefined);
+    expect(parent._children).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node2);
     expect(parent.firstElementChild).toBe(node1);

@@ -2,10 +2,10 @@
 
 The extremely fast DOM implementation.
 
-- Zero dependencies;
-- [Just 3 kB gzipped;](https://bundlephobia.com/package/flyweight-dom)
 - DOM can be extended with custom nodes;
 - Low memory consumption.
+- Zero dependencies;
+- [4 kB gzipped;](https://bundlephobia.com/package/flyweight-dom)
 
 ```sh
 npm install --save-prod flyweight-dom

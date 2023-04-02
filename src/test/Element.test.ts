@@ -1,4 +1,5 @@
-import { DOMTokenList, Element, InsertPosition, Node, Text } from '../main';
+import { DOMTokenList, Element, Node, Text } from '../main';
+import { InsertPosition } from '../main/Element';
 
 describe('Element', () => {
   test('creates an Element instance', () => {

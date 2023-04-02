@@ -1,11 +1,7 @@
 import { die, isSpaceChar } from './utils';
 
-const VALUE_ACCESSOR = Symbol('valueAccessor');
-const TOKENIZED_VALUE = Symbol('tokenizedValue');
-const TOKENS = Symbol('tokens');
-
 const separatorRegex = /\s+/;
-const SEPARATOR = ' ';
+const separator = ' ';
 
 export interface ValueAccessor {
   get(): string;
@@ -17,7 +13,7 @@ export interface DOMTokenList {
   length: number;
   value: string;
 
-  [TOKENS]: string[];
+  _tokens: string[];
 
   add(...tokens: string[]): void;
 
@@ -35,12 +31,9 @@ export interface DOMTokenList {
 }
 
 export class DOMTokenList {
-  [VALUE_ACCESSOR]: ValueAccessor;
-  [TOKENIZED_VALUE]: string | undefined;
+  _tokenizedValue: string | undefined;
 
-  constructor(valueAccessor: ValueAccessor) {
-    this[VALUE_ACCESSOR] = valueAccessor;
-  }
+  constructor(public _valueAccessor: ValueAccessor) {}
 }
 
 const prototype = DOMTokenList.prototype;
@@ -54,10 +47,10 @@ Object.defineProperties(prototype, {
 
   value: {
     get(this: DOMTokenList) {
-      return this[VALUE_ACCESSOR].get();
+      return this._valueAccessor.get();
     },
     set(this: DOMTokenList, value) {
-      this[VALUE_ACCESSOR].set(value);
+      this._valueAccessor.set(value);
     },
   },
 });
@@ -158,16 +151,14 @@ prototype.forEach = function (callback, thisArg) {
 };
 
 prototype.toString = function () {
-  return this[VALUE_ACCESSOR].get();
+  return this._valueAccessor.get();
 };
 
 function getTokens(tokenList: DOMTokenList): string[] {
-  const valueAccessor = tokenList[VALUE_ACCESSOR];
+  let value = tokenList._valueAccessor.get();
 
-  let value = valueAccessor.get();
-
-  if (value === tokenList[TOKENIZED_VALUE]) {
-    return tokenList[TOKENS];
+  if (value === tokenList._tokenizedValue) {
+    return tokenList._tokens;
   }
 
   value = value.trim();
@@ -183,18 +174,18 @@ function getTokens(tokenList: DOMTokenList): string[] {
     }
   }
 
-  tokenList[TOKENIZED_VALUE] = value;
-  tokenList[TOKENS] = tokens;
+  tokenList._tokenizedValue = value;
+  tokenList._tokens = tokens;
 
   return tokens;
 }
 
 function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
-  const value = tokens.join(SEPARATOR);
+  const value = tokens.join(separator);
 
-  tokenList[VALUE_ACCESSOR].set(value);
-  tokenList[TOKENIZED_VALUE] = value;
-  tokenList[TOKENS] = tokens;
+  tokenList._valueAccessor.set(value);
+  tokenList._tokenizedValue = value;
+  tokenList._tokens = tokens;
 }
 
 function assertToken(token: string): void {

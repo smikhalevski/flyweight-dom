@@ -1,15 +1,6 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import {
-  CHILD_NODES,
-  CHILDREN,
-  Constructor,
-  die,
-  getNextSiblingOrSelf,
-  getPreviousSiblingOrSelf,
-  isElement,
-  NodeConstants,
-} from './utils';
+import { Constructor, die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement, NodeConstants } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
@@ -24,7 +15,7 @@ export interface ParentNode extends Node {
   readonly lastElementChild: Element | null;
 
   // private
-  [CHILDREN]: Element[] | undefined;
+  _children: Element[] | undefined;
 
   append(...nodes: Array<Node | string>): this;
 
@@ -43,9 +34,9 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
       get(this: ParentNode) {
         const nodes: Element[] = [];
 
-        this[CHILDREN] = nodes;
+        this._children = nodes;
 
-        for (let child = this.firstChild; child != null; child = child.nextSibling) {
+        for (let child = this.firstChild; child !== null; child = child.nextSibling) {
           if (isElement(child)) {
             nodes.push(child);
           }
@@ -58,7 +49,7 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
 
     childElementCount: {
       get(this: ParentNode) {
-        const children = this[CHILDREN];
+        const children = this._children;
 
         if (children) {
           return children.length;
@@ -66,7 +57,7 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
 
         let count = 0;
 
-        for (let child = this.firstChild; child != null; child = child.nextSibling) {
+        for (let child = this.firstChild; child !== null; child = child.nextSibling) {
           if (isElement(child)) {
             ++count;
           }
@@ -106,14 +97,14 @@ function appendChild<T extends Node>(this: ParentNode, node: T): T {
 function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | null | undefined): T {
   assertInsertableNode(this, node);
 
-  if (child != null) {
+  if (child !== null && child !== undefined) {
     if (child.parentNode !== this) {
       die('The node before which the new node is to be inserted is not a child of this node');
     }
   } else {
     child = this.firstChild;
   }
-  if (child != null) {
+  if (child !== null) {
     uncheckedRemoveAndInsertBefore(this, node, child as ChildNode);
   } else {
     uncheckedRemoveAndAppendChild(this, node);
@@ -160,7 +151,7 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
   for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);
   }
-  if (firstChild != null) {
+  if (firstChild !== null) {
     for (let i = 0; i < argumentsLength; ++i) {
       uncheckedRemoveAndInsertBefore(this, uncheckedToInsertableNode(arguments[i]), firstChild);
     }
@@ -175,20 +166,20 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
 function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
-  const childNodes = this[CHILD_NODES];
-  const children = this[CHILDREN];
+  const childNodes = this._childNodes;
+  const children = this._children;
 
   for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);
   }
 
-  for (let child = this.firstChild; child != null; child = child.nextSibling) {
+  for (let child = this.firstChild; child !== null; child = child.nextSibling) {
     child.parentNode = child.previousSibling = child.nextSibling = null;
   }
-  if (childNodes != null) {
+  if (childNodes !== undefined) {
     childNodes.length = 0;
   }
-  if (children != null) {
+  if (children !== undefined) {
     children.length = 0;
   }
 

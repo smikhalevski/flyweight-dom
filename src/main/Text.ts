@@ -25,13 +25,13 @@ const prototype = extendClass(Text, CharacterData, {
 
       let text = this;
 
-      for (let node = text.previousSibling; node != null && node.nodeType === nodeType; node = node.previousSibling) {
+      for (let node = text.previousSibling; node !== null && node.nodeType === nodeType; node = node.previousSibling) {
         text = node as Text;
       }
 
       let str = '';
 
-      for (let node: Text | null = text; node != null && node.nodeType === nodeType; node = node.nextSibling as Text) {
+      for (let node: Text | null = text; node !== null && node.nodeType === nodeType; node = node.nextSibling as Text) {
         str += node.data;
       }
 
@@ -47,8 +47,8 @@ prototype.splitText = function (offset) {
 
   const node = new (this.constructor as Constructor)(data.substring(offset));
 
-  if (parentNode != null) {
-    if (nextSibling != null) {
+  if (parentNode !== null) {
+    if (nextSibling !== null) {
       uncheckedInsertBefore(parentNode, node, nextSibling);
     } else {
       uncheckedAppendChild(parentNode, node);

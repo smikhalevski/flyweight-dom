@@ -1,5 +1,9 @@
 # Flyweight DOM
 
+```sh
+npm install --save-prod flyweight-dom
+```
+
 The extremely fast DOM implementation.
 
 - DOM can be extended with custom nodes;
@@ -7,9 +11,6 @@ The extremely fast DOM implementation.
 - Zero dependencies;
 - [4 kB gzipped;](https://bundlephobia.com/package/flyweight-dom)
 
-```sh
-npm install --save-prod flyweight-dom
-```
 
 # Usage
 
@@ -29,32 +30,6 @@ element.classList.add('red');
 
 element.getAttribute('class');
 // ⮕ 'red'
-```
-
-You can create custom nodes by extending [`Node`](https://smikhalevski.github.io/flyweight-dom/interfaces/Node.html)
-class or its subclasses:
-
-```ts
-import { Element, Node } from 'flyweight-dom';
-
-class MyNode extends Node {}
-
-new Element('div').appendChild(new MyNode());
-```
-
-Or extend your already existing classes using a declaration merging:
-
-```ts
-// Your existing class
-class MyClass {}
-
-// Merge declarations
-interface MyClass extends Node {}
-
-// Extend the prototype
-Node.extend(MyClass);
-
-new Element('div').append(new MyClass());
 ```
 
 ## Performance considerations

@@ -1,6 +1,7 @@
 import { Node } from './Node';
 import { Element } from './Element';
 import {
+  AbstractConstructor,
   Constructor,
   die,
   getNextSiblingOrSelf,
@@ -58,6 +59,9 @@ export interface ParentNode extends Node {
   cloneNode(deep?: boolean): ParentNode;
 }
 
+/**
+ * The mixin that can extend the constructor prototype with properties and methods of the {@link ParentNode}.
+ */
 export const ParentNode = {
   /**
    * Extends the constructor prototype with properties and methods of the {@link ParentNode}.
@@ -65,7 +69,7 @@ export const ParentNode = {
   extend: extendParentNode,
 };
 
-export function extendParentNode(constructor: Constructor<ParentNode>): void {
+export function extendParentNode(constructor: Constructor<ParentNode> | AbstractConstructor<ParentNode>): void {
   const prototype = constructor.prototype;
 
   Object.defineProperties(prototype, {

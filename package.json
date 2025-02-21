@@ -11,6 +11,11 @@
       "import": "./index.mjs",
       "require": "./index.js"
     },
+    "./dsl": {
+      "types": "./dsl.d.ts",
+      "import": "./dsl.mjs",
+      "require": "./dsl.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": false,

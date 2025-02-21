@@ -2,7 +2,7 @@ import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { isEqualConstructor } from './utils';
 
-export interface DocumentType extends Node, ChildNode {}
+export interface DocumentType extends ChildNode {}
 
 /**
  * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType} on MDN

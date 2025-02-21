@@ -18,7 +18,7 @@
     "build": "rollup --config && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
     "clean": "rimraf lib docs coverage",
     "test": "jest",
-    "perf": "toofast",
+    "perf": "node --expose-gc --max-old-space-size=4096 node_modules/.bin/toofast src/test/perf.js",
     "docs": "typedoc"
   },
   "repository": {

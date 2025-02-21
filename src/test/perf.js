@@ -2,10 +2,6 @@ const domhandler = require('domhandler');
 const lib = require('../../lib');
 
 describe('Element.appendChild', () => {
-  beforeBatch(() => {
-    gc();
-  });
-
   test('lib', measure => {
     measure(() => {
       const root = new lib.Element('div');
@@ -28,10 +24,6 @@ describe('Element.appendChild', () => {
 });
 
 describe('Element.append', () => {
-  beforeBatch(() => {
-    gc();
-  });
-
   test('lib', measure => {
     measure(() => {
       const root = new lib.Element('div');
@@ -52,10 +44,6 @@ describe('Element.append', () => {
 });
 
 describe('Element.childNodes', () => {
-  beforeBatch(() => {
-    gc();
-  });
-
   test('lib', measure => {
     const root = new lib.Element('div');
 
@@ -68,10 +56,6 @@ describe('Element.childNodes', () => {
 });
 
 describe('Element.classList', () => {
-  beforeBatch(() => {
-    gc();
-  });
-
   test('add', measure => {
     let element;
 

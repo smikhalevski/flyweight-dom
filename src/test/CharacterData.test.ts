@@ -1,7 +1,10 @@
 import { CharacterData, Node } from '../main';
 
 describe('CharacterData', () => {
-  class MockCharacterData extends CharacterData {}
+  class MockCharacterData extends CharacterData {
+    readonly nodeType = -1;
+    readonly nodeName = '';
+  }
 
   test('creates a CharacterData instance', () => {
     const node = new MockCharacterData();

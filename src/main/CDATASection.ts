@@ -1,15 +1,10 @@
 import { Text } from './Text';
-import { extendClass, NodeConstants } from './utils';
+import { NodeConstants } from './utils';
 
-export interface CDATASection extends Text {}
-
-export class CDATASection {
-  constructor(data = '') {
-    this.data = data;
-  }
+/**
+ * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CDATASection CDATASection} on MDN
+ */
+export class CDATASection extends Text {
+  readonly nodeType: number = NodeConstants.CDATA_SECTION_NODE;
+  readonly nodeName: string = '#cdata-section';
 }
-
-extendClass(CDATASection, Text, {
-  nodeType: { value: NodeConstants.CDATA_SECTION_NODE },
-  nodeName: { value: '#cdata-section' },
-});

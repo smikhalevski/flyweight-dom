@@ -4,25 +4,59 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf, NodeConstants } from './utils';
+import {
+  AbstractConstructor,
+  Constructor,
+  getNextSiblingOrSelf,
+  getPreviousSiblingOrSelf,
+  NodeConstants,
+} from './utils';
 
 export interface ChildNode extends Node {
-  // public readonly
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling Element.previousElementSibling} on MDN
+   */
   readonly previousElementSibling: Element | null;
+
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling Element.nextElementSibling} on MDN
+   */
   readonly nextElementSibling: Element | null;
 
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/after Element.after} on MDN
+   */
   after(...nodes: Array<Node | string>): this;
 
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/before Element.before} on MDN
+   */
   before(...nodes: Array<Node | string>): this;
 
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/remove Element.remove} on MDN
+   */
   remove(): this;
 
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith Element.replaceWith} on MDN
+   */
   replaceWith(...nodes: Array<Node | string>): this;
+
+  cloneNode(deep?: boolean): ChildNode;
 }
 
-export const ChildNode = { extend: extendChildNode };
+/**
+ * The mixin that can extend the constructor prototype with properties and methods of the {@linkcode ChildNode}.
+ */
+export const ChildNode = {
+  /**
+   * Extends the constructor prototype with properties and methods of the {@linkcode ChildNode}.
+   */
+  extend: extendChildNode,
+};
 
-export function extendChildNode(constructor: Constructor<ChildNode>): void {
+export function extendChildNode(constructor: Constructor<ChildNode> | AbstractConstructor<ChildNode>): void {
   const prototype = constructor.prototype;
 
   Object.defineProperties(prototype, {

@@ -1,7 +1,7 @@
 import { die, isSpaceChar } from './utils';
 
-const separatorRegex = /\s+/;
-const separator = ' ';
+const SEPARATOR_REGEX = /\s+/;
+const SEPARATOR = ' ';
 
 export interface ValueAccessor {
   get(): string;
@@ -9,161 +9,179 @@ export interface ValueAccessor {
   set(value: string): void;
 }
 
-export interface DOMTokenList {
-  length: number;
-  value: string;
+/**
+ * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList} on MDN
+ */
+export class DOMTokenList {
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length DOMTokenList.length} on MDN
+   */
+  get length(): number {
+    return getTokens(this).length;
+  }
 
-  _tokens: string[];
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value DOMTokenList.value} on MDN
+   */
+  get value(): string {
+    return this._valueAccessor.get();
+  }
 
+  set value(value: string) {
+    this._valueAccessor.set(value);
+  }
+
+  private _tokens: string[] = [];
+  private _tokenizedValue: string | undefined;
+  private _valueAccessor: ValueAccessor;
+
+  /**
+   * Creates a new instance of {@linkcode DOMTokenList}.
+   *
+   * @param valueAccessor The accessor that reads and writes the class string to the element.
+   */
+  constructor(valueAccessor: ValueAccessor) {
+    this._valueAccessor = valueAccessor;
+  }
+
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add DOMTokenList.add} on MDN
+   */
   add(...tokens: string[]): void;
 
+  add(): void {
+    const argumentsLength = arguments.length;
+
+    for (let i = 0; i < argumentsLength; ++i) {
+      assertToken(arguments[i]);
+    }
+
+    const tokens = getTokens(this);
+
+    for (let i = 0; i < argumentsLength; ++i) {
+      const token = arguments[i];
+
+      if (tokens.indexOf(token) === -1) {
+        tokens.push(token);
+      }
+    }
+
+    setTokens(this, tokens);
+  }
+
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/remove DOMTokenList.remove} on MDN
+   */
   remove(...tokens: string[]): void;
 
-  replace(replacedToken: string, token: string): boolean;
+  remove(): void {
+    const argumentsLength = arguments.length;
 
-  toggle(token: string, force?: boolean): boolean;
-
-  contains(token: string): boolean;
-
-  item(index: number): string | null;
-
-  forEach(callback: (value: string, index: number, parent: DOMTokenList) => void, thisArg?: any): void;
-}
-
-export class DOMTokenList {
-  _tokenizedValue: string | undefined;
-
-  constructor(public _valueAccessor: ValueAccessor) {}
-}
-
-const prototype = DOMTokenList.prototype;
-
-Object.defineProperties(prototype, {
-  length: {
-    get(this: DOMTokenList) {
-      return getTokens(this).length;
-    },
-  },
-
-  value: {
-    get(this: DOMTokenList) {
-      return this._valueAccessor.get();
-    },
-    set(this: DOMTokenList, value) {
-      this._valueAccessor.set(value);
-    },
-  },
-});
-
-prototype.add = function (/*...tokens: string[]*/) {
-  const argumentsLength = arguments.length;
-
-  for (let i = 0; i < argumentsLength; ++i) {
-    assertToken(arguments[i]);
-  }
-
-  const tokens = getTokens(this);
-
-  for (let i = 0; i < argumentsLength; ++i) {
-    const token = arguments[i];
-
-    if (tokens.indexOf(token) === -1) {
-      tokens.push(token);
+    for (let i = 0; i < argumentsLength; ++i) {
+      assertToken(arguments[i]);
     }
-  }
 
-  setTokens(this, tokens);
-};
+    const tokens = getTokens(this);
 
-prototype.remove = function (/*...tokens: string[]*/) {
-  const argumentsLength = arguments.length;
+    for (let i = 0; i < argumentsLength; ++i) {
+      const index = tokens.indexOf(arguments[i]);
 
-  for (let i = 0; i < argumentsLength; ++i) {
-    assertToken(arguments[i]);
-  }
-
-  const tokens = getTokens(this);
-
-  for (let i = 0; i < argumentsLength; ++i) {
-    const index = tokens.indexOf(arguments[i]);
-
-    if (index !== -1) {
-      tokens.splice(index, 1);
+      if (index !== -1) {
+        tokens.splice(index, 1);
+      }
     }
+
+    setTokens(this, tokens);
   }
 
-  setTokens(this, tokens);
-};
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace DOMTokenList.replace} on MDN
+   */
+  replace(replacedToken: string, token: string): boolean {
+    assertToken(replacedToken);
+    assertToken(token);
 
-prototype.replace = function (replacedToken, token) {
-  assertToken(replacedToken);
-  assertToken(token);
+    const tokens = getTokens(this);
+    const index = tokens.indexOf(replacedToken);
 
-  const tokens = getTokens(this);
-  const index = tokens.indexOf(replacedToken);
+    if (index === -1) {
+      return false;
+    }
 
-  if (index === -1) {
-    return false;
-  }
-
-  tokens.splice(index, 1, token);
-  setTokens(this, tokens);
-  return true;
-};
-
-prototype.toggle = function (token, force) {
-  assertToken(token);
-
-  const tokens = getTokens(this);
-  const index = tokens.indexOf(token);
-  const exists = index !== -1;
-
-  if (!exists && (force === undefined || force)) {
-    tokens.push(token);
+    tokens.splice(index, 1, token);
     setTokens(this, tokens);
     return true;
   }
 
-  if (exists && (force === undefined || !force)) {
-    tokens.splice(index, 1);
-    setTokens(this, tokens);
-    return false;
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle DOMTokenList.toggle} on MDN
+   */
+  toggle(token: string, force?: boolean): boolean {
+    assertToken(token);
+
+    const tokens = getTokens(this);
+    const index = tokens.indexOf(token);
+    const exists = index !== -1;
+
+    if (!exists && (force === undefined || force)) {
+      tokens.push(token);
+      setTokens(this, tokens);
+      return true;
+    }
+
+    if (exists && (force === undefined || !force)) {
+      tokens.splice(index, 1);
+      setTokens(this, tokens);
+      return false;
+    }
+
+    return exists;
   }
 
-  return exists;
-};
-
-prototype.contains = function (token) {
-  return getTokens(this).indexOf(token) !== -1;
-};
-
-prototype.item = function (index) {
-  const tokens = getTokens(this);
-  return index < 0 || index >= tokens.length ? null : tokens[index] || null;
-};
-
-prototype.forEach = function (callback, thisArg) {
-  const tokens = getTokens(this);
-
-  for (let i = 0; i < tokens.length; ++i) {
-    callback.call(thisArg, tokens[i], i, this);
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/contains DOMTokenList.contains} on MDN
+   */
+  contains(token: string): boolean {
+    return getTokens(this).indexOf(token) !== -1;
   }
-};
 
-prototype.toString = function () {
-  return this._valueAccessor.get();
-};
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/item DOMTokenList.item} on MDN
+   */
+  item(index: number): string | null {
+    const tokens = getTokens(this);
+    return index < 0 || index >= tokens.length ? null : tokens[index] || null;
+  }
+
+  /**
+   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/forEach DOMTokenList.forEach} on MDN
+   */
+  forEach(callback: (value: string, index: number, parent: DOMTokenList) => void, thisArg?: any): void {
+    const tokens = getTokens(this);
+
+    for (let i = 0; i < tokens.length; ++i) {
+      callback.call(thisArg, tokens[i], i, this);
+    }
+  }
+
+  /**
+   * @internal
+   */
+  toString() {
+    return this._valueAccessor.get();
+  }
+}
 
 function getTokens(tokenList: DOMTokenList): string[] {
-  let value = tokenList._valueAccessor.get();
+  let value = tokenList['_valueAccessor'].get();
 
-  if (value === tokenList._tokenizedValue) {
-    return tokenList._tokens;
+  if (value === tokenList['_tokenizedValue']) {
+    return tokenList['_tokens'];
   }
 
   value = value.trim();
 
-  const tokens = value.length === 0 ? [] : value.split(separatorRegex);
+  const tokens = value.length === 0 ? [] : value.split(SEPARATOR_REGEX);
 
   // Make unique
   for (let i = 0; i < tokens.length; ++i) {
@@ -174,18 +192,18 @@ function getTokens(tokenList: DOMTokenList): string[] {
     }
   }
 
-  tokenList._tokenizedValue = value;
-  tokenList._tokens = tokens;
+  tokenList['_tokenizedValue'] = value;
+  tokenList['_tokens'] = tokens;
 
   return tokens;
 }
 
 function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
-  const value = tokens.join(separator);
+  const value = tokens.join(SEPARATOR);
 
-  tokenList._valueAccessor.set(value);
-  tokenList._tokenizedValue = value;
-  tokenList._tokens = tokens;
+  tokenList['_valueAccessor'].set(value);
+  tokenList['_tokenizedValue'] = value;
+  tokenList['_tokens'] = tokens;
 }
 
 function assertToken(token: string): void {

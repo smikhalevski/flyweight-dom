@@ -1,23 +1,24 @@
 import { Node } from './Node';
 import { extendParentNode, ParentNode } from './ParentNode';
-import { extendClass, NodeConstants } from './utils';
+import { NodeConstants } from './utils';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 
 export interface DocumentFragment extends Node, ParentNode {}
 
-export class DocumentFragment {}
+/**
+ * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment DocumentFragment} on MDN
+ */
+export class DocumentFragment extends Node {
+  readonly nodeType: number = NodeConstants.DOCUMENT_FRAGMENT_NODE;
+  readonly nodeName: string = '#document-fragment';
 
-const prototype = extendClass(DocumentFragment, Node, {
-  nodeType: { value: NodeConstants.DOCUMENT_FRAGMENT_NODE },
-  nodeName: { value: '#document-fragment' },
-});
+  cloneNode(deep?: boolean): DocumentFragment {
+    const node = new DocumentFragment();
+    if (deep) {
+      uncheckedCloneChildren(this, node);
+    }
+    return node;
+  }
+}
 
 extendParentNode(DocumentFragment);
-
-prototype.cloneNode = function (deep) {
-  const node = new DocumentFragment();
-  if (deep) {
-    uncheckedCloneChildren(this, node);
-  }
-  return node;
-};

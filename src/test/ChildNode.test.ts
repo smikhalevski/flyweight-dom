@@ -4,7 +4,14 @@ describe('ChildNode', () => {
   test('extends a class constructor', () => {
     interface MockNode extends ChildNode {}
 
-    class MockNode extends Node {}
+    class MockNode extends Node {
+      readonly nodeName = '';
+      readonly nodeType = -1;
+
+      cloneNode(deep?: boolean): MockNode {
+        return this;
+      }
+    }
 
     ChildNode.extend(MockNode);
 

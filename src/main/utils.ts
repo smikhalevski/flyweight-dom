@@ -32,46 +32,7 @@ export const enum NodeFilterConstants {
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
-export interface TypedPropertyDescriptor<T, V> {
-  configurable?: boolean;
-  enumerable?: boolean;
-  value?: any;
-  writable?: boolean;
-
-  get?(this: T): V;
-
-  set?(this: T, value: V): void;
-}
-
-export type TypedPropertyDescriptorMap<T> = { [K in keyof T]?: TypedPropertyDescriptor<T, T[K]> };
-
-/**
- * `extendClass` is used instead of `extends` syntax to avoid excessive super constructor calls and speed up
- * instantiation.
- */
-export function extendClass<T>(
-  constructor: Constructor<T>,
-  superConstructor: Constructor,
-  properties?: TypedPropertyDescriptorMap<T>
-): T {
-  const Super = class {
-    constructor() {
-      this.constructor = constructor;
-    }
-  };
-
-  Super.prototype = superConstructor.prototype;
-
-  Object.setPrototypeOf(constructor, superConstructor);
-
-  constructor.prototype = new Super();
-
-  if (properties !== undefined) {
-    Object.defineProperties(constructor.prototype, properties as PropertyDescriptorMap);
-  }
-
-  return constructor.prototype;
-}
+export type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
 
 export function die(message: string): never {
   throw new Error(message);

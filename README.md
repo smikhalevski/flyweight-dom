@@ -1,4 +1,4 @@
-# Flyweight DOM&ensp;🍃&ensp;[![build](https://github.com/smikhalevski/flyweight-dom/actions/workflows/test.yml/badge.svg?branch=master&event=push)](https://github.com/smikhalevski/flyweight-dom/actions/workflows/test.yml)
+# Flyweight DOM
 
 The extremely fast DOM implementation.
 

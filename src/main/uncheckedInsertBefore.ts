@@ -3,7 +3,7 @@ import { ChildNode } from './ChildNode';
 import { isElement } from './utils';
 
 export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child: ChildNode): void {
-  const childNodes = parent._childNodes;
+  const childNodes = parent['_childNodes'];
   const children = parent._children;
 
   const { previousSibling } = child;

@@ -3,7 +3,7 @@ import { ParentNode } from './ParentNode';
 import { isElement } from './utils';
 
 export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
-  const childNodes = parent._childNodes;
+  const childNodes = parent['_childNodes'];
   const children = parent._children;
 
   const { previousSibling, nextSibling } = child;

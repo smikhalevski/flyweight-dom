@@ -4,7 +4,7 @@ import { Node } from './Node';
 export type NodeFilter = ((node: Node) => number) | { acceptNode(node: Node): number };
 
 /**
- * **See** {@linkcode https://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter NodeFilter} on W3C
+ * **See** {@link https://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter NodeFilter} on W3C
  */
 export const NodeFilter = {
   FILTER_ACCEPT: NodeFilterConstants.FILTER_ACCEPT as number,

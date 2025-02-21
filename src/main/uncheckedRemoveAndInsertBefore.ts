@@ -7,7 +7,7 @@ import { InsertableNode } from './uncheckedToInsertableNode';
 
 export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {
   if (isDocumentFragment(node)) {
-    const childNodes = node['_childNodes'];
+    const childNodes = node._childNodes;
     const children = node._children;
 
     let nodeChild = node.firstChild;

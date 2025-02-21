@@ -5,29 +5,29 @@ import { isEqualConstructor, NodeConstants } from './utils';
 export interface DocumentType extends Node, ChildNode {}
 
 /**
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType} on MDN
  */
 export class DocumentType extends Node {
   readonly nodeType: number = NodeConstants.DOCUMENT_TYPE_NODE;
   readonly nodeName: string;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.name} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.name} on MDN
    */
   readonly name: string;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.publicId} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.publicId} on MDN
    */
   readonly publicId: string;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.systemId} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.systemId} on MDN
    */
   readonly systemId: string;
 
   /**
-   * Creates a new instance of {@linkcode DocumentType}.
+   * Creates a new instance of {@link DocumentType}.
    */
   constructor(name: string, publicId = '', systemId = '') {
     super();

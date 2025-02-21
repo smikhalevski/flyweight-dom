@@ -4,14 +4,14 @@ import { uncheckedAppendChild } from './uncheckedAppendChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 
 /**
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Text Text} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Text Text} on MDN
  */
 export class Text extends CharacterData {
   readonly nodeType: number = NodeConstants.TEXT_NODE;
   readonly nodeName: string = '#text';
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Text/wholeText Text.wholeText} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Text/wholeText Text.wholeText} on MDN
    */
   get wholeText(): string {
     const { nodeType } = this;
@@ -32,7 +32,7 @@ export class Text extends CharacterData {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Text/splitText Text.splitText} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Text/splitText Text.splitText} on MDN
    */
   splitText(offset: number): this {
     const { data, parentNode, nextSibling } = this;

@@ -6,7 +6,7 @@ import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 export interface DocumentFragment extends Node, ParentNode {}
 
 /**
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment DocumentFragment} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment DocumentFragment} on MDN
  */
 export class DocumentFragment extends Node {
   readonly nodeType: number = NodeConstants.DOCUMENT_FRAGMENT_NODE;

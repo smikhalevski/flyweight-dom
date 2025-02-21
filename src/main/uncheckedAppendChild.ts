@@ -3,7 +3,7 @@ import { ChildNode } from './ChildNode';
 import { isElement } from './utils';
 
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
-  const childNodes = parent['_childNodes'];
+  const childNodes = parent._childNodes;
   const children = parent._children;
 
   const { lastChild } = parent;

@@ -7,41 +7,44 @@ import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } fro
 import { ChildNode } from './ChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 
+/**
+ * The node that can be a parent of another node.
+ *
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
+ */
 export interface ParentNode extends Node {
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children} on MDN
    */
   readonly children: Node[];
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount Element.childElementCount} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount Element.childElementCount} on MDN
    */
   readonly childElementCount: number;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild Element.firstElementChild} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild Element.firstElementChild} on MDN
    */
   readonly firstElementChild: Element | null;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild Element.lastElementChild} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild Element.lastElementChild} on MDN
    */
   readonly lastElementChild: Element | null;
 
-  /* private */ _children: Element[] | undefined;
-
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/append Element.append} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/append Element.append} on MDN
    */
   append(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/prepend Element.prepend} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/prepend Element.prepend} on MDN
    */
   prepend(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceChildren Element.replaceChildren} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceChildren Element.replaceChildren} on MDN
    */
   replaceChildren(...nodes: Array<Node | string>): this;
 
@@ -50,7 +53,7 @@ export interface ParentNode extends Node {
 
 export const ParentNode = {
   /**
-   * Extends the constructor prototype with properties and methods of the {@linkcode ParentNode}.
+   * Extends the constructor prototype with properties and methods of the {@link ParentNode}.
    */
   extend: extendParentNode,
 };

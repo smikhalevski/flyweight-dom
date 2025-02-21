@@ -10,18 +10,18 @@ export interface ValueAccessor {
 }
 
 /**
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList} on MDN
  */
 export class DOMTokenList {
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length DOMTokenList.length} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length DOMTokenList.length} on MDN
    */
   get length(): number {
     return getTokens(this).length;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value DOMTokenList.value} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value DOMTokenList.value} on MDN
    */
   get value(): string {
     return this._valueAccessor.get();
@@ -31,12 +31,12 @@ export class DOMTokenList {
     this._valueAccessor.set(value);
   }
 
-  private _tokens: string[] = [];
-  private _tokenizedValue: string | undefined;
+  private _tokens: string[] | undefined = undefined;
+  private _tokenizedValue: string | undefined = undefined;
   private _valueAccessor: ValueAccessor;
 
   /**
-   * Creates a new instance of {@linkcode DOMTokenList}.
+   * Creates a new instance of {@link DOMTokenList}.
    *
    * @param valueAccessor The accessor that reads and writes the class string to the element.
    */
@@ -45,7 +45,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add DOMTokenList.add} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add DOMTokenList.add} on MDN
    */
   add(...tokens: string[]): void;
 
@@ -70,7 +70,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/remove DOMTokenList.remove} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/remove DOMTokenList.remove} on MDN
    */
   remove(...tokens: string[]): void;
 
@@ -95,7 +95,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace DOMTokenList.replace} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace DOMTokenList.replace} on MDN
    */
   replace(replacedToken: string, token: string): boolean {
     assertToken(replacedToken);
@@ -114,7 +114,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle DOMTokenList.toggle} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle DOMTokenList.toggle} on MDN
    */
   toggle(token: string, force?: boolean): boolean {
     assertToken(token);
@@ -139,14 +139,14 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/contains DOMTokenList.contains} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/contains DOMTokenList.contains} on MDN
    */
   contains(token: string): boolean {
     return getTokens(this).indexOf(token) !== -1;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/item DOMTokenList.item} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/item DOMTokenList.item} on MDN
    */
   item(index: number): string | null {
     const tokens = getTokens(this);
@@ -154,7 +154,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/forEach DOMTokenList.forEach} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/forEach DOMTokenList.forEach} on MDN
    */
   forEach(callback: (value: string, index: number, parent: DOMTokenList) => void, thisArg?: any): void {
     const tokens = getTokens(this);
@@ -175,7 +175,7 @@ export class DOMTokenList {
 function getTokens(tokenList: DOMTokenList): string[] {
   let value = tokenList['_valueAccessor'].get();
 
-  if (value === tokenList['_tokenizedValue']) {
+  if (value === tokenList['_tokenizedValue'] && tokenList['_tokens'] !== undefined) {
     return tokenList['_tokens'];
   }
 

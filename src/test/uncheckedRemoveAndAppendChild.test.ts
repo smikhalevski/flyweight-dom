@@ -9,7 +9,7 @@ describe('uncheckedRemoveAndAppendChild', () => {
 
     uncheckedRemoveAndAppendChild(parent, node);
 
-    expect(parent['_childNodes']).toBe(undefined);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(node);
     expect(parent.lastChild).toBe(node);
 
@@ -28,7 +28,7 @@ describe('uncheckedRemoveAndAppendChild', () => {
     uncheckedRemoveAndAppendChild(parent, node2);
     uncheckedRemoveAndAppendChild(parent, node3);
 
-    expect(parent['_childNodes']).toBe(undefined);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
 

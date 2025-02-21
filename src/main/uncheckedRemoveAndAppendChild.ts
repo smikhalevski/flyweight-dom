@@ -6,7 +6,7 @@ import { InsertableNode } from './uncheckedToInsertableNode';
 
 export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {
   if (isDocumentFragment(node)) {
-    const childNodes = node['_childNodes'];
+    const childNodes = node._childNodes;
     const children = node._children;
 
     let nodeChild = node.firstChild;

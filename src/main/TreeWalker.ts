@@ -5,37 +5,37 @@ import { NodeFilter } from './NodeFilter';
 /**
  * Implemented according to https://dom.spec.whatwg.org/#treewalker
  *
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker TreeWalker} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker TreeWalker} on MDN
  */
 export class TreeWalker {
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/currentNode TreeWalker.currentNode} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/currentNode TreeWalker.currentNode} on MDN
    */
   currentNode: Node;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/root TreeWalker.root} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/root TreeWalker.root} on MDN
    */
   readonly root: Node;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow TreeWalker.whatToShow} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow TreeWalker.whatToShow} on MDN
    */
   readonly whatToShow: number;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter TreeWalker.filter} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter TreeWalker.filter} on MDN
    */
   readonly filter: NodeFilter | null;
 
   /**
-   * Creates a new {@linkcode TreeWalker} instance.
+   * Creates a new {@link TreeWalker} instance.
    *
-   * @param root A root {@linkcode Node} of this {@linkcode TreeWalker} traversal.
+   * @param root A root {@link Node} of this {@link TreeWalker} traversal.
    * @param whatToShow A unsigned long representing a bitmask created by combining the constant properties of
-   * {@linkcode NodeFilter}.
-   * @param filter A {@linkcode NodeFilter}, that is an object with a method `acceptNode`, which is called by the
-   * {@linkcode TreeWalker} to determine whether to accept a node that has passed the `whatToShow` check.
+   * {@link NodeFilter}.
+   * @param filter A {@link NodeFilter}, that is an object with a method `acceptNode`, which is called by the
+   * {@link TreeWalker} to determine whether to accept a node that has passed the `whatToShow` check.
    */
   constructor(root: Node, whatToShow?: number, filter: NodeFilter | null = null) {
     this.currentNode = this.root = root;
@@ -44,7 +44,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/parentNode TreeWalker.parentNode} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/parentNode TreeWalker.parentNode} on MDN
    */
   parentNode(): Node | null {
     const { root } = this;
@@ -62,7 +62,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/firstChild TreeWalker.firstChild} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/firstChild TreeWalker.firstChild} on MDN
    */
   firstChild(): Node | null {
     const { currentNode, root } = this;
@@ -98,7 +98,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/lastChild TreeWalker.lastChild} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/lastChild TreeWalker.lastChild} on MDN
    */
   lastChild(): Node | null {
     const { currentNode, root } = this;
@@ -134,7 +134,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextSibling TreeWalker.nextSibling} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextSibling TreeWalker.nextSibling} on MDN
    */
   nextSibling(): Node | null {
     const { root } = this;
@@ -177,7 +177,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousSibling TreeWalker.previousSibling} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousSibling TreeWalker.previousSibling} on MDN
    */
   previousSibling(): Node | null {
     const { root } = this;
@@ -220,7 +220,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextNode TreeWalker.nextNode} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextNode TreeWalker.nextNode} on MDN
    */
   nextNode(): Node | null {
     const { root } = this;
@@ -258,7 +258,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousNode TreeWalker.previousNode} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousNode TreeWalker.previousNode} on MDN
    */
   previousNode(): Node | null {
     const { root } = this;

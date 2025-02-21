@@ -12,22 +12,24 @@ export interface Attributes {
 
 export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
 
-export interface Element extends Node, ChildNode, ParentNode {}
+export interface Element extends ChildNode, ParentNode {}
 
 /**
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element Element} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element} on MDN
  */
 export class Element extends Node {
   readonly nodeName: string;
   readonly nodeType: number = NodeConstants.ELEMENT_NODE;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName Element.tagName} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName Element.tagName} on MDN
    */
   readonly tagName: string;
 
+  private _attributes: Attributes | undefined;
+
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/id Element.id} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/id Element.id} on MDN
    */
   get id(): string {
     return this.getAttribute('id') || '';
@@ -38,7 +40,7 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/className Element.className} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/className Element.className} on MDN
    */
   get className(): string {
     return this.getAttribute('class') || '';
@@ -49,7 +51,7 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/classList Element.classList} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/classList Element.classList} on MDN
    */
   get classList(): DOMTokenList {
     const tokenList = new DOMTokenList({
@@ -69,62 +71,60 @@ export class Element extends Node {
   /**
    * Map from an attribute name to an attribute value. If an attribute is absent then value is `undefined`.
    */
-  get attrs(): Attributes {
-    return this._attrs === undefined ? (this._attrs = {}) : this._attrs;
+  get attributes(): Attributes {
+    return this._attributes === undefined ? (this._attributes = {}) : this._attributes;
   }
 
-  set attrs(value: Attributes) {
-    this._attrs = value;
+  set attributes(value: Attributes) {
+    this._attributes = value;
   }
 
   /**
-   * Creates a new instance of {@linkcode Element}.
+   * Creates a new instance of {@link Element}.
    */
-  constructor(
-    tagName: string,
-    private _attrs?: Attributes
-  ) {
+  constructor(tagName: string, attributes?: Attributes) {
     super();
     this.nodeName = this.tagName = tagName;
+    this._attributes = attributes;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute} on MDN
    */
   setAttribute(name: string, value: string): this {
-    if (this._attrs === undefined) {
-      this._attrs = {};
+    if (this._attributes === undefined) {
+      this._attributes = {};
     }
-    this._attrs[name] = '' + value;
+    this._attributes[name] = '' + value;
     return this;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute Element.getAttribute} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute Element.getAttribute} on MDN
    */
   getAttribute(name: string): string | null {
-    return this._attrs !== undefined && this._attrs[name] !== undefined ? this._attrs[name] : null;
+    return this._attributes !== undefined && this._attributes[name] !== undefined ? this._attributes[name] : null;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute} on MDN
    */
   hasAttribute(name: string): boolean {
-    return this._attrs !== undefined && this._attrs[name] !== undefined;
+    return this._attributes !== undefined && this._attributes[name] !== undefined;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute Element.removeAttribute} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute Element.removeAttribute} on MDN
    */
   removeAttribute(name: string): this {
-    if (this._attrs !== undefined) {
-      delete this._attrs[name];
+    if (this._attributes !== undefined) {
+      delete this._attributes[name];
     }
     return this;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/toggleAttribute Element.toggleAttribute} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/toggleAttribute Element.toggleAttribute} on MDN
    */
   toggleAttribute(name: string, force?: boolean): boolean {
     const value = this.getAttribute(name);
@@ -144,21 +144,21 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames Element.getAttributeNames} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames Element.getAttributeNames} on MDN
    */
   getAttributeNames(): string[] {
-    return this._attrs !== undefined ? Object.keys(this._attrs) : [];
+    return this._attributes !== undefined ? Object.keys(this._attributes) : [];
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement Element.insertAdjacentElement} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement Element.insertAdjacentElement} on MDN
    */
   insertAdjacentElement(position: InsertPosition, element: Element): Element | null {
     return insertAdjacentNode(this, position, element);
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText Element.insertAdjacentText} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText Element.insertAdjacentText} on MDN
    */
   insertAdjacentText(position: InsertPosition, data: string): void {
     for (let i = 0, dataLength = data.length; i < dataLength; ++i) {
@@ -173,13 +173,13 @@ export class Element extends Node {
     return (
       isEqualConstructor(this, otherNode) &&
       this.tagName === otherNode.tagName &&
-      isEqualAttributes(this._attrs, otherNode._attrs) &&
+      isEqualAttributes(this._attributes, otherNode._attributes) &&
       isEqualChildNodes(this, otherNode)
     );
   }
 
   cloneNode(deep?: boolean): Element {
-    const node = new Element(this.tagName, Object.assign({}, this._attrs));
+    const node = new Element(this.tagName, Object.assign({}, this._attributes));
     if (deep) {
       uncheckedCloneChildren(this, node);
     }

@@ -3,7 +3,7 @@ import { CharacterData } from './CharacterData';
 import { isEqualConstructor, NodeConstants } from './utils';
 
 /**
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction ProcessingInstruction} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction ProcessingInstruction} on MDN
  */
 export class ProcessingInstruction extends CharacterData {
   readonly nodeType: number = NodeConstants.PROCESSING_INSTRUCTION_NODE;
@@ -11,12 +11,11 @@ export class ProcessingInstruction extends CharacterData {
   readonly target: string;
 
   /**
-   * Creates a new instance of {@linkcode ProcessingInstruction}.
+   * Creates a new instance of {@link ProcessingInstruction}.
    */
-  constructor(target: string, data = '') {
-    super();
+  constructor(target: string, data?: string) {
+    super(data);
     this.nodeName = this.target = target;
-    this.data = data;
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {

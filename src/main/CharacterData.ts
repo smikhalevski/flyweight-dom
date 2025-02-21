@@ -2,19 +2,35 @@ import { Constructor, isEqualConstructor } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
 
-export interface CharacterData extends Node, ChildNode {}
+export interface CharacterData extends ChildNode {}
 
 /**
- * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData CharacterData} on MDN
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData CharacterData} on MDN
  */
 export abstract class CharacterData extends Node {
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data CharacterData.data} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data CharacterData.data} on MDN
    */
-  data;
+  data: string;
+
+  get nodeValue(): string | null {
+    return this.data;
+  }
+
+  set nodeValue(value: string | null) {
+    this.data = value === null || value === undefined ? '' : value;
+  }
+
+  get textContent(): string | null {
+    return this.data;
+  }
+
+  set textContent(value: string | null) {
+    this.data = value === null || value === undefined ? '' : value;
+  }
 
   /**
-   * Creates a new instance of {@linkcode CharacterData}.
+   * Creates a new instance of {@link CharacterData}.
    */
   constructor(data = '') {
     super();
@@ -22,14 +38,14 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/length CharacterData.length} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/length CharacterData.length} on MDN
    */
   get length(): number {
     return this.data.length;
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/appendData CharacterData.appendData} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/appendData CharacterData.appendData} on MDN
    */
   appendData(data: string): this {
     this.data += data;
@@ -37,7 +53,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/deleteData CharacterData.deleteData} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/deleteData CharacterData.deleteData} on MDN
    */
   deleteData(offset: number, count: number): this {
     this.data = this.data.substring(0, offset) + this.data.substring(offset + count);
@@ -45,7 +61,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/insertData CharacterData.insertData} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/insertData CharacterData.insertData} on MDN
    */
   insertData(offset: number, data: string): this {
     this.data = this.data.substring(0, offset) + data + this.data.substring(offset);
@@ -53,7 +69,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData CharacterData.replaceData} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData CharacterData.replaceData} on MDN
    */
   replaceData(offset: number, count: number, data: string): this {
     this.data = this.data.substring(0, offset) + data + this.data.substring(offset + count);
@@ -61,7 +77,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData CharacterData.substringData} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData CharacterData.substringData} on MDN
    */
   substringData(offset: number, count: number): string {
     return this.data.substring(offset, offset + count);
@@ -77,25 +93,5 @@ export abstract class CharacterData extends Node {
     return node;
   }
 }
-
-Object.defineProperties(CharacterData.prototype, {
-  nodeValue: {
-    get(this: CharacterData) {
-      return this.data;
-    },
-    set(this: CharacterData, value: string) {
-      this.data = value !== null && value !== undefined ? value : '';
-    },
-  },
-
-  textContent: {
-    get(this: CharacterData) {
-      return this.data;
-    },
-    set(this: CharacterData, value: string) {
-      this.data = value !== null && value !== undefined ? value : '';
-    },
-  },
-});
 
 extendChildNode(CharacterData);

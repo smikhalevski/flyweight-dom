@@ -12,34 +12,39 @@ import {
   NodeConstants,
 } from './utils';
 
+/**
+ * The node that can be a child of another node.
+ *
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
+ */
 export interface ChildNode extends Node {
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling Element.previousElementSibling} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling Element.previousElementSibling} on MDN
    */
   readonly previousElementSibling: Element | null;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling Element.nextElementSibling} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling Element.nextElementSibling} on MDN
    */
   readonly nextElementSibling: Element | null;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/after Element.after} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/after Element.after} on MDN
    */
   after(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/before Element.before} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/before Element.before} on MDN
    */
   before(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/remove Element.remove} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/remove Element.remove} on MDN
    */
   remove(): this;
 
   /**
-   * **See** {@linkcode https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith Element.replaceWith} on MDN
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith Element.replaceWith} on MDN
    */
   replaceWith(...nodes: Array<Node | string>): this;
 
@@ -47,11 +52,11 @@ export interface ChildNode extends Node {
 }
 
 /**
- * The mixin that can extend the constructor prototype with properties and methods of the {@linkcode ChildNode}.
+ * The mixin that can extend the constructor prototype with properties and methods of the {@link ChildNode}.
  */
 export const ChildNode = {
   /**
-   * Extends the constructor prototype with properties and methods of the {@linkcode ChildNode}.
+   * Extends the constructor prototype with properties and methods of the {@link ChildNode}.
    */
   extend: extendChildNode,
 };

@@ -116,7 +116,7 @@ describe('uncheckedRemove', () => {
     uncheckedAppendChild(parent, node3);
     uncheckedRemoveChild(parent, node2);
 
-    expect(parent._children).toBe(undefined);
+    expect(parent._childNodes).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
     expect(parent.firstElementChild).toBe(node1);

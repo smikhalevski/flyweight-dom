@@ -1,30 +1,69 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { Constructor, die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement, NodeConstants } from './utils';
+import {
+  Constructor,
+  die,
+  getNextSiblingOrSelf,
+  getPreviousSiblingOrSelf,
+  InternalParentNode,
+  isElement,
+} from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { ChildNode } from './ChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 
+/**
+ * The node that can be a parent of another node.
+ *
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
+ */
 export interface ParentNode extends Node {
-  // public readonly
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children} on MDN
+   */
   readonly children: Node[];
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount Element.childElementCount} on MDN
+   */
   readonly childElementCount: number;
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild Element.firstElementChild} on MDN
+   */
   readonly firstElementChild: Element | null;
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild Element.lastElementChild} on MDN
+   */
   readonly lastElementChild: Element | null;
 
-  // private
-  _children: Element[] | undefined;
-
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/append Element.append} on MDN
+   */
   append(...nodes: Array<Node | string>): this;
 
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/prepend Element.prepend} on MDN
+   */
   prepend(...nodes: Array<Node | string>): this;
 
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceChildren Element.replaceChildren} on MDN
+   */
   replaceChildren(...nodes: Array<Node | string>): this;
+
+  cloneNode(deep?: boolean): ParentNode;
 }
 
-export const ParentNode = { extend: extendParentNode };
+export const ParentNode = {
+  /**
+   * Extends the constructor prototype with properties and methods of the {@link ParentNode}.
+   */
+  extend: extendParentNode,
+};
 
 export function extendParentNode(constructor: Constructor<ParentNode>): void {
   const prototype = constructor.prototype;
@@ -68,13 +107,13 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
 
     firstElementChild: {
       get(this: ParentNode) {
-        return getNextSiblingOrSelf(this.firstChild, NodeConstants.ELEMENT_NODE);
+        return getNextSiblingOrSelf(this.firstChild, Node.ELEMENT_NODE);
       },
     },
 
     lastElementChild: {
       get(this: ParentNode) {
-        return getPreviousSiblingOrSelf(this.lastChild, NodeConstants.ELEMENT_NODE);
+        return getPreviousSiblingOrSelf(this.lastChild, Node.ELEMENT_NODE);
       },
     },
   });
@@ -163,7 +202,7 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
   return this;
 }
 
-function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
+function replaceChildren(this: InternalParentNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
   const childNodes = this._childNodes;

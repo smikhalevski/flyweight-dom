@@ -1,175 +1,196 @@
 import { Node } from './Node';
-import { die, extendClass, isEqualChildNodes, isEqualConstructor, isSpaceChar, NodeConstants } from './utils';
+import { die, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DOMTokenList } from './DOMTokenList';
 import { Text } from './Text';
 
-interface Attrs {
+export interface Attributes {
   [name: string]: string;
 }
 
 export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
 
-export interface Element extends Node, ChildNode, ParentNode {
-  // readonly
-  tagName: string;
-  id: string;
-  className: string;
-  classList: DOMTokenList;
+export interface Element extends ChildNode, ParentNode {}
 
-  // public
-  attrs: Attrs;
+/**
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element} on MDN
+ */
+export class Element extends Node {
+  readonly nodeName: string;
+  readonly nodeType: number = Node.ELEMENT_NODE;
 
-  setAttribute(name: string, value: string): this;
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName Element.tagName} on MDN
+   */
+  readonly tagName: string;
 
-  getAttribute(name: string): string | null;
+  private _attributes: Attributes | undefined;
 
-  hasAttribute(name: string): boolean;
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/id Element.id} on MDN
+   */
+  get id(): string {
+    return this.getAttribute('id') || '';
+  }
 
-  removeAttribute(name: string): this;
+  set id(value: string) {
+    this.setAttribute('id', value);
+  }
 
-  toggleAttribute(name: string, force?: boolean): boolean;
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/className Element.className} on MDN
+   */
+  get className(): string {
+    return this.getAttribute('class') || '';
+  }
 
-  getAttributeNames(): string[];
+  set className(value: string) {
+    this.setAttribute('class', value);
+  }
 
-  insertAdjacentElement(position: InsertPosition, element: Element): Element | null;
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/classList Element.classList} on MDN
+   */
+  get classList(): DOMTokenList {
+    const tokenList = new DOMTokenList({
+      get: () => {
+        return this.getAttribute('class') || '';
+      },
+      set: value => {
+        this.setAttribute('class', value);
+      },
+    });
 
-  insertAdjacentText(position: InsertPosition, data: string): void;
-}
+    Object.defineProperty(this, 'classList', { value: tokenList });
 
-export class Element {
-  constructor(tagName: string, public _attrs?: Attrs) {
+    return tokenList;
+  }
+
+  /**
+   * Map from an attribute name to an attribute value. If an attribute is absent then value is `undefined`.
+   */
+  get attributes(): Attributes {
+    return this._attributes === undefined ? (this._attributes = {}) : this._attributes;
+  }
+
+  set attributes(value: Attributes) {
+    this._attributes = value;
+  }
+
+  /**
+   * Creates a new instance of {@link Element}.
+   */
+  constructor(tagName: string, attributes?: Attributes) {
+    super();
     this.nodeName = this.tagName = tagName;
+    this._attributes = attributes;
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute} on MDN
+   */
+  setAttribute(name: string, value: string): this {
+    if (this._attributes === undefined) {
+      this._attributes = {};
+    }
+    this._attributes[name] = '' + value;
+    return this;
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute Element.getAttribute} on MDN
+   */
+  getAttribute(name: string): string | null {
+    return this._attributes !== undefined && this._attributes[name] !== undefined ? this._attributes[name] : null;
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute} on MDN
+   */
+  hasAttribute(name: string): boolean {
+    return this._attributes !== undefined && this._attributes[name] !== undefined;
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute Element.removeAttribute} on MDN
+   */
+  removeAttribute(name: string): this {
+    if (this._attributes !== undefined) {
+      delete this._attributes[name];
+    }
+    return this;
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/toggleAttribute Element.toggleAttribute} on MDN
+   */
+  toggleAttribute(name: string, force?: boolean): boolean {
+    const value = this.getAttribute(name);
+    const exists = value !== null;
+
+    if (!exists && (force === undefined || force)) {
+      this.setAttribute(name, '');
+      return true;
+    }
+
+    if (exists && (force === undefined || !force)) {
+      this.removeAttribute(name);
+      return false;
+    }
+
+    return exists;
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames Element.getAttributeNames} on MDN
+   */
+  getAttributeNames(): string[] {
+    return this._attributes !== undefined ? Object.keys(this._attributes) : [];
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement Element.insertAdjacentElement} on MDN
+   */
+  insertAdjacentElement(position: InsertPosition, element: Element): Element | null {
+    return insertAdjacentNode(this, position, element);
+  }
+
+  /**
+   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText Element.insertAdjacentText} on MDN
+   */
+  insertAdjacentText(position: InsertPosition, data: string): void {
+    for (let i = 0, dataLength = data.length; i < dataLength; ++i) {
+      if (!isSpaceChar(data.charCodeAt(i))) {
+        insertAdjacentNode(this, position, new Text(data));
+        break;
+      }
+    }
+  }
+
+  isEqualNode(otherNode: Node | null | undefined): boolean {
+    return (
+      isEqualConstructor(this, otherNode) &&
+      this.tagName === otherNode.tagName &&
+      isEqualAttributes(this._attributes, otherNode._attributes) &&
+      isEqualChildNodes(this, otherNode)
+    );
+  }
+
+  cloneNode(deep?: boolean): Element {
+    const node = new Element(this.tagName, Object.assign({}, this._attributes));
+    if (deep) {
+      uncheckedCloneChildren(this, node);
+    }
+    return node;
   }
 }
-
-const prototype = extendClass(Element, Node, {
-  nodeType: { value: NodeConstants.ELEMENT_NODE },
-
-  attrs: {
-    get() {
-      return this._attrs === undefined ? (this._attrs = {}) : this._attrs;
-    },
-    set(value) {
-      this._attrs = value;
-    },
-  },
-
-  id: {
-    get() {
-      return this.getAttribute('id') || '';
-    },
-    set(value) {
-      this.setAttribute('id', value);
-    },
-  },
-
-  className: {
-    get() {
-      return this.getAttribute('class') || '';
-    },
-    set(value) {
-      this.setAttribute('class', value);
-    },
-  },
-
-  classList: {
-    get() {
-      const tokenList = new DOMTokenList({
-        get: () => {
-          return this.getAttribute('class') || '';
-        },
-        set: value => {
-          this.setAttribute('class', value);
-        },
-      });
-
-      Object.defineProperty(this, 'classList', { value: tokenList });
-
-      return tokenList;
-    },
-  },
-});
 
 extendChildNode(Element);
 extendParentNode(Element);
 
-prototype.setAttribute = function (name, value) {
-  if (this._attrs === undefined) {
-    this._attrs = {};
-  }
-  this._attrs[name] = '' + value;
-  return this;
-};
-
-prototype.getAttribute = function (name) {
-  return this._attrs !== undefined && this._attrs[name] !== undefined ? this._attrs[name] : null;
-};
-
-prototype.hasAttribute = function (name) {
-  return this._attrs !== undefined && this._attrs[name] !== undefined;
-};
-
-prototype.removeAttribute = function (name) {
-  if (this._attrs !== undefined) {
-    delete this._attrs[name];
-  }
-  return this;
-};
-
-prototype.toggleAttribute = function (name, force) {
-  const value = this.getAttribute(name);
-  const exists = value !== null;
-
-  if (!exists && (force === undefined || force)) {
-    this.setAttribute(name, '');
-    return true;
-  }
-
-  if (exists && (force === undefined || !force)) {
-    this.removeAttribute(name);
-    return false;
-  }
-
-  return exists;
-};
-
-prototype.getAttributeNames = function () {
-  return this._attrs !== undefined ? Object.keys(this._attrs) : [];
-};
-
-prototype.insertAdjacentElement = function (position, element) {
-  return insertAdjacentNode(this, position, element);
-};
-
-prototype.insertAdjacentText = function (position, data) {
-  for (let i = 0, dataLength = data.length; i < dataLength; ++i) {
-    if (!isSpaceChar(data.charCodeAt(i))) {
-      return insertAdjacentNode(this, position, new Text(data));
-    }
-  }
-};
-
-prototype.isEqualNode = function (otherNode) {
-  return (
-    isEqualConstructor(this, otherNode) &&
-    this.tagName === otherNode.tagName &&
-    isEqualAttributes(this._attrs, otherNode._attrs) &&
-    isEqualChildNodes(this, otherNode)
-  );
-};
-
-prototype.cloneNode = function (deep) {
-  const node = new Element(this.tagName, Object.assign({}, this._attrs));
-  if (deep) {
-    uncheckedCloneChildren(this, node);
-  }
-  return node;
-};
-
-function isEqualAttributes(attrs: Attrs | undefined, otherAttrs: Attrs | undefined): boolean {
+function isEqualAttributes(attrs: Attributes | undefined, otherAttrs: Attributes | undefined): boolean {
   if (attrs === undefined) {
     return otherAttrs === undefined || Object.keys(otherAttrs).length === 0;
   }

@@ -1,6 +1,5 @@
 import { Document, Element, NodeFilter, Text, TreeWalker } from '../main';
 import { filterNode } from '../main/TreeWalker';
-import { NodeFilterConstants } from '../main/utils';
 
 /*
  * <document>
@@ -322,7 +321,7 @@ describe('TreeWalker', () => {
 
 describe('filterNode', () => {
   test('returns skip if not shown', () => {
-    const treeWalker = new TreeWalker(document, NodeFilter.SHOW_DOCUMENT | NodeFilterConstants.SHOW_TEXT);
+    const treeWalker = new TreeWalker(document, NodeFilter.SHOW_DOCUMENT | NodeFilter.SHOW_TEXT);
 
     expect(filterNode(treeWalker, element4)).toBe(NodeFilter.FILTER_SKIP);
 

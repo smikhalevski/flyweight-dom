@@ -1,20 +1,22 @@
-import { NodeFilterConstants } from './utils';
 import { Node } from './Node';
 
 export type NodeFilter = ((node: Node) => number) | { acceptNode(node: Node): number };
 
+/**
+ * **See** {@link https://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter NodeFilter} on W3C
+ */
 export const NodeFilter = {
-  FILTER_ACCEPT: NodeFilterConstants.FILTER_ACCEPT,
-  FILTER_REJECT: NodeFilterConstants.FILTER_REJECT,
-  FILTER_SKIP: NodeFilterConstants.FILTER_SKIP,
-  SHOW_ALL: NodeFilterConstants.SHOW_ALL,
-  SHOW_ATTRIBUTE: NodeFilterConstants.SHOW_ATTRIBUTE,
-  SHOW_CDATA_SECTION: NodeFilterConstants.SHOW_CDATA_SECTION,
-  SHOW_COMMENT: NodeFilterConstants.SHOW_COMMENT,
-  SHOW_DOCUMENT: NodeFilterConstants.SHOW_DOCUMENT,
-  SHOW_DOCUMENT_FRAGMENT: NodeFilterConstants.SHOW_DOCUMENT_FRAGMENT,
-  SHOW_DOCUMENT_TYPE: NodeFilterConstants.SHOW_DOCUMENT_TYPE,
-  SHOW_ELEMENT: NodeFilterConstants.SHOW_ELEMENT,
-  SHOW_PROCESSING_INSTRUCTION: NodeFilterConstants.SHOW_PROCESSING_INSTRUCTION,
-  SHOW_TEXT: NodeFilterConstants.SHOW_TEXT,
-};
+  FILTER_ACCEPT: 1,
+  FILTER_REJECT: 2,
+  FILTER_SKIP: 3,
+  SHOW_ALL: 0xffffffff,
+  SHOW_ATTRIBUTE: 2,
+  SHOW_CDATA_SECTION: 8,
+  SHOW_COMMENT: 128,
+  SHOW_DOCUMENT: 256,
+  SHOW_DOCUMENT_FRAGMENT: 1024,
+  SHOW_DOCUMENT_TYPE: 512,
+  SHOW_ELEMENT: 1,
+  SHOW_PROCESSING_INSTRUCTION: 64,
+  SHOW_TEXT: 4,
+} as const;

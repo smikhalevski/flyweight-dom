@@ -2,19 +2,24 @@
   "name": "flyweight-dom",
   "version": "1.2.0",
   "description": "The extremely fast DOM implementation.",
-  "main": "./lib/index.js",
-  "module": "./lib/index.mjs",
-  "types": "./lib/index.d.ts",
-  "files": [
-    "lib"
-  ],
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "scripts": {
-    "build": "rollup --config --configPlugin typescript && cp ./src/main/index-d.ts ./lib/index.d.ts",
-    "clean": "rimraf ./lib ./docs",
+    "build": "rollup --config && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
+    "clean": "rimraf lib docs coverage",
     "test": "jest",
-    "perf": "[ -d ./lib ] || npm run build && node --expose-gc --max-old-space-size=4096 ./node_modules/.bin/toofast ./src/test/perf.js",
-    "docs": "typedoc --name 'Flyweight DOM' --readme none ./src/main/index-d.ts"
+    "perf": "toofast",
+    "docs": "typedoc"
   },
   "repository": {
     "type": "git",
@@ -30,18 +35,22 @@
   },
   "homepage": "https://github.com/smikhalevski/flyweight-dom#readme",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-typescript": "^10.0.1",
-    "@types/jest": "^29.2.5",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@swc/core": "^1.10.18",
+    "@swc/jest": "^0.2.37",
+    "@types/jest": "^29.5.14",
     "domhandler": "^5.0.3",
-    "jest": "^29.3.1",
-    "prettier": "^2.8.1",
-    "rimraf": "^3.0.2",
-    "rollup": "^3.9.1",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.1",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.34.8",
     "toofast": "^2.0.0",
-    "ts-jest": "^29.0.3",
-    "tslib": "^2.4.1",
-    "typedoc": "^0.23.23",
-    "typescript": "^4.9.4"
+    "ts-jest": "^29.2.5",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.26.8",
+    "typedoc-custom-css": "github:smikhalevski/typedoc-custom-css#master",
+    "typedoc-plugin-mdn-links": "^4.0.13",
+    "typescript": "^5.6.3"
   }
 }

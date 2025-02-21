@@ -1,15 +1,10 @@
 import { CharacterData } from './CharacterData';
-import { extendClass, NodeConstants } from './utils';
+import { Node } from './Node';
 
-export interface Comment extends CharacterData {}
-
-export class Comment {
-  constructor(data = '') {
-    this.data = data;
-  }
+/**
+ * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Comment Comment} on MDN
+ */
+export class Comment extends CharacterData {
+  readonly nodeType: number = Node.COMMENT_NODE;
+  readonly nodeName: string = '#comment';
 }
-
-extendClass(Comment, CharacterData, {
-  nodeType: { value: NodeConstants.COMMENT_NODE },
-  nodeName: { value: '#comment' },
-});

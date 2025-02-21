@@ -1,12 +1,12 @@
 import { Node } from './Node';
 import { CharacterData } from './CharacterData';
-import { isEqualConstructor, NodeConstants } from './utils';
+import { isEqualConstructor } from './utils';
 
 /**
  * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction ProcessingInstruction} on MDN
  */
 export class ProcessingInstruction extends CharacterData {
-  readonly nodeType: number = NodeConstants.PROCESSING_INSTRUCTION_NODE;
+  readonly nodeType: number = Node.PROCESSING_INSTRUCTION_NODE;
   readonly nodeName: string;
   readonly target: string;
 

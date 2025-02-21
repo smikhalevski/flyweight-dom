@@ -1,5 +1,5 @@
 import { Element } from './Element';
-import { die, isEqualChildNodes, isEqualConstructor, NodeConstants } from './utils';
+import { die, isEqualChildNodes, isEqualConstructor } from './utils';
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
 import { uncheckedContains } from './uncheckedContains';
@@ -8,15 +8,15 @@ import { uncheckedContains } from './uncheckedContains';
  * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
  */
 export abstract class Node {
-  static readonly ELEMENT_NODE: number = NodeConstants.ELEMENT_NODE;
-  static readonly ATTRIBUTE_NODE: number = NodeConstants.ATTRIBUTE_NODE;
-  static readonly TEXT_NODE: number = NodeConstants.TEXT_NODE;
-  static readonly CDATA_SECTION_NODE: number = NodeConstants.CDATA_SECTION_NODE;
-  static readonly PROCESSING_INSTRUCTION_NODE: number = NodeConstants.PROCESSING_INSTRUCTION_NODE;
-  static readonly COMMENT_NODE: number = NodeConstants.COMMENT_NODE;
-  static readonly DOCUMENT_NODE: number = NodeConstants.DOCUMENT_NODE;
-  static readonly DOCUMENT_TYPE_NODE: number = NodeConstants.DOCUMENT_TYPE_NODE;
-  static readonly DOCUMENT_FRAGMENT_NODE: number = NodeConstants.DOCUMENT_FRAGMENT_NODE;
+  static readonly ELEMENT_NODE: number = 1;
+  static readonly ATTRIBUTE_NODE: number = 2;
+  static readonly TEXT_NODE: number = 3;
+  static readonly CDATA_SECTION_NODE: number = 4;
+  static readonly PROCESSING_INSTRUCTION_NODE: number = 7;
+  static readonly COMMENT_NODE: number = 8;
+  static readonly DOCUMENT_NODE: number = 9;
+  static readonly DOCUMENT_TYPE_NODE: number = 10;
+  static readonly DOCUMENT_FRAGMENT_NODE: number = 11;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType} on MDN
@@ -31,27 +31,27 @@ export abstract class Node {
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode Node.parentNode} on MDN
    */
-  /* readonly */ parentNode: ParentNode | null = null;
+  readonly parentNode: ParentNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling Node.previousSibling} on MDN
    */
-  /* readonly */ previousSibling: ChildNode | null = null;
+  readonly previousSibling: ChildNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling Node.nextSibling} on MDN
    */
-  /* readonly */ nextSibling: ChildNode | null = null;
+  readonly nextSibling: ChildNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild Node.firstChild} on MDN
    */
-  /* readonly */ firstChild: ChildNode | null = null;
+  readonly firstChild: ChildNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild Node.lastChild} on MDN
    */
-  /* readonly */ lastChild: ChildNode | null = null;
+  readonly lastChild: ChildNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue Node.nodeValue} on MDN
@@ -93,10 +93,14 @@ export abstract class Node {
   get parentElement(): Element | null {
     let parent = this.parentNode;
 
-    while (parent !== null && parent.nodeType !== NodeConstants.ELEMENT_NODE) {
+    while (parent !== null && parent.nodeType !== Node.ELEMENT_NODE) {
       parent = parent.parentNode;
     }
     return parent as Element | null;
+  }
+
+  constructor() {
+    this.parentNode = this.previousSibling = this.nextSibling = this.firstChild = this.lastChild = null;
   }
 
   /**

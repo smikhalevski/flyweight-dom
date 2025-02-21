@@ -1,4 +1,3 @@
-import { NodeFilterConstants } from './utils';
 import { Node } from './Node';
 
 export type NodeFilter = ((node: Node) => number) | { acceptNode(node: Node): number };
@@ -7,17 +6,17 @@ export type NodeFilter = ((node: Node) => number) | { acceptNode(node: Node): nu
  * **See** {@link https://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-NodeFilter NodeFilter} on W3C
  */
 export const NodeFilter = {
-  FILTER_ACCEPT: NodeFilterConstants.FILTER_ACCEPT as number,
-  FILTER_REJECT: NodeFilterConstants.FILTER_REJECT as number,
-  FILTER_SKIP: NodeFilterConstants.FILTER_SKIP as number,
-  SHOW_ALL: NodeFilterConstants.SHOW_ALL as number,
-  SHOW_ATTRIBUTE: NodeFilterConstants.SHOW_ATTRIBUTE as number,
-  SHOW_CDATA_SECTION: NodeFilterConstants.SHOW_CDATA_SECTION as number,
-  SHOW_COMMENT: NodeFilterConstants.SHOW_COMMENT as number,
-  SHOW_DOCUMENT: NodeFilterConstants.SHOW_DOCUMENT as number,
-  SHOW_DOCUMENT_FRAGMENT: NodeFilterConstants.SHOW_DOCUMENT_FRAGMENT as number,
-  SHOW_DOCUMENT_TYPE: NodeFilterConstants.SHOW_DOCUMENT_TYPE as number,
-  SHOW_ELEMENT: NodeFilterConstants.SHOW_ELEMENT as number,
-  SHOW_PROCESSING_INSTRUCTION: NodeFilterConstants.SHOW_PROCESSING_INSTRUCTION as number,
-  SHOW_TEXT: NodeFilterConstants.SHOW_TEXT as number,
+  FILTER_ACCEPT: 1,
+  FILTER_REJECT: 2,
+  FILTER_SKIP: 3,
+  SHOW_ALL: 0xffffffff,
+  SHOW_ATTRIBUTE: 2,
+  SHOW_CDATA_SECTION: 8,
+  SHOW_COMMENT: 128,
+  SHOW_DOCUMENT: 256,
+  SHOW_DOCUMENT_FRAGMENT: 1024,
+  SHOW_DOCUMENT_TYPE: 512,
+  SHOW_ELEMENT: 1,
+  SHOW_PROCESSING_INSTRUCTION: 64,
+  SHOW_TEXT: 4,
 } as const;

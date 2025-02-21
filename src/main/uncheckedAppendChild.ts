@@ -1,8 +1,6 @@
-import { ParentNode } from './ParentNode';
-import { ChildNode } from './ChildNode';
-import { isElement } from './utils';
+import { InternalChildNode, InternalParentNode, isElement } from './utils';
 
-export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
+export function uncheckedAppendChild(parent: InternalParentNode, node: InternalChildNode): void {
   const childNodes = parent._childNodes;
   const children = parent._children;
 

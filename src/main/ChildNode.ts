@@ -4,13 +4,7 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import {
-  AbstractConstructor,
-  Constructor,
-  getNextSiblingOrSelf,
-  getPreviousSiblingOrSelf,
-  NodeConstants,
-} from './utils';
+import { AbstractConstructor, Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils';
 
 /**
  * The node that can be a child of another node.
@@ -67,13 +61,13 @@ export function extendChildNode(constructor: Constructor<ChildNode> | AbstractCo
   Object.defineProperties(prototype, {
     previousElementSibling: {
       get(this: ChildNode) {
-        return getPreviousSiblingOrSelf(this.previousSibling, NodeConstants.ELEMENT_NODE);
+        return getPreviousSiblingOrSelf(this.previousSibling, Node.ELEMENT_NODE);
       },
     },
 
     nextElementSibling: {
       get(this: ChildNode) {
-        return getNextSiblingOrSelf(this.nextSibling, NodeConstants.ELEMENT_NODE);
+        return getNextSiblingOrSelf(this.nextSibling, Node.ELEMENT_NODE);
       },
     },
   });

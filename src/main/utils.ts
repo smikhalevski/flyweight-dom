@@ -1,33 +1,37 @@
 import { Node } from './Node';
 import { Element } from './Element';
+import { ChildNode } from './ChildNode';
+import { ParentNode } from './ParentNode';
 import { DocumentFragment } from './DocumentFragment';
 
-export const enum NodeConstants {
-  ELEMENT_NODE = 1,
-  ATTRIBUTE_NODE = 2,
-  TEXT_NODE = 3,
-  CDATA_SECTION_NODE = 4,
-  PROCESSING_INSTRUCTION_NODE = 7,
-  COMMENT_NODE = 8,
-  DOCUMENT_NODE = 9,
-  DOCUMENT_TYPE_NODE = 10,
-  DOCUMENT_FRAGMENT_NODE = 11,
+export interface InternalParentNode extends ParentNode {
+  parentNode: InternalParentNode | null;
+  previousSibling: InternalChildNode | null;
+  nextSibling: InternalChildNode | null;
+  firstChild: InternalChildNode | null;
+  lastChild: InternalChildNode | null;
+
+  cloneNode(deep?: boolean): InternalParentNode;
 }
 
-export const enum NodeFilterConstants {
-  FILTER_ACCEPT = 1,
-  FILTER_REJECT = 2,
-  FILTER_SKIP = 3,
-  SHOW_ALL = 0xffffffff,
-  SHOW_ATTRIBUTE = 2,
-  SHOW_CDATA_SECTION = 8,
-  SHOW_COMMENT = 128,
-  SHOW_DOCUMENT = 256,
-  SHOW_DOCUMENT_FRAGMENT = 1024,
-  SHOW_DOCUMENT_TYPE = 512,
-  SHOW_ELEMENT = 1,
-  SHOW_PROCESSING_INSTRUCTION = 64,
-  SHOW_TEXT = 4,
+export interface InternalChildNode extends ChildNode {
+  parentNode: InternalParentNode | null;
+  previousSibling: InternalChildNode | null;
+  nextSibling: InternalChildNode | null;
+  firstChild: InternalChildNode | null;
+  lastChild: InternalChildNode | null;
+
+  cloneNode(deep?: boolean): InternalChildNode;
+}
+
+export interface InternalDocumentFragment extends DocumentFragment {
+  parentNode: InternalParentNode | null;
+  previousSibling: InternalChildNode | null;
+  nextSibling: InternalChildNode | null;
+  firstChild: InternalChildNode | null;
+  lastChild: InternalChildNode | null;
+
+  cloneNode(deep?: boolean): InternalDocumentFragment;
 }
 
 export type Constructor<T = any> = new (...args: any[]) => T;
@@ -39,21 +43,21 @@ export function die(message: string): never {
 }
 
 export function isElement(node: Node): node is Element {
-  return node.nodeType === NodeConstants.ELEMENT_NODE;
+  return node.nodeType === Node.ELEMENT_NODE;
 }
 
-export function isDocumentFragment(node: Node): node is DocumentFragment {
-  return node.nodeType === NodeConstants.DOCUMENT_FRAGMENT_NODE;
+export function isDocumentFragment(node: Node): node is InternalDocumentFragment {
+  return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
 }
 
-export function getPreviousSiblingOrSelf(node: Node | null, nodeType: NodeConstants): Node | null {
+export function getPreviousSiblingOrSelf(node: Node | null, nodeType: number): Node | null {
   while (node !== null && node.nodeType !== nodeType) {
     node = node.previousSibling;
   }
   return node;
 }
 
-export function getNextSiblingOrSelf(node: Node | null, nodeType: NodeConstants): Node | null {
+export function getNextSiblingOrSelf(node: Node | null, nodeType: number): Node | null {
   while (node !== null && node.nodeType !== nodeType) {
     node = node.nextSibling;
   }
@@ -77,5 +81,5 @@ export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
     child = child.nextSibling;
     otherChild = otherNode.nextSibling;
   }
-  return child === null && otherChild === null;
+  return child == null && otherChild == null;
 }

@@ -1,6 +1,6 @@
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
-import { isEqualConstructor, NodeConstants } from './utils';
+import { isEqualConstructor } from './utils';
 
 export interface DocumentType extends Node, ChildNode {}
 
@@ -8,7 +8,7 @@ export interface DocumentType extends Node, ChildNode {}
  * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType} on MDN
  */
 export class DocumentType extends Node {
-  readonly nodeType: number = NodeConstants.DOCUMENT_TYPE_NODE;
+  readonly nodeType: number = Node.DOCUMENT_TYPE_NODE;
   readonly nodeName: string;
 
   /**

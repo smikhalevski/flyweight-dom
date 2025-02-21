@@ -1,13 +1,14 @@
 import { CharacterData } from './CharacterData';
-import { Constructor, NodeConstants } from './utils';
+import { Constructor } from './utils';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
+import { Node } from './Node';
 
 /**
  * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Text Text} on MDN
  */
 export class Text extends CharacterData {
-  readonly nodeType: number = NodeConstants.TEXT_NODE;
+  readonly nodeType: number = Node.TEXT_NODE;
   readonly nodeName: string = '#text';
 
   /**

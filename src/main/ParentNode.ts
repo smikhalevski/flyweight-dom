@@ -1,6 +1,13 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { Constructor, die, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement, NodeConstants } from './utils';
+import {
+  Constructor,
+  die,
+  getNextSiblingOrSelf,
+  getPreviousSiblingOrSelf,
+  InternalParentNode,
+  isElement,
+} from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
@@ -100,13 +107,13 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
 
     firstElementChild: {
       get(this: ParentNode) {
-        return getNextSiblingOrSelf(this.firstChild, NodeConstants.ELEMENT_NODE);
+        return getNextSiblingOrSelf(this.firstChild, Node.ELEMENT_NODE);
       },
     },
 
     lastElementChild: {
       get(this: ParentNode) {
-        return getPreviousSiblingOrSelf(this.lastChild, NodeConstants.ELEMENT_NODE);
+        return getPreviousSiblingOrSelf(this.lastChild, Node.ELEMENT_NODE);
       },
     },
   });
@@ -195,7 +202,7 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
   return this;
 }
 
-function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
+function replaceChildren(this: InternalParentNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
   const childNodes = this._childNodes;

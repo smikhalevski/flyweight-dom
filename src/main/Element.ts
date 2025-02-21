@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { die, isEqualChildNodes, isEqualConstructor, isSpaceChar, NodeConstants } from './utils';
+import { die, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
@@ -19,7 +19,7 @@ export interface Element extends ChildNode, ParentNode {}
  */
 export class Element extends Node {
   readonly nodeName: string;
-  readonly nodeType: number = NodeConstants.ELEMENT_NODE;
+  readonly nodeType: number = Node.ELEMENT_NODE;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName Element.tagName} on MDN

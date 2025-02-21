@@ -1,16 +1,15 @@
-import { ParentNode } from './ParentNode';
-import { ChildNode } from './ChildNode';
+import { InternalChildNode, InternalParentNode } from './utils';
 
-export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: ParentNode): void {
+export function uncheckedCloneChildren(sourceParent: InternalParentNode, targetParent: InternalParentNode): void {
   const { firstChild } = sourceParent;
 
-  if (firstChild === null || sourceParent === targetParent) {
+  if (firstChild == null || sourceParent === targetParent) {
     return;
   }
 
   let { lastChild } = targetParent;
 
-  for (let child: ChildNode | null = firstChild; child !== null; child = child.nextSibling) {
+  for (let child: InternalChildNode | null = firstChild; child !== null; child = child.nextSibling) {
     const node = child.cloneNode(true);
 
     node.parentNode = targetParent;

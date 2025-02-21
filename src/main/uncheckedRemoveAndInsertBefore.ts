@@ -1,11 +1,13 @@
-import { ParentNode } from './ParentNode';
-import { ChildNode } from './ChildNode';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore';
-import { isDocumentFragment } from './utils';
+import { InternalChildNode, InternalParentNode, isDocumentFragment } from './utils';
 import { InsertableNode } from './uncheckedToInsertableNode';
 
-export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {
+export function uncheckedRemoveAndInsertBefore(
+  parent: InternalParentNode,
+  node: InsertableNode,
+  child: InternalChildNode
+): void {
   if (isDocumentFragment(node)) {
     const childNodes = node._childNodes;
     const children = node._children;

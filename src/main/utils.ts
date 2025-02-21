@@ -1,42 +1,42 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
+import { ChildNode } from './ChildNode';
 import { DocumentFragment } from './DocumentFragment';
-
-export interface InternalParentNode extends ParentNode {
-  parentNode: InternalParentNode | null;
-  previousSibling: InternalChildNode | null;
-  nextSibling: InternalChildNode | null;
-  firstChild: InternalChildNode | null;
-  lastChild: InternalChildNode | null;
-
-  cloneNode(deep?: boolean): InternalParentNode;
-}
-
-export interface InternalChildNode extends ChildNode {
-  parentNode: InternalParentNode | null;
-  previousSibling: InternalChildNode | null;
-  nextSibling: InternalChildNode | null;
-  firstChild: InternalChildNode | null;
-  lastChild: InternalChildNode | null;
-
-  cloneNode(deep?: boolean): InternalChildNode;
-}
-
-export interface InternalDocumentFragment extends DocumentFragment {
-  parentNode: InternalParentNode | null;
-  previousSibling: InternalChildNode | null;
-  nextSibling: InternalChildNode | null;
-  firstChild: InternalChildNode | null;
-  lastChild: InternalChildNode | null;
-
-  cloneNode(deep?: boolean): InternalDocumentFragment;
-}
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
 export type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
+
+export interface MutableParentNode extends ParentNode {
+  parentNode: MutableParentNode | null;
+  previousSibling: MutableChildNode | null;
+  nextSibling: MutableChildNode | null;
+  firstChild: MutableChildNode | null;
+  lastChild: MutableChildNode | null;
+
+  cloneNode(deep?: boolean): MutableParentNode;
+}
+
+export interface MutableChildNode extends ChildNode {
+  parentNode: MutableParentNode | null;
+  previousSibling: MutableChildNode | null;
+  nextSibling: MutableChildNode | null;
+  firstChild: MutableChildNode | null;
+  lastChild: MutableChildNode | null;
+
+  cloneNode(deep?: boolean): MutableChildNode;
+}
+
+export interface MutableDocumentFragment extends DocumentFragment {
+  parentNode: MutableParentNode | null;
+  previousSibling: MutableChildNode | null;
+  nextSibling: MutableChildNode | null;
+  firstChild: MutableChildNode | null;
+  lastChild: MutableChildNode | null;
+
+  cloneNode(deep?: boolean): MutableDocumentFragment;
+}
 
 export function die(message: string): never {
   throw new Error(message);
@@ -46,7 +46,7 @@ export function isElement(node: Node): node is Element {
   return node.nodeType === Node.ELEMENT_NODE;
 }
 
-export function isDocumentFragment(node: Node): node is InternalDocumentFragment {
+export function isDocumentFragment(node: Node): node is MutableDocumentFragment {
   return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
 }
 

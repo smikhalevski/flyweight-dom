@@ -5,8 +5,8 @@ import {
   die,
   getNextSiblingOrSelf,
   getPreviousSiblingOrSelf,
-  InternalParentNode,
   isElement,
+  MutableParentNode,
 } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
@@ -23,7 +23,7 @@ export interface ParentNode extends Node {
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children} on MDN
    */
-  readonly children: Node[];
+  readonly children: readonly Node[];
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount Element.childElementCount} on MDN
@@ -202,7 +202,7 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
   return this;
 }
 
-function replaceChildren(this: InternalParentNode /*...nodes: Array<Node | string>*/) {
+function replaceChildren(this: MutableParentNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
   const childNodes = this._childNodes;

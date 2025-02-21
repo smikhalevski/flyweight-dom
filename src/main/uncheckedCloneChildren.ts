@@ -1,6 +1,6 @@
-import { InternalChildNode, InternalParentNode } from './utils';
+import { MutableChildNode, MutableParentNode } from './utils';
 
-export function uncheckedCloneChildren(sourceParent: InternalParentNode, targetParent: InternalParentNode): void {
+export function uncheckedCloneChildren(sourceParent: MutableParentNode, targetParent: MutableParentNode): void {
   const { firstChild } = sourceParent;
 
   if (firstChild == null || sourceParent === targetParent) {
@@ -9,7 +9,7 @@ export function uncheckedCloneChildren(sourceParent: InternalParentNode, targetP
 
   let { lastChild } = targetParent;
 
-  for (let child: InternalChildNode | null = firstChild; child !== null; child = child.nextSibling) {
+  for (let child: MutableChildNode | null = firstChild; child !== null; child = child.nextSibling) {
     const node = child.cloneNode(true);
 
     node.parentNode = targetParent;

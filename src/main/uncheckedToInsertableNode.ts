@@ -1,10 +1,10 @@
 import { Node } from './Node';
 import { ParentNode } from './ParentNode';
 import { Text } from './Text';
-import { die, InternalChildNode, InternalDocumentFragment } from './utils';
+import { die, MutableChildNode, MutableDocumentFragment } from './utils';
 import { uncheckedContains } from './uncheckedContains';
 
-export type InsertableNode = InternalDocumentFragment | InternalChildNode;
+export type InsertableNode = MutableDocumentFragment | MutableChildNode;
 
 export function assertInsertableNode(parent: ParentNode, node: Node): asserts node is InsertableNode {
   const { nodeType } = node;

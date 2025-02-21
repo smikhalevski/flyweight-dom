@@ -1,9 +1,9 @@
 import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 import { uncheckedAppendChild } from './uncheckedAppendChild';
-import { InternalParentNode, isDocumentFragment } from './utils';
+import { isDocumentFragment, MutableParentNode } from './utils';
 import { InsertableNode } from './uncheckedToInsertableNode';
 
-export function uncheckedRemoveAndAppendChild(parent: InternalParentNode, node: InsertableNode): void {
+export function uncheckedRemoveAndAppendChild(parent: MutableParentNode, node: InsertableNode): void {
   if (isDocumentFragment(node)) {
     const childNodes = node._childNodes;
     const children = node._children;

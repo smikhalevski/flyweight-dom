@@ -1,9 +1,9 @@
-import { InternalChildNode, InternalParentNode, isElement } from './utils';
+import { isElement, MutableChildNode, MutableParentNode } from './utils';
 
 export function uncheckedInsertBefore(
-  parent: InternalParentNode,
-  node: InternalChildNode,
-  child: InternalChildNode
+  parent: MutableParentNode,
+  node: MutableChildNode,
+  child: MutableChildNode
 ): void {
   const childNodes = parent._childNodes;
   const children = parent._children;

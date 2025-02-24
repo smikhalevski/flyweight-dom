@@ -1,4 +1,12 @@
-# Flyweight DOM
+<p align="center">
+  <a href="#readme"><picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/logo-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./assets/logo-light.png" />
+    <img alt="Flyweight DOM" src="./assets/logo-light.png" width="400" />
+  </picture></a>
+</p>
+
+<br>
 
 ```sh
 npm install --save-prod flyweight-dom

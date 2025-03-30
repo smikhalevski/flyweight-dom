@@ -21,7 +21,7 @@ The extremely fast DOM implementation.
 
 # Usage
 
-🔎 [API documentation is available here.](https://smikhalevski.github.io/flyweight-dom/modules.html)
+🔎 [API documentation is available here.](https://smikhalevski.github.io/flyweight-dom/)
 
 The implementation provides classes for all DOM nodes:
 

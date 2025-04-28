@@ -8,7 +8,6 @@ import { DocumentFragment } from './DocumentFragment';
 import { ProcessingInstruction } from './ProcessingInstruction';
 import { Comment } from './Comment';
 import { CDATASection } from './CDATASection';
-import { die } from './utils';
 
 export type DSL = NodeFactories & ElementFactories;
 
@@ -77,8 +76,12 @@ const nodeFactories: NodeFactories = {
 };
 
 const proxyHandler: ProxyHandler<any> = {
-  get(target, key: string, _receiver) {
-    return target.hasOwnProperty(key) ? target[key] : (target[key] = createElementFactory(key));
+  get(target, key, _receiver) {
+    if (typeof key === 'string' && !target.hasOwnProperty(key)) {
+      target[key] = createElementFactory(key);
+    }
+
+    return target[key];
   },
 };
 
@@ -108,15 +111,10 @@ function createElementFactory(tagName: string): ElementFactory {
 }
 
 function appendChild(parent: ParentNode, child: Child): void {
-  if (child === null || child === undefined) {
+  if (child === null || child === undefined || typeof child === 'boolean') {
     return;
   }
-  if (
-    typeof child === 'string' ||
-    typeof child === 'number' ||
-    typeof child === 'boolean' ||
-    typeof child === 'bigint'
-  ) {
+  if (typeof child === 'string' || typeof child === 'number' || typeof child === 'bigint') {
     parent.appendChild(new Text(child.toString()));
     return;
   }
@@ -124,7 +122,7 @@ function appendChild(parent: ParentNode, child: Child): void {
     parent.appendChild(child);
     return;
   }
-  die('Cannot append a child');
+  throw new Error('Cannot append a child');
 }
 
 const dsl: DSL = new Proxy(nodeFactories, proxyHandler);

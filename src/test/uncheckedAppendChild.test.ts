@@ -8,7 +8,7 @@ describe('uncheckedAppendChild', () => {
 
     uncheckedAppendChild(parent, node);
 
-    expect(parent._childNodes).toBe(undefined);
+    expect(parent['_childNodes']).toBe(undefined);
     expect(parent.firstChild).toBe(node);
     expect(parent.lastChild).toBe(node);
     expect(parent.firstElementChild).toBe(null);
@@ -32,7 +32,7 @@ describe('uncheckedAppendChild', () => {
     uncheckedAppendChild(parent, node2);
     uncheckedAppendChild(parent, node3);
 
-    expect(parent._childNodes).toBe(undefined);
+    expect(parent['_childNodes']).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node3);
     expect(parent.firstElementChild).toBe(null);

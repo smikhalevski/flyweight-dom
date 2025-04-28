@@ -11,7 +11,7 @@ describe('uncheckedInsertBefore', () => {
     uncheckedAppendChild(parent, node2);
     uncheckedInsertBefore(parent, node1, node2);
 
-    expect(parent._childNodes).toBe(undefined);
+    expect(parent['_childNodes']).toBe(undefined);
     expect(parent['_children']).toBe(undefined);
     expect(parent.firstChild).toBe(node1);
     expect(parent.lastChild).toBe(node2);

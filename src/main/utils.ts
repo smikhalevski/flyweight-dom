@@ -1,52 +1,16 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import { ParentNode } from './ParentNode';
-import { ChildNode } from './ChildNode';
 import { DocumentFragment } from './DocumentFragment';
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
 export type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
 
-export interface MutableParentNode extends ParentNode {
-  parentNode: MutableParentNode | null;
-  previousSibling: MutableChildNode | null;
-  nextSibling: MutableChildNode | null;
-  firstChild: MutableChildNode | null;
-  lastChild: MutableChildNode | null;
-
-  cloneNode(deep?: boolean): MutableParentNode;
-}
-
-export interface MutableChildNode extends ChildNode {
-  parentNode: MutableParentNode | null;
-  previousSibling: MutableChildNode | null;
-  nextSibling: MutableChildNode | null;
-  firstChild: MutableChildNode | null;
-  lastChild: MutableChildNode | null;
-
-  cloneNode(deep?: boolean): MutableChildNode;
-}
-
-export interface MutableDocumentFragment extends DocumentFragment {
-  parentNode: MutableParentNode | null;
-  previousSibling: MutableChildNode | null;
-  nextSibling: MutableChildNode | null;
-  firstChild: MutableChildNode | null;
-  lastChild: MutableChildNode | null;
-
-  cloneNode(deep?: boolean): MutableDocumentFragment;
-}
-
-export function die(message: string): never {
-  throw new Error(message);
-}
-
 export function isElement(node: Node): node is Element {
   return node.nodeType === Node.ELEMENT_NODE;
 }
 
-export function isDocumentFragment(node: Node): node is MutableDocumentFragment {
+export function isDocumentFragment(node: Node): node is DocumentFragment {
   return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
 }
 
@@ -81,5 +45,6 @@ export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
     child = child.nextSibling;
     otherChild = otherNode.nextSibling;
   }
+
   return child == null && otherChild == null;
 }

@@ -1,14 +1,6 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import {
-  AbstractConstructor,
-  Constructor,
-  die,
-  getNextSiblingOrSelf,
-  getPreviousSiblingOrSelf,
-  isElement,
-  MutableParentNode,
-} from './utils';
+import { AbstractConstructor, Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
@@ -77,7 +69,7 @@ export function extendParentNode(constructor: Constructor<ParentNode> | Abstract
       get(this: ParentNode) {
         const nodes: Element[] = [];
 
-        this._children = nodes;
+        this['_children'] = nodes;
 
         for (let child = this.firstChild; child !== null; child = child.nextSibling) {
           if (isElement(child)) {
@@ -92,7 +84,7 @@ export function extendParentNode(constructor: Constructor<ParentNode> | Abstract
 
     childElementCount: {
       get(this: ParentNode) {
-        const children = this._children;
+        const children = this['_children'];
 
         if (children) {
           return children.length;
@@ -142,7 +134,7 @@ function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | n
 
   if (child !== null && child !== undefined) {
     if (child.parentNode !== this) {
-      die('The node before which the new node is to be inserted is not a child of this node');
+      throw new Error('The node before which the new node is to be inserted is not a child of this node');
     }
   } else {
     child = this.firstChild;
@@ -157,7 +149,7 @@ function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | n
 
 function removeChild<T extends Node>(this: Node, child: T): T {
   if (child.parentNode !== this) {
-    die('The node to be removed is not a child of this node');
+    throw new Error('The node to be removed is not a child of this node');
   }
   uncheckedRemoveChild(child.parentNode, child as Node as ChildNode);
   return child;
@@ -167,7 +159,7 @@ function replaceChild<T extends Node>(this: ParentNode, node: Node, child: T): T
   assertInsertableNode(this, node);
 
   if (child.parentNode !== this) {
-    die('The node to be replaced is not a child of this node');
+    throw new Error('The node to be replaced is not a child of this node');
   }
   uncheckedRemoveAndInsertBefore(this, node, child as Node as ChildNode);
   uncheckedRemoveChild(this, child as Node as ChildNode);
@@ -206,11 +198,11 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
   return this;
 }
 
-function replaceChildren(this: MutableParentNode /*...nodes: Array<Node | string>*/) {
+function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
-  const childNodes = this._childNodes;
-  const children = this._children;
+  const childNodes = this['_childNodes'];
+  const children = this['_children'];
 
   for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);

@@ -1,5 +1,5 @@
 import { Element } from './Element';
-import { die, isEqualChildNodes, isEqualConstructor } from './utils';
+import { isEqualChildNodes, isEqualConstructor } from './utils';
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
 import { uncheckedContains } from './uncheckedContains';
@@ -30,28 +30,41 @@ export abstract class Node {
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode Node.parentNode} on MDN
+   *
+   * @readonly
    */
-  readonly parentNode: ParentNode | null;
+  parentNode: ParentNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling Node.previousSibling} on MDN
+   *
+   * @readonly
    */
-  readonly previousSibling: ChildNode | null;
+  previousSibling: ChildNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling Node.nextSibling} on MDN
+   *
+   * @readonly
    */
-  readonly nextSibling: ChildNode | null;
+  nextSibling: ChildNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild Node.firstChild} on MDN
+   *
+   * @readonly
    */
-  readonly firstChild: ChildNode | null;
+  firstChild: ChildNode | null;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild Node.lastChild} on MDN
+   *
+   * @readonly
    */
-  readonly lastChild: ChildNode | null;
+  lastChild: ChildNode | null;
+
+  declare private _childNodes: ChildNode[] | undefined;
+  declare private _children: Element[] | undefined;
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue Node.nodeValue} on MDN
@@ -114,14 +127,14 @@ export abstract class Node {
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild Node.appendChild} on MDN
    */
   appendChild<T extends Node>(node: T): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore Node.insertBefore} on MDN
    */
   insertBefore<T extends Node>(node: T, child: Node | null | undefined): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
@@ -135,14 +148,14 @@ export abstract class Node {
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/removeChild Node.removeChild} on MDN
    */
   removeChild<T extends Node>(child: T): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/replaceChild Node.replaceChild} on MDN
    */
   replaceChild<T extends Node>(node: Node, child: T): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
@@ -156,10 +169,6 @@ export abstract class Node {
    * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode Node.cloneNode} on MDN
    */
   cloneNode(deep?: boolean): Node {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
-}
-
-function unsupported(): never {
-  die('This node type does not support this method');
 }

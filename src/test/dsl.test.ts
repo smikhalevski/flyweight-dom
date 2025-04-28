@@ -1,17 +1,17 @@
 import { Document, Element, Text } from '../main';
-import h from '../main/dsl';
+import dsl from '../main/dsl';
 
 describe('DSL', () => {
   test('creates an document', () => {
-    const fragment = h.f(h.div(h.span({ className: 'xxx' }, 'yyy')));
+    const fragment = dsl.f(dsl.div(dsl.span({ className: 'xxx' }, 'yyy')));
 
-    const document = h.doc(h.doctype('html'), fragment);
+    const document = dsl.doc(dsl.doctype('html'), fragment);
 
     expect(document).toBeInstanceOf(Document);
   });
 
   test('creates an element', () => {
-    const element = h.span({ className: 'xxx' }, 'yyy');
+    const element = dsl.span({ className: 'xxx' }, 'yyy');
 
     expect(element).toBeInstanceOf(Element);
     expect(element.tagName).toBe('span');

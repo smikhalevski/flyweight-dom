@@ -1,4 +1,4 @@
-import { die, isSpaceChar } from './utils';
+import { isSpaceChar } from './utils';
 
 const SEPARATOR_REGEX = /\s+/;
 const SEPARATOR = ' ';
@@ -165,7 +165,7 @@ export class DOMTokenList {
   }
 
   /**
-   * @internal
+   * @hidden
    */
   toString() {
     return this._valueAccessor.get();
@@ -210,11 +210,13 @@ function assertToken(token: string): void {
   const tokenLength = token.length;
 
   if (tokenLength === 0) {
-    die('The token provided must not be empty');
+    throw new Error('The token provided must not be empty');
   }
   for (let i = 0; i < tokenLength; ++i) {
     if (isSpaceChar(token.charCodeAt(i))) {
-      die("The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens");
+      throw new Error(
+        "The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens"
+      );
     }
   }
 }

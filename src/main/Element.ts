@@ -1,5 +1,5 @@
 import { Node } from './Node';
-import { die, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
+import { isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
@@ -232,5 +232,7 @@ function insertAdjacentNode<T extends Node>(element: Element, position: InsertPo
     element.after(node);
     return node;
   }
-  die("The value provided ('" + position + "') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'");
+  throw new Error(
+    "The value provided ('" + position + "') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'"
+  );
 }

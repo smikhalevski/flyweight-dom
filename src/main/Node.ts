@@ -1,11 +1,12 @@
 import { Element } from './Element';
-import { die, isEqualChildNodes, isEqualConstructor } from './utils';
+import { isEqualChildNodes, isEqualConstructor } from './utils';
 import { ChildNode } from './ChildNode';
 import { ParentNode } from './ParentNode';
 import { uncheckedContains } from './uncheckedContains';
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
+ * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
+ * @group Nodes
  */
 export abstract class Node {
   static readonly ELEMENT_NODE: number = 1;
@@ -19,42 +20,55 @@ export abstract class Node {
   static readonly DOCUMENT_FRAGMENT_NODE: number = 11;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType Node.nodeType} on MDN
+   * @see [Node.nodeType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType) on MDN
    */
   abstract readonly nodeType: number;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName Node.nodeName} on MDN
+   * @see [Node.nodeName](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName) on MDN
    */
   abstract readonly nodeName: string;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode Node.parentNode} on MDN
+   * @see [Node.parentNode](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode) on MDN
+   *
+   * @readonly
    */
-  readonly parentNode: ParentNode | null;
+  parentNode: ParentNode | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling Node.previousSibling} on MDN
+   * @see [Node.previousSibling](https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling) on MDN
+   *
+   * @readonly
    */
-  readonly previousSibling: ChildNode | null;
+  previousSibling: ChildNode | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling Node.nextSibling} on MDN
+   * @see [Node.nextSibling](https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling) on MDN
+   *
+   * @readonly
    */
-  readonly nextSibling: ChildNode | null;
+  nextSibling: ChildNode | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild Node.firstChild} on MDN
+   * @see [Node.firstChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild) on MDN
+   *
+   * @readonly
    */
-  readonly firstChild: ChildNode | null;
+  firstChild: ChildNode | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild Node.lastChild} on MDN
+   * @see [Node.lastChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild) on MDN
+   *
+   * @readonly
    */
-  readonly lastChild: ChildNode | null;
+  lastChild: ChildNode | null;
+
+  declare private _childNodes: ChildNode[] | undefined;
+  declare private _children: Element[] | undefined;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue Node.nodeValue} on MDN
+   * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
    */
   get nodeValue(): string | null {
     return null;
@@ -63,7 +77,7 @@ export abstract class Node {
   set nodeValue(value: string | null) {}
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent Node.textContent} on MDN
+   * @see [Node.textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) on MDN
    */
   get textContent(): string | null {
     return null;
@@ -72,7 +86,7 @@ export abstract class Node {
   set textContent(value: string | null) {}
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes Node.childNodes} on MDN
+   * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
    */
   get childNodes(): readonly ChildNode[] {
     const nodes: ChildNode[] = [];
@@ -88,7 +102,7 @@ export abstract class Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement Node.parentElement} on MDN
+   * @see [Node.parentElement](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement) on MDN
    */
   get parentElement(): Element | null {
     let parent = this.parentNode;
@@ -104,62 +118,58 @@ export abstract class Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/hasChildNodes Node.hasChildNodes} on MDN
+   * @see [Node.hasChildNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/hasChildNodes) on MDN
    */
   hasChildNodes(): boolean {
     return this.firstChild !== null;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild Node.appendChild} on MDN
+   * @see [Node.appendChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild) on MDN
    */
   appendChild<T extends Node>(node: T): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore Node.insertBefore} on MDN
+   * @see [Node.insertBefore](https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore) on MDN
    */
   insertBefore<T extends Node>(node: T, child: Node | null | undefined): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/contains Node.contains} on MDN
+   * @see [Node.contains](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains) on MDN
    */
   contains(node: Node | null | undefined): boolean {
     return node !== null && node !== undefined ? uncheckedContains(this, node) : false;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/removeChild Node.removeChild} on MDN
+   * @see [Node.removeChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/removeChild) on MDN
    */
   removeChild<T extends Node>(child: T): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/replaceChild Node.replaceChild} on MDN
+   * @see [Node.replaceChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/replaceChild) on MDN
    */
   replaceChild<T extends Node>(node: Node, child: T): T {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode Node.isEqualNode} on MDN
+   * @see [Node.isEqualNode](https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode) on MDN
    */
   isEqualNode(otherNode: Node | null | undefined): boolean {
     return isEqualConstructor(this, otherNode) && isEqualChildNodes(this, otherNode);
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode Node.cloneNode} on MDN
+   * @see [Node.cloneNode](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode) on MDN
    */
   cloneNode(deep?: boolean): Node {
-    unsupported();
+    throw new Error('This node type does not support this method');
   }
-}
-
-function unsupported(): never {
-  die('This node type does not support this method');
 }

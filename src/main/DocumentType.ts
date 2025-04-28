@@ -2,27 +2,31 @@ import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { isEqualConstructor } from './utils';
 
-export interface DocumentType extends Node, ChildNode {}
+/**
+ * @group Nodes
+ */
+export interface DocumentType extends ChildNode {}
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType} on MDN
+ * @see [DocumentType](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
+ * @group Nodes
  */
 export class DocumentType extends Node {
   readonly nodeType: number = Node.DOCUMENT_TYPE_NODE;
   readonly nodeName: string;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.name} on MDN
+   * @see [DocumentType.name](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
    */
   readonly name: string;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.publicId} on MDN
+   * @see [DocumentType.publicId](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
    */
   readonly publicId: string;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentType DocumentType.systemId} on MDN
+   * @see [DocumentType.systemId](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
    */
   readonly systemId: string;
 

@@ -5,14 +5,15 @@ import { uncheckedInsertBefore } from './uncheckedInsertBefore';
 import { Node } from './Node';
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Text Text} on MDN
+ * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
+ * @group Nodes
  */
 export class Text extends CharacterData {
   readonly nodeType: number = Node.TEXT_NODE;
   readonly nodeName: string = '#text';
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Text/wholeText Text.wholeText} on MDN
+   * @see [Text.wholeText](https://developer.mozilla.org/en-US/docs/Web/API/Text/wholeText) on MDN
    */
   get wholeText(): string {
     const { nodeType } = this;
@@ -33,7 +34,7 @@ export class Text extends CharacterData {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Text/splitText Text.splitText} on MDN
+   * @see [Text.splitText](https://developer.mozilla.org/en-US/docs/Web/API/Text/splitText) on MDN
    */
   splitText(offset: number): this {
     const { data, parentNode, nextSibling } = this;

@@ -2,14 +2,18 @@ import { Constructor, isEqualConstructor } from './utils';
 import { Node } from './Node';
 import { ChildNode, extendChildNode } from './ChildNode';
 
+/**
+ * @group Nodes
+ */
 export interface CharacterData extends ChildNode {}
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData CharacterData} on MDN
+ * @see [CharacterData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData) on MDN
+ * @group Nodes
  */
 export abstract class CharacterData extends Node {
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data CharacterData.data} on MDN
+   * @see [CharacterData.data](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data) on MDN
    */
   data: string;
 
@@ -38,14 +42,14 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/length CharacterData.length} on MDN
+   * @see [CharacterData.length](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/length) on MDN
    */
   get length(): number {
     return this.data.length;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/appendData CharacterData.appendData} on MDN
+   * @see [CharacterData.appendData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/appendData) on MDN
    */
   appendData(data: string): this {
     this.data += data;
@@ -53,7 +57,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/deleteData CharacterData.deleteData} on MDN
+   * @see [CharacterData.deleteData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/deleteData) on MDN
    */
   deleteData(offset: number, count: number): this {
     this.data = this.data.substring(0, offset) + this.data.substring(offset + count);
@@ -61,7 +65,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/insertData CharacterData.insertData} on MDN
+   * @see [CharacterData.insertData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/insertData) on MDN
    */
   insertData(offset: number, data: string): this {
     this.data = this.data.substring(0, offset) + data + this.data.substring(offset);
@@ -69,7 +73,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData CharacterData.replaceData} on MDN
+   * @see [CharacterData.replaceData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData) on MDN
    */
   replaceData(offset: number, count: number, data: string): this {
     this.data = this.data.substring(0, offset) + data + this.data.substring(offset + count);
@@ -77,7 +81,7 @@ export abstract class CharacterData extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData CharacterData.substringData} on MDN
+   * @see [CharacterData.substringData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData) on MDN
    */
   substringData(offset: number, count: number): string {
     return this.data.substring(offset, offset + count);

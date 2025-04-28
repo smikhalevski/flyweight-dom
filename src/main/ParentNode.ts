@@ -1,13 +1,6 @@
 import { Node } from './Node';
 import { Element } from './Element';
-import {
-  Constructor,
-  die,
-  getNextSiblingOrSelf,
-  getPreviousSiblingOrSelf,
-  isElement,
-  MutableParentNode,
-} from './utils';
+import { AbstractConstructor, Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
@@ -17,47 +10,53 @@ import { uncheckedRemoveChild } from './uncheckedRemoveChild';
 /**
  * The node that can be a parent of another node.
  *
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
+ * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
+ * @group Nodes
  */
 export interface ParentNode extends Node {
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/children Element.children} on MDN
+   * @see [Element.children](https://developer.mozilla.org/en-US/docs/Web/API/Element/children) on MDN
    */
   readonly children: readonly Node[];
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount Element.childElementCount} on MDN
+   * @see [Element.childElementCount](https://developer.mozilla.org/en-US/docs/Web/API/Element/childElementCount) on MDN
    */
   readonly childElementCount: number;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild Element.firstElementChild} on MDN
+   * @see [Element.firstElementChild](https://developer.mozilla.org/en-US/docs/Web/API/Element/firstElementChild) on MDN
    */
   readonly firstElementChild: Element | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild Element.lastElementChild} on MDN
+   * @see [Element.lastElementChild](https://developer.mozilla.org/en-US/docs/Web/API/Element/lastElementChild) on MDN
    */
   readonly lastElementChild: Element | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/append Element.append} on MDN
+   * @see [Element.append](https://developer.mozilla.org/en-US/docs/Web/API/Element/append) on MDN
    */
   append(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/prepend Element.prepend} on MDN
+   * @see [Element.prepend](https://developer.mozilla.org/en-US/docs/Web/API/Element/prepend) on MDN
    */
   prepend(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceChildren Element.replaceChildren} on MDN
+   * @see [Element.replaceChildren](https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceChildren) on MDN
    */
   replaceChildren(...nodes: Array<Node | string>): this;
 
   cloneNode(deep?: boolean): ParentNode;
 }
 
+/**
+ * The mixin that can extend the constructor prototype with properties and methods of the {@link ParentNode}.
+ *
+ * @group Nodes
+ */
 export const ParentNode = {
   /**
    * Extends the constructor prototype with properties and methods of the {@link ParentNode}.
@@ -65,7 +64,7 @@ export const ParentNode = {
   extend: extendParentNode,
 };
 
-export function extendParentNode(constructor: Constructor<ParentNode>): void {
+export function extendParentNode(constructor: Constructor<ParentNode> | AbstractConstructor<ParentNode>): void {
   const prototype = constructor.prototype;
 
   Object.defineProperties(prototype, {
@@ -73,7 +72,7 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
       get(this: ParentNode) {
         const nodes: Element[] = [];
 
-        this._children = nodes;
+        this['_children'] = nodes;
 
         for (let child = this.firstChild; child !== null; child = child.nextSibling) {
           if (isElement(child)) {
@@ -88,7 +87,7 @@ export function extendParentNode(constructor: Constructor<ParentNode>): void {
 
     childElementCount: {
       get(this: ParentNode) {
-        const children = this._children;
+        const children = this['_children'];
 
         if (children) {
           return children.length;
@@ -138,7 +137,7 @@ function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | n
 
   if (child !== null && child !== undefined) {
     if (child.parentNode !== this) {
-      die('The node before which the new node is to be inserted is not a child of this node');
+      throw new Error('The node before which the new node is to be inserted is not a child of this node');
     }
   } else {
     child = this.firstChild;
@@ -153,7 +152,7 @@ function insertBefore<T extends Node>(this: ParentNode, node: T, child: Node | n
 
 function removeChild<T extends Node>(this: Node, child: T): T {
   if (child.parentNode !== this) {
-    die('The node to be removed is not a child of this node');
+    throw new Error('The node to be removed is not a child of this node');
   }
   uncheckedRemoveChild(child.parentNode, child as Node as ChildNode);
   return child;
@@ -163,7 +162,7 @@ function replaceChild<T extends Node>(this: ParentNode, node: Node, child: T): T
   assertInsertableNode(this, node);
 
   if (child.parentNode !== this) {
-    die('The node to be replaced is not a child of this node');
+    throw new Error('The node to be replaced is not a child of this node');
   }
   uncheckedRemoveAndInsertBefore(this, node, child as Node as ChildNode);
   uncheckedRemoveChild(this, child as Node as ChildNode);
@@ -202,11 +201,11 @@ function prepend(this: ParentNode /*...nodes: Array<Node | string>*/) {
   return this;
 }
 
-function replaceChildren(this: MutableParentNode /*...nodes: Array<Node | string>*/) {
+function replaceChildren(this: ParentNode /*...nodes: Array<Node | string>*/) {
   const argumentsLength = arguments.length;
 
-  const childNodes = this._childNodes;
-  const children = this._children;
+  const childNodes = this['_childNodes'];
+  const children = this['_children'];
 
   for (let i = 0; i < argumentsLength; ++i) {
     assertInsertable(this, arguments[i]);

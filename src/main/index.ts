@@ -1,3 +1,23 @@
+/**
+ * The core DOM nodes implementation.
+ *
+ * ```ts
+ * import { Element } from 'flyweight-dom';
+ *
+ * const element = new Element('div').append(
+ *   'Hello, ',
+ *   new Element('strong').append('world!')
+ * );
+ *
+ * element.classList.add('red');
+ *
+ * element.getAttribute('class');
+ * // ⮕ 'red'
+ * ```
+ *
+ * @module flyweight-dom
+ */
+
 export { CDATASection } from './CDATASection';
 export { CharacterData } from './CharacterData';
 export { ChildNode } from './ChildNode';

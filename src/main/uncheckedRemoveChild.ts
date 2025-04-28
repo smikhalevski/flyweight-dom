@@ -1,8 +1,10 @@
-import { isElement, MutableChildNode, MutableParentNode } from './utils';
+import { ParentNode } from './ParentNode';
+import { ChildNode } from './ChildNode';
+import { isElement } from './utils';
 
-export function uncheckedRemoveChild(parent: MutableParentNode, child: MutableChildNode): void {
-  const childNodes = parent._childNodes;
-  const children = parent._children;
+export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
+  const childNodes = parent['_childNodes'];
+  const children = parent['_children'];
 
   const { previousSibling, nextSibling } = child;
 

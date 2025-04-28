@@ -39,7 +39,57 @@ element.getAttribute('class');
 // ⮕ 'red'
 ```
 
-## Performance considerations
+Use DSL to streamlines DOM authoring:
+
+```ts
+import dsl from 'flyweight-dom/dsl';
+
+const element = dsl.div({ class: 'red' }, 'Hello, ', dsl.strong('world!'));
+
+element.textContent;
+// ⮕ 'Hello, world!'
+```
+
+# Custom nodes
+
+Create custom nodes:
+
+```ts
+import { Node } from 'flyweight-dom';
+
+class MyNode extends Node {
+  readonly nodeName = '#my-node';
+  readonly nodeType = 100;
+}
+
+const myNode = new MyNode();
+const element = new Element('div');
+
+element.appendChild(myNode);
+
+element.firstChild;
+// ⮕ myNode
+```
+
+Custom nodes can extend
+[`ChildNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/flyweight_dom.ChildNode.html) and
+[`ParenNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/flyweight_dom.ParenNode.html):
+
+```ts
+import { Node, ChildNode, ParentNode } from 'flyweight-dom';
+
+interface MyNode extends ChildNode, ParentNode {}
+
+class MyNode extends Node {
+  readonly nodeName = '#my-node';
+  readonly nodeType = 100;
+}
+
+ChildNode.extend(MyNode);
+ParentNode.extend(MyNode);
+```
+
+# Performance considerations
 
 For better performance, prefer `nextSibling` and `previousSibling` over `childNodes` and `children` whenever possible.
 

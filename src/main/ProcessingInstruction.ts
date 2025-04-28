@@ -3,7 +3,8 @@ import { CharacterData } from './CharacterData';
 import { isEqualConstructor } from './utils';
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction ProcessingInstruction} on MDN
+ * @see [ProcessingInstruction](https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction) on MDN
+ * @group Nodes
  */
 export class ProcessingInstruction extends CharacterData {
   readonly nodeType: number = Node.PROCESSING_INSTRUCTION_NODE;

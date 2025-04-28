@@ -4,26 +4,27 @@ import { NodeFilter } from './NodeFilter';
 /**
  * Implemented according to https://dom.spec.whatwg.org/#treewalker
  *
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker TreeWalker} on MDN
+ * @see [TreeWalker](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker) on MDN
+ * @group Other
  */
 export class TreeWalker {
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/currentNode TreeWalker.currentNode} on MDN
+   * @see [TreeWalker.currentNode](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/currentNode) on MDN
    */
   currentNode: Node;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/root TreeWalker.root} on MDN
+   * @see [TreeWalker.root](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/root) on MDN
    */
   readonly root: Node;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow TreeWalker.whatToShow} on MDN
+   * @see [TreeWalker.whatToShow](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow) on MDN
    */
   readonly whatToShow: number;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter TreeWalker.filter} on MDN
+   * @see [TreeWalker.filter](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter) on MDN
    */
   readonly filter: NodeFilter | null;
 
@@ -43,7 +44,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/parentNode TreeWalker.parentNode} on MDN
+   * @see [TreeWalker.parentNode](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/parentNode) on MDN
    */
   parentNode(): Node | null {
     const { root } = this;
@@ -61,7 +62,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/firstChild TreeWalker.firstChild} on MDN
+   * @see [TreeWalker.firstChild](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/firstChild) on MDN
    */
   firstChild(): Node | null {
     const { currentNode, root } = this;
@@ -97,7 +98,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/lastChild TreeWalker.lastChild} on MDN
+   * @see [TreeWalker.lastChild](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/lastChild) on MDN
    */
   lastChild(): Node | null {
     const { currentNode, root } = this;
@@ -133,7 +134,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextSibling TreeWalker.nextSibling} on MDN
+   * @see [TreeWalker.nextSibling](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextSibling) on MDN
    */
   nextSibling(): Node | null {
     const { root } = this;
@@ -172,7 +173,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousSibling TreeWalker.previousSibling} on MDN
+   * @see [TreeWalker.previousSibling](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousSibling) on MDN
    */
   previousSibling(): Node | null {
     const { root } = this;
@@ -211,7 +212,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextNode TreeWalker.nextNode} on MDN
+   * @see [TreeWalker.nextNode](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/nextNode) on MDN
    */
   nextNode(): Node | null {
     const { root } = this;
@@ -249,7 +250,7 @@ export class TreeWalker {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousNode TreeWalker.previousNode} on MDN
+   * @see [TreeWalker.previousNode](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/previousNode) on MDN
    */
   previousNode(): Node | null {
     const { root } = this;

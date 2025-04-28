@@ -1,9 +1,19 @@
 import { Node } from './Node';
 import { Element } from './Element';
 import { DocumentFragment } from './DocumentFragment';
+import { ParentNode } from './ParentNode';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild';
+import { uncheckedAppendChild } from './uncheckedAppendChild';
+import { Text } from './Text';
 
+/**
+ * @group Other
+ */
 export type Constructor<T = any> = new (...args: any[]) => T;
 
+/**
+ * @group Other
+ */
 export type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
 
 export function isElement(node: Node): node is Element {
@@ -47,4 +57,24 @@ export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
   }
 
   return child == null && otherChild == null;
+}
+
+export function setTextContent(node: ParentNode, value: string | null): void {
+  while (node.firstChild !== null) {
+    uncheckedRemoveChild(node, node.firstChild);
+  }
+
+  if (value !== null && value.length !== 0) {
+    uncheckedAppendChild(node, new Text(value));
+  }
+}
+
+export function getTextContent(node: Node): string {
+  let value = '';
+
+  for (let child = node.firstChild; child !== null; child = child.nextSibling) {
+    value += child.textContent;
+  }
+
+  return value;
 }

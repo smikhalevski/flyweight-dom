@@ -9,36 +9,37 @@ import { AbstractConstructor, Constructor, getNextSiblingOrSelf, getPreviousSibl
 /**
  * The node that can be a child of another node.
  *
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Node Node} on MDN
+ * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
+ * @group Nodes
  */
 export interface ChildNode extends Node {
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling Element.previousElementSibling} on MDN
+   * @see [Element.previousElementSibling](https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling) on MDN
    */
   readonly previousElementSibling: Element | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling Element.nextElementSibling} on MDN
+   * @see [Element.nextElementSibling](https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling) on MDN
    */
   readonly nextElementSibling: Element | null;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/after Element.after} on MDN
+   * @see [Element.after](https://developer.mozilla.org/en-US/docs/Web/API/Element/after) on MDN
    */
   after(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/before Element.before} on MDN
+   * @see [Element.before](https://developer.mozilla.org/en-US/docs/Web/API/Element/before) on MDN
    */
   before(...nodes: Array<Node | string>): this;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/remove Element.remove} on MDN
+   * @see [Element.remove](https://developer.mozilla.org/en-US/docs/Web/API/Element/remove) on MDN
    */
   remove(): this;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith Element.replaceWith} on MDN
+   * @see [Element.replaceWith](https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith) on MDN
    */
   replaceWith(...nodes: Array<Node | string>): this;
 
@@ -47,6 +48,8 @@ export interface ChildNode extends Node {
 
 /**
  * The mixin that can extend the constructor prototype with properties and methods of the {@link ChildNode}.
+ *
+ * @group Nodes
  */
 export const ChildNode = {
   /**

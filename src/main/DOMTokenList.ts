@@ -3,6 +3,9 @@ import { isSpaceChar } from './utils';
 const SEPARATOR_REGEX = /\s+/;
 const SEPARATOR = ' ';
 
+/**
+ * @group Other
+ */
 export interface ValueAccessor {
   get(): string;
 
@@ -10,18 +13,19 @@ export interface ValueAccessor {
 }
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList DOMTokenList} on MDN
+ * @see [DOMTokenList](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList) on MDN
+ * @group Nodes
  */
 export class DOMTokenList {
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length DOMTokenList.length} on MDN
+   * @see [DOMTokenList.length](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/length) on MDN
    */
   get length(): number {
     return getTokens(this).length;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value DOMTokenList.value} on MDN
+   * @see [DOMTokenList.value](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value) on MDN
    */
   get value(): string {
     return this._valueAccessor.get();
@@ -45,7 +49,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add DOMTokenList.add} on MDN
+   * @see [DOMTokenList.add](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/add) on MDN
    */
   add(...tokens: string[]): void;
 
@@ -70,7 +74,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/remove DOMTokenList.remove} on MDN
+   * @see [DOMTokenList.remove](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/remove) on MDN
    */
   remove(...tokens: string[]): void;
 
@@ -95,7 +99,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace DOMTokenList.replace} on MDN
+   * @see [DOMTokenList.replace](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace) on MDN
    */
   replace(replacedToken: string, token: string): boolean {
     assertToken(replacedToken);
@@ -114,7 +118,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle DOMTokenList.toggle} on MDN
+   * @see [DOMTokenList.toggle](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle) on MDN
    */
   toggle(token: string, force?: boolean): boolean {
     assertToken(token);
@@ -139,14 +143,14 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/contains DOMTokenList.contains} on MDN
+   * @see [DOMTokenList.contains](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/contains) on MDN
    */
   contains(token: string): boolean {
     return getTokens(this).indexOf(token) !== -1;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/item DOMTokenList.item} on MDN
+   * @see [DOMTokenList.item](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/item) on MDN
    */
   item(index: number): string | null {
     const tokens = getTokens(this);
@@ -154,7 +158,7 @@ export class DOMTokenList {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/forEach DOMTokenList.forEach} on MDN
+   * @see [DOMTokenList.forEach](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/forEach) on MDN
    */
   forEach(callback: (value: string, index: number, parent: DOMTokenList) => void, thisArg?: any): void {
     const tokens = getTokens(this);

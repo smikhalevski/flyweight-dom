@@ -1,3 +1,21 @@
+/**
+ * The DSL that streamlines DOM authoring.
+ *
+ * ```ts
+ * import dsl from 'flyweight-dom/dsl';
+ *
+ * const element = dsl.div({ class: 'red' }, 'Hello, ', dsl.strong('world!'));
+ *
+ * element.getAttribute('class');
+ * // ⮕ 'red'
+ *
+ * element.textContent;
+ * // ⮕ 'Hello, world!'
+ * ```
+ *
+ * @module dsl
+ */
+
 import { Attributes, Element } from './Element';
 import { Node } from './Node';
 import { Text } from './Text';
@@ -9,10 +27,19 @@ import { ProcessingInstruction } from './ProcessingInstruction';
 import { Comment } from './Comment';
 import { CDATASection } from './CDATASection';
 
+/**
+ * @group DSL
+ */
 export type DSL = NodeFactories & ElementFactories;
 
+/**
+ * @group DSL
+ */
 export type Child = Node | string | number | boolean | bigint | null | undefined;
 
+/**
+ * @group DSL
+ */
 export interface NodeFactories {
   doc(...children: Child[]): Document;
 
@@ -27,12 +54,18 @@ export interface NodeFactories {
   comment(data?: string): Comment;
 }
 
+/**
+ * @group DSL
+ */
 export interface ElementFactory {
   (attributes: Attributes, ...children: Child[]): Element;
 
   (...children: Child[]): Element;
 }
 
+/**
+ * @group DSL
+ */
 export interface ElementFactories {
   [tagName: string]: ElementFactory;
 }
@@ -125,6 +158,9 @@ function appendChild(parent: ParentNode, child: Child): void {
   throw new Error('Cannot append a child');
 }
 
+/**
+ * @group DSL
+ */
 const dsl: DSL = new Proxy(nodeFactories, proxyHandler);
 
 export default dsl;

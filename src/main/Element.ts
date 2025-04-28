@@ -1,35 +1,45 @@
 import { Node } from './Node';
-import { isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils';
+import { getTextContent, isEqualChildNodes, isEqualConstructor, isSpaceChar, setTextContent } from './utils';
 import { ChildNode, extendChildNode } from './ChildNode';
 import { extendParentNode, ParentNode } from './ParentNode';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DOMTokenList } from './DOMTokenList';
 import { Text } from './Text';
 
+/**
+ * @group Nodes
+ */
 export interface Attributes {
   [name: string]: string;
 }
 
+/**
+ * @group Other
+ */
 export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
 
+/**
+ * @group Nodes
+ */
 export interface Element extends ChildNode, ParentNode {}
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element} on MDN
+ * @see [Element](https://developer.mozilla.org/en-US/docs/Web/API/Element) on MDN
+ * @group Nodes
  */
 export class Element extends Node {
   readonly nodeName: string;
   readonly nodeType: number = Node.ELEMENT_NODE;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName Element.tagName} on MDN
+   * @see [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) on MDN
    */
   readonly tagName: string;
 
   private _attributes: Attributes | undefined;
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/id Element.id} on MDN
+   * @see [Element.id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) on MDN
    */
   get id(): string {
     return this.getAttribute('id') || '';
@@ -40,7 +50,7 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/className Element.className} on MDN
+   * @see [Element.className](https://developer.mozilla.org/en-US/docs/Web/API/Element/className) on MDN
    */
   get className(): string {
     return this.getAttribute('class') || '';
@@ -51,7 +61,7 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/classList Element.classList} on MDN
+   * @see [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) on MDN
    */
   get classList(): DOMTokenList {
     const tokenList = new DOMTokenList({
@@ -79,6 +89,14 @@ export class Element extends Node {
     this._attributes = value;
   }
 
+  get textContent(): string | null {
+    return getTextContent(this);
+  }
+
+  set textContent(value: string | null) {
+    setTextContent(this, value);
+  }
+
   /**
    * Creates a new instance of {@link Element}.
    */
@@ -89,7 +107,7 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute Element.setAttribute} on MDN
+   * @see [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) on MDN
    */
   setAttribute(name: string, value: string): this {
     if (this._attributes === undefined) {
@@ -100,21 +118,21 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute Element.getAttribute} on MDN
+   * @see [Element.getAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute) on MDN
    */
   getAttribute(name: string): string | null {
     return this._attributes !== undefined && this._attributes[name] !== undefined ? this._attributes[name] : null;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute Element.hasAttribute} on MDN
+   * @see [Element.hasAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute) on MDN
    */
   hasAttribute(name: string): boolean {
     return this._attributes !== undefined && this._attributes[name] !== undefined;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute Element.removeAttribute} on MDN
+   * @see [Element.removeAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute) on MDN
    */
   removeAttribute(name: string): this {
     if (this._attributes !== undefined) {
@@ -124,7 +142,7 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/toggleAttribute Element.toggleAttribute} on MDN
+   * @see [Element.toggleAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/toggleAttribute) on MDN
    */
   toggleAttribute(name: string, force?: boolean): boolean {
     const value = this.getAttribute(name);
@@ -144,21 +162,21 @@ export class Element extends Node {
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames Element.getAttributeNames} on MDN
+   * @see [Element.getAttributeNames](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames) on MDN
    */
   getAttributeNames(): string[] {
     return this._attributes !== undefined ? Object.keys(this._attributes) : [];
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement Element.insertAdjacentElement} on MDN
+   * @see [Element.insertAdjacentElement](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement) on MDN
    */
   insertAdjacentElement(position: InsertPosition, element: Element): Element | null {
     return insertAdjacentNode(this, position, element);
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText Element.insertAdjacentText} on MDN
+   * @see [Element.insertAdjacentText](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText) on MDN
    */
   insertAdjacentText(position: InsertPosition, data: string): void {
     for (let i = 0, dataLength = data.length; i < dataLength; ++i) {

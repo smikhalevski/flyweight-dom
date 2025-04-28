@@ -5,24 +5,28 @@ import { getNextSiblingOrSelf } from './utils';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren';
 import { DocumentType } from './DocumentType';
 
+/**
+ * @group Nodes
+ */
 export interface Document extends ParentNode {}
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Document Document} on MDN
+ * @see [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document) on MDN
+ * @group Nodes
  */
 export class Document extends Node {
   readonly nodeType: number = Node.DOCUMENT_NODE;
   readonly nodeName: string = '#document';
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype Document.doctype} on MDN
+   * @see [Document.doctype](https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype) on MDN
    */
   get doctype(): DocumentType | null {
     return getNextSiblingOrSelf(this.firstChild, Node.DOCUMENT_TYPE_NODE) as DocumentType | null;
   }
 
   /**
-   * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement Document.documentElement} on MDN
+   * @see [Document.documentElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement) on MDN
    */
   get documentElement(): Element | null {
     return getNextSiblingOrSelf(this.firstChild, Node.ELEMENT_NODE) as Element | null;

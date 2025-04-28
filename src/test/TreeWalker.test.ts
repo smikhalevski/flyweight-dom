@@ -35,7 +35,7 @@ describe('TreeWalker', () => {
     });
 
     test('returns null if current node is root', () => {
-      expect(new TreeWalker(text1).parentNode()).toBe(null);
+      expect(new TreeWalker(text1).parentNode()).toBeNull();
     });
 
     test('ignores skipped nodes', () => {
@@ -65,7 +65,7 @@ describe('TreeWalker', () => {
     });
 
     test('returns null if there are no children', () => {
-      expect(new TreeWalker(text1).firstChild()).toBe(null);
+      expect(new TreeWalker(text1).firstChild()).toBeNull();
     });
 
     test('ignores skipped nodes', () => {
@@ -99,7 +99,7 @@ describe('TreeWalker', () => {
     });
 
     test('returns null if there are no children', () => {
-      expect(new TreeWalker(text1).lastChild()).toBe(null);
+      expect(new TreeWalker(text1).lastChild()).toBeNull();
     });
 
     test('ignores skipped nodes', () => {
@@ -141,11 +141,11 @@ describe('TreeWalker', () => {
       const treeWalker = new TreeWalker(document);
       treeWalker.currentNode = element4;
 
-      expect(treeWalker.nextSibling()).toBe(null);
+      expect(treeWalker.nextSibling()).toBeNull();
     });
 
     test('returns null the current element is the root', () => {
-      expect(new TreeWalker(element1).nextSibling()).toBe(null);
+      expect(new TreeWalker(element1).nextSibling()).toBeNull();
     });
 
     test('ignores skipped ancestor', () => {
@@ -197,11 +197,11 @@ describe('TreeWalker', () => {
       const treeWalker = new TreeWalker(document);
       treeWalker.currentNode = element1;
 
-      expect(treeWalker.previousSibling()).toBe(null);
+      expect(treeWalker.previousSibling()).toBeNull();
     });
 
     test('returns null the current element is the root', () => {
-      expect(new TreeWalker(element3).previousSibling()).toBe(null);
+      expect(new TreeWalker(element3).previousSibling()).toBeNull();
     });
 
     test('ignores skipped ancestor', () => {
@@ -250,7 +250,7 @@ describe('TreeWalker', () => {
       const treeWalker = new TreeWalker(document);
       treeWalker.currentNode = element4;
 
-      expect(treeWalker.nextNode()).toBe(null);
+      expect(treeWalker.nextNode()).toBeNull();
     });
 
     test('ignores skipped child nodes', () => {
@@ -274,7 +274,7 @@ describe('TreeWalker', () => {
       const treeWalker = new TreeWalker(element1);
       treeWalker.currentNode = text1;
 
-      expect(treeWalker.nextNode()).toBe(null);
+      expect(treeWalker.nextNode()).toBeNull();
     });
 
     test('ignores rejected nodes', () => {
@@ -296,7 +296,7 @@ describe('TreeWalker', () => {
     });
 
     test('returns null if current node is root', () => {
-      expect(new TreeWalker(element3).previousNode()).toBe(null);
+      expect(new TreeWalker(element3).previousNode()).toBeNull();
     });
 
     test('ignores skipped nodes', () => {

@@ -2,7 +2,8 @@ import { CharacterData } from './CharacterData';
 import { Node } from './Node';
 
 /**
- * **See** {@link https://developer.mozilla.org/en-US/docs/Web/API/Comment Comment} on MDN
+ * @see [Comment](https://developer.mozilla.org/en-US/docs/Web/API/Comment) on MDN
+ * @group Nodes
  */
 export class Comment extends CharacterData {
   readonly nodeType: number = Node.COMMENT_NODE;

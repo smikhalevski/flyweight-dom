@@ -1,4 +1,5 @@
-import { Document, DocumentType, Element, Node, Text } from '../main';
+import { expect, test } from 'vitest';
+import { Document, DocumentType, Element, Node, Text } from '../main/index.js';
 
 test('creates a new Document instance', () => {
   const node = new Document();

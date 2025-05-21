@@ -1,4 +1,5 @@
-import { DOMTokenList, ValueAccessor } from '../main';
+import { beforeEach, describe, expect, test } from 'vitest';
+import { DOMTokenList, ValueAccessor } from '../main/index.js';
 
 let valueMock = '';
 

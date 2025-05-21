@@ -1,9 +1,9 @@
-import { Node } from './Node';
-import { ParentNode } from './ParentNode';
-import { Text } from './Text';
-import { ChildNode } from './ChildNode';
-import { DocumentFragment } from './DocumentFragment';
-import { uncheckedContains } from './uncheckedContains';
+import { Node } from './Node.js';
+import { ParentNode } from './ParentNode.js';
+import { Text } from './Text.js';
+import { ChildNode } from './ChildNode.js';
+import { DocumentFragment } from './DocumentFragment.js';
+import { uncheckedContains } from './uncheckedContains.js';
 
 export type InsertableNode = DocumentFragment | ChildNode;
 

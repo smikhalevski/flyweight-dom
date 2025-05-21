@@ -1,5 +1,5 @@
-import { CharacterData } from './CharacterData';
-import { Node } from './Node';
+import { CharacterData } from './CharacterData.js';
+import { Node } from './Node.js';
 
 /**
  * @see [Comment](https://developer.mozilla.org/en-US/docs/Web/API/Comment) on MDN

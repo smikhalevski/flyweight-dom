@@ -1,8 +1,9 @@
-const domhandler = require('domhandler');
-const lib = require('../../lib');
+import { describe, measure, test, beforeIteration } from 'toofast';
+import * as domhandler from 'domhandler';
+import lib from '../../lib/index.js';
 
 describe('Element.appendChild', () => {
-  test('lib', measure => {
+  test('lib', () => {
     measure(() => {
       const root = new lib.Element('div');
 
@@ -12,7 +13,7 @@ describe('Element.appendChild', () => {
     });
   });
 
-  test('domhandler', measure => {
+  test('domhandler', () => {
     measure(() => {
       const root = new domhandler.Element('div', {});
 
@@ -24,7 +25,7 @@ describe('Element.appendChild', () => {
 });
 
 describe('Element.append', () => {
-  test('lib', measure => {
+  test('lib', () => {
     measure(() => {
       const root = new lib.Element('div');
 
@@ -32,7 +33,7 @@ describe('Element.append', () => {
     });
   });
 
-  test('domhandler', measure => {
+  test('domhandler', () => {
     measure(() => {
       const root = new domhandler.Element('div', {});
 
@@ -44,7 +45,7 @@ describe('Element.append', () => {
 });
 
 describe('Element.childNodes', () => {
-  test('lib', measure => {
+  test('lib', () => {
     const root = new lib.Element('div');
 
     root.append(new lib.Element('div'), new lib.Element('div'), new lib.Element('div'));
@@ -56,7 +57,7 @@ describe('Element.childNodes', () => {
 });
 
 describe('Element.classList', () => {
-  test('add', measure => {
+  test('add', () => {
     let element;
 
     beforeIteration(() => {
@@ -93,7 +94,7 @@ describe('TreeWalker.nextNode()', () => {
 
   document.append(element1.append(element2.append(text1)), element3.append(text2), element4);
 
-  test('firstChild', measure => {
+  test('firstChild', () => {
     const treeWalker = new lib.TreeWalker(document);
 
     beforeIteration(() => {
@@ -105,7 +106,7 @@ describe('TreeWalker.nextNode()', () => {
     });
   });
 
-  test('filter', measure => {
+  test('filter', () => {
     const treeWalker = new lib.TreeWalker(document, undefined, node => (node.nodeType !== 3 ? 3 : 1));
 
     beforeIteration(() => {

@@ -1,5 +1,6 @@
-import { DOMTokenList, Element, Node, Text } from '../main';
-import { InsertPosition } from '../main/Element';
+import { expect, test } from 'vitest';
+import { DOMTokenList, Element, Node, Text } from '../main/index.js';
+import { InsertPosition } from '../main/Element.js';
 
 test('creates an Element instance', () => {
   const node = new Element('aaa');

@@ -1,10 +1,10 @@
-import { Node } from './Node';
-import { getTextContent, isEqualChildNodes, isEqualConstructor, isSpaceChar, setTextContent } from './utils';
-import { ChildNode, extendChildNode } from './ChildNode';
-import { extendParentNode, ParentNode } from './ParentNode';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren';
-import { DOMTokenList } from './DOMTokenList';
-import { Text } from './Text';
+import { Node } from './Node.js';
+import { getTextContent, isEqualChildNodes, isEqualConstructor, isSpaceChar, setTextContent } from './utils.js';
+import { ChildNode, extendChildNode } from './ChildNode.js';
+import { extendParentNode, ParentNode } from './ParentNode.js';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
+import { DOMTokenList } from './DOMTokenList.js';
+import { Text } from './Text.js';
 
 /**
  * @group Nodes

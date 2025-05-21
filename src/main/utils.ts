@@ -1,10 +1,10 @@
-import { Node } from './Node';
-import { Element } from './Element';
-import { DocumentFragment } from './DocumentFragment';
-import { ParentNode } from './ParentNode';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { uncheckedAppendChild } from './uncheckedAppendChild';
-import { Text } from './Text';
+import { Node } from './Node.js';
+import { Element } from './Element.js';
+import { DocumentFragment } from './DocumentFragment.js';
+import { ParentNode } from './ParentNode.js';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
+import { uncheckedAppendChild } from './uncheckedAppendChild.js';
+import { Text } from './Text.js';
 
 /**
  * @group Other

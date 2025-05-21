@@ -1,10 +1,10 @@
-import { Node } from './Node';
-import { Element } from './Element';
-import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild';
-import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore';
-import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { AbstractConstructor, Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils';
+import { Node } from './Node.js';
+import { Element } from './Element.js';
+import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
+import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
+import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
+import { AbstractConstructor, Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
 
 /**
  * The node that can be a child of another node.

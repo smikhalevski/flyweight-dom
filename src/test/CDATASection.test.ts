@@ -1,4 +1,5 @@
-import { CDATASection, CharacterData, Node, Text } from '../main';
+import { expect, test } from 'vitest';
+import { CDATASection, CharacterData, Node, Text } from '../main/index.js';
 
 test('creates a new CDATASection instance', () => {
   const node = new CDATASection();

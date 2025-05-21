@@ -1,9 +1,9 @@
-import { uncheckedRemoveChild } from './uncheckedRemoveChild';
-import { uncheckedInsertBefore } from './uncheckedInsertBefore';
-import { ParentNode } from './ParentNode';
-import { ChildNode } from './ChildNode';
-import { InsertableNode } from './uncheckedToInsertableNode';
-import { isDocumentFragment } from './utils';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
+import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
+import { ParentNode } from './ParentNode.js';
+import { ChildNode } from './ChildNode.js';
+import { InsertableNode } from './uncheckedToInsertableNode.js';
+import { isDocumentFragment } from './utils.js';
 
 export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {
   if (isDocumentFragment(node)) {

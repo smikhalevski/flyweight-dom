@@ -1,5 +1,6 @@
-import { Element, Node, Text } from '../main';
-import { assertInsertableNode, uncheckedToInsertableNode } from '../main/uncheckedToInsertableNode';
+import { describe, expect, test } from 'vitest';
+import { Element, Node, Text } from '../main/index.js';
+import { assertInsertableNode, uncheckedToInsertableNode } from '../main/uncheckedToInsertableNode.js';
 
 describe('assertInsertableNode', () => {
   class MockNode extends Node {

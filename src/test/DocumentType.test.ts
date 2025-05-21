@@ -1,4 +1,5 @@
-import { DocumentType, Node } from '../main';
+import { expect, test } from 'vitest';
+import { DocumentType, Node } from '../main/index.js';
 
 test('creates a new DocumentType instance', () => {
   const node = new DocumentType('aaa');

@@ -1,4 +1,5 @@
-import { Element, Node, Text } from '../main';
+import { expect, test } from 'vitest';
+import { Element, Node, Text } from '../main/index.js';
 
 class MockNode extends Node {
   readonly nodeName = '';

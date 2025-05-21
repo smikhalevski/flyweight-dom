@@ -1,5 +1,6 @@
-import { Element, Text } from '../main';
-import { uncheckedCloneChildren } from '../main/uncheckedCloneChildren';
+import { expect, test } from 'vitest';
+import { Element, Text } from '../main/index.js';
+import { uncheckedCloneChildren } from '../main/uncheckedCloneChildren.js';
 
 test('clones a single children of source to target', () => {
   const sourceParent = new Element('sourceParent');

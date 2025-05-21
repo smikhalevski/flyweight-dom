@@ -1,4 +1,5 @@
-import { CharacterData, Node } from '../main';
+import { expect, test } from 'vitest';
+import { CharacterData, Node } from '../main/index.js';
 
 class MockCharacterData extends CharacterData {
   readonly nodeType = -1;

@@ -1,4 +1,5 @@
-import { CharacterData, Comment, Node } from '../main';
+import { expect, test } from 'vitest';
+import { CharacterData, Comment, Node } from '../main/index.js';
 
 test('creates a new Comment instance', () => {
   const node = new Comment();

@@ -1,5 +1,6 @@
-import { Element, Text } from '../main';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
+import { expect, test } from 'vitest';
+import { Element, Text } from '../main/index.js';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
 
 test('appends the first child node to an element', () => {
   const parent = new Element('parent');

@@ -1,6 +1,7 @@
-import { Element, Text } from '../main';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
-import { uncheckedRemoveChild } from '../main/uncheckedRemoveChild';
+import { expect, test } from 'vitest';
+import { Element, Text } from '../main/index.js';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
+import { uncheckedRemoveChild } from '../main/uncheckedRemoveChild.js';
 
 test('removes the only child', () => {
   const parent = new Element('parent');

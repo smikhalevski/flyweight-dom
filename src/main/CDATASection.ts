@@ -1,5 +1,5 @@
-import { Text } from './Text';
-import { Node } from './Node';
+import { Text } from './Text.js';
+import { Node } from './Node.js';
 
 /**
  * @see [CDATASection](https://developer.mozilla.org/en-US/docs/Web/API/CDATASection) on MDN

@@ -1,6 +1,7 @@
-import { Element, Text } from '../main';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
-import { uncheckedContains } from '../main/uncheckedContains';
+import { expect, test } from 'vitest';
+import { Element, Text } from '../main/index.js';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
+import { uncheckedContains } from '../main/uncheckedContains.js';
 
 test('an elements contains itself', () => {
   const node = new Element('node');

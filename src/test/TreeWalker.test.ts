@@ -1,5 +1,6 @@
-import { Document, Element, NodeFilter, Text, TreeWalker } from '../main';
-import { filterNode } from '../main/TreeWalker';
+import { describe, expect, test, vi } from 'vitest';
+import { Document, Element, NodeFilter, Text, TreeWalker } from '../main/index.js';
+import { filterNode } from '../main/TreeWalker.js';
 
 /*
  * <document>
@@ -330,7 +331,7 @@ describe('filterNode', () => {
   });
 
   test('calls filter function', () => {
-    const filterMock = jest.fn();
+    const filterMock = vi.fn();
 
     filterNode(new TreeWalker(document, undefined, filterMock), element4);
 
@@ -339,7 +340,7 @@ describe('filterNode', () => {
   });
 
   test('calls acceptNode method', () => {
-    const acceptNodeMock = jest.fn();
+    const acceptNodeMock = vi.fn();
 
     filterNode(new TreeWalker(document, undefined, { acceptNode: acceptNodeMock }), element4);
 

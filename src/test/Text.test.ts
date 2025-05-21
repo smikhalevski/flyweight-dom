@@ -1,4 +1,5 @@
-import { CharacterData, Node, Text } from '../main';
+import { expect, test } from 'vitest';
+import { CharacterData, Node, Text } from '../main/index.js';
 
 test('creates a new Text instance', () => {
   const node = new Text();

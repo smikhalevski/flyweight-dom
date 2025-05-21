@@ -1,4 +1,5 @@
-import { DocumentFragment, Element, Node, Text } from '../main';
+import { expect, test } from 'vitest';
+import { DocumentFragment, Element, Node, Text } from '../main/index.js';
 
 test('creates a new DocumentFragment instance', () => {
   const node = new DocumentFragment();

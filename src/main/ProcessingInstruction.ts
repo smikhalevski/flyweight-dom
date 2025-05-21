@@ -1,6 +1,6 @@
-import { Node } from './Node';
-import { CharacterData } from './CharacterData';
-import { isEqualConstructor } from './utils';
+import { Node } from './Node.js';
+import { CharacterData } from './CharacterData.js';
+import { isEqualConstructor } from './utils.js';
 
 /**
  * @see [ProcessingInstruction](https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction) on MDN

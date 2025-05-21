@@ -1,9 +1,9 @@
-import { Node } from './Node';
-import { extendParentNode, ParentNode } from './ParentNode';
-import { Element } from './Element';
-import { getNextSiblingOrSelf } from './utils';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren';
-import { DocumentType } from './DocumentType';
+import { Node } from './Node.js';
+import { extendParentNode, ParentNode } from './ParentNode.js';
+import { Element } from './Element.js';
+import { getNextSiblingOrSelf } from './utils.js';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
+import { DocumentType } from './DocumentType.js';
 
 /**
  * @group Nodes

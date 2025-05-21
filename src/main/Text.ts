@@ -1,8 +1,8 @@
-import { CharacterData } from './CharacterData';
-import { Constructor } from './utils';
-import { uncheckedAppendChild } from './uncheckedAppendChild';
-import { uncheckedInsertBefore } from './uncheckedInsertBefore';
-import { Node } from './Node';
+import { CharacterData } from './CharacterData.js';
+import { Constructor } from './utils.js';
+import { uncheckedAppendChild } from './uncheckedAppendChild.js';
+import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
+import { Node } from './Node.js';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN

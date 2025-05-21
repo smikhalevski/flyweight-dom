@@ -1,5 +1,6 @@
-import { Document, Element, Text } from '../main';
-import dsl from '../main/dsl';
+import { expect, test } from 'vitest';
+import { Document, Element, Text } from '../main/index.js';
+import dsl from '../main/dsl.js';
 
 test('creates an document', () => {
   const fragment = dsl.f(dsl.div(dsl.span({ className: 'xxx' }, 'yyy')));

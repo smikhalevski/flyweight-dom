@@ -1,6 +1,6 @@
-import { Node } from './Node';
-import { ChildNode, extendChildNode } from './ChildNode';
-import { isEqualConstructor } from './utils';
+import { Node } from './Node.js';
+import { ChildNode, extendChildNode } from './ChildNode.js';
+import { isEqualConstructor } from './utils.js';
 
 /**
  * @group Nodes

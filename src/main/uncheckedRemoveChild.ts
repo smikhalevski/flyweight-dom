@@ -1,6 +1,6 @@
-import { ParentNode } from './ParentNode';
-import { ChildNode } from './ChildNode';
-import { isElement } from './utils';
+import { ParentNode } from './ParentNode.js';
+import { ChildNode } from './ChildNode.js';
+import { isElement } from './utils.js';
 
 export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
   const childNodes = parent['_childNodes'];

@@ -1,7 +1,7 @@
-import { Node } from './Node';
-import { extendParentNode, ParentNode } from './ParentNode';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren';
-import { getTextContent, setTextContent } from './utils';
+import { Node } from './Node.js';
+import { extendParentNode, ParentNode } from './ParentNode.js';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
+import { getTextContent, setTextContent } from './utils.js';
 
 /**
  * @group Nodes

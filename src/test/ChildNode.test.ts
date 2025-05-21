@@ -1,4 +1,5 @@
-import { ChildNode, Element, Node, Text } from '../main';
+import { describe, expect, test } from 'vitest';
+import { ChildNode, Element, Node, Text } from '../main/index.js';
 
 test('extends a class constructor', () => {
   interface MockNode extends ChildNode {}

@@ -1,5 +1,5 @@
-import { Node } from './Node';
-import { NodeFilter } from './NodeFilter';
+import { Node } from './Node.js';
+import { NodeFilter } from './NodeFilter.js';
 
 /**
  * Implemented according to https://dom.spec.whatwg.org/#treewalker

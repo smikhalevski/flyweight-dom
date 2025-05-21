@@ -1,4 +1,4 @@
-import { isSpaceChar } from './utils';
+import { isSpaceChar } from './utils.js';
 
 const SEPARATOR_REGEX = /\s+/;
 const SEPARATOR = ' ';

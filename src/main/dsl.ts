@@ -16,16 +16,16 @@
  * @module dsl
  */
 
-import { Attributes, Element } from './Element';
-import { Node } from './Node';
-import { Text } from './Text';
-import { ParentNode } from './ParentNode';
-import { Document } from './Document';
-import { DocumentType } from './DocumentType';
-import { DocumentFragment } from './DocumentFragment';
-import { ProcessingInstruction } from './ProcessingInstruction';
-import { Comment } from './Comment';
-import { CDATASection } from './CDATASection';
+import { Attributes, Element } from './Element.js';
+import { Node } from './Node.js';
+import { Text } from './Text.js';
+import { ParentNode } from './ParentNode.js';
+import { Document } from './Document.js';
+import { DocumentType } from './DocumentType.js';
+import { DocumentFragment } from './DocumentFragment.js';
+import { ProcessingInstruction } from './ProcessingInstruction.js';
+import { Comment } from './Comment.js';
+import { CDATASection } from './CDATASection.js';
 
 /**
  * @group DSL

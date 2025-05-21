@@ -18,19 +18,19 @@
  * @module flyweight-dom
  */
 
-export { CDATASection } from './CDATASection';
-export { CharacterData } from './CharacterData';
-export { ChildNode } from './ChildNode';
-export { Comment } from './Comment';
-export { Document } from './Document';
-export { DocumentFragment } from './DocumentFragment';
-export { DocumentType } from './DocumentType';
-export { DOMTokenList, type ValueAccessor } from './DOMTokenList';
-export { Element, type InsertPosition, type Attributes } from './Element';
-export { Node } from './Node';
-export { NodeFilter } from './NodeFilter';
-export { ParentNode } from './ParentNode';
-export { ProcessingInstruction } from './ProcessingInstruction';
-export { Text } from './Text';
-export { TreeWalker } from './TreeWalker';
-export { type Constructor, type AbstractConstructor } from './utils';
+export { CDATASection } from './CDATASection.js';
+export { CharacterData } from './CharacterData.js';
+export { ChildNode } from './ChildNode.js';
+export { Comment } from './Comment.js';
+export { Document } from './Document.js';
+export { DocumentFragment } from './DocumentFragment.js';
+export { DocumentType } from './DocumentType.js';
+export { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
+export { Element, type InsertPosition, type Attributes } from './Element.js';
+export { Node } from './Node.js';
+export { NodeFilter } from './NodeFilter.js';
+export { ParentNode } from './ParentNode.js';
+export { ProcessingInstruction } from './ProcessingInstruction.js';
+export { Text } from './Text.js';
+export { TreeWalker } from './TreeWalker.js';
+export { type Constructor, type AbstractConstructor } from './utils.js';

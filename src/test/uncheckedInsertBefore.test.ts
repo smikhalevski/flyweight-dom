@@ -1,6 +1,7 @@
-import { Element, Text } from '../main';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild';
-import { uncheckedInsertBefore } from '../main/uncheckedInsertBefore';
+import { expect, test } from 'vitest';
+import { Element, Text } from '../main/index.js';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
+import { uncheckedInsertBefore } from '../main/uncheckedInsertBefore.js';
 
 test('inserts an element before another element', () => {
   const parent = new Element('parent');

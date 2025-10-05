@@ -1,7 +1,14 @@
 import { Node } from './Node.js';
+import { ChildNode } from './ChildNode.js';
 
-export class NodeList<T extends Node = Node> {
-  [index: number]: Node;
+/**
+ * Implemented according to https://dom.spec.whatwg.org/#treewalker
+ *
+ * @see [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) on MDN
+ * @group Other
+ */
+export class NodeList<T extends ChildNode = ChildNode> {
+  [index: number]: T;
 
   private _parentNode;
   private _filter;
@@ -10,9 +17,12 @@ export class NodeList<T extends Node = Node> {
     this._parentNode = parentNode;
     this._filter = filter;
 
-    return new Proxy(this, proxyHandler) as NodeList<T>;
+    return new Proxy<NodeList<T>>(this, proxyHandler);
   }
 
+  /**
+   * @see [NodeList.length](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/length) on MDN
+   */
   get length(): number {
     const { _filter } = this;
 
@@ -27,25 +37,35 @@ export class NodeList<T extends Node = Node> {
     return length;
   }
 
-  item(index: number): Node | null {
+  /**
+   * @see [NodeList.item](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/item) on MDN
+   */
+  item(index: number): T | null {
     const { _filter } = this;
 
     for (let child = this._parentNode.firstChild, i = 0; child !== null; child = child.nextSibling) {
       if ((_filter === undefined || _filter(child)) && i++ === index) {
-        return child;
+        return child as T;
       }
     }
     return null;
   }
 
-  *[Symbol.iterator](): IterableIterator<Node> {
+  /**
+   * @see [NodeList.values](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/values) on MDN
+   */
+  *values(): IterableIterator<T> {
     const { _filter } = this;
 
     for (let child = this._parentNode.firstChild; child !== null; child = child.nextSibling) {
       if (_filter === undefined || _filter(child)) {
-        yield child;
+        yield child as T;
       }
     }
+  }
+
+  [Symbol.iterator](): IterableIterator<T> {
+    return this.values();
   }
 }
 

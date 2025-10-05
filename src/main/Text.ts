@@ -1,5 +1,4 @@
 import { CharacterData } from './CharacterData.js';
-import { Constructor } from './utils.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
 import { Node } from './Node.js';
@@ -41,14 +40,16 @@ export class Text extends CharacterData {
 
     this.data = data.substring(0, offset);
 
-    const node = new (this.constructor as Constructor)(data.substring(offset));
+    const node = new (this.constructor as typeof Text)(data.substring(offset)) as this;
 
-    if (parentNode !== null) {
-      if (nextSibling !== null) {
-        uncheckedInsertBefore(parentNode, node, nextSibling);
-      } else {
-        uncheckedAppendChild(parentNode, node);
-      }
+    if (parentNode === null) {
+      return node;
+    }
+
+    if (nextSibling !== null) {
+      uncheckedInsertBefore(parentNode, node, nextSibling);
+    } else {
+      uncheckedAppendChild(parentNode, node);
     }
     return node;
   }

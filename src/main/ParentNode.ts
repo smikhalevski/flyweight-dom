@@ -62,6 +62,12 @@ const parentConstructorCache = new WeakMap();
  */
 export function ParentNode(): new () => ParentNode;
 
+/**
+ * The mixin that can extend the constructor prototype with properties and methods of the {@link ParentNode}.
+ *
+ * @template T The base node constructor.
+ * @group Nodes
+ */
 export function ParentNode<T extends Node>(constructor: new () => T): new () => T & ParentNode;
 
 export function ParentNode(constructor: new () => Node = Node) {

@@ -34,4 +34,3 @@ export { ParentNode } from './ParentNode.js';
 export { ProcessingInstruction } from './ProcessingInstruction.js';
 export { Text } from './Text.js';
 export { TreeWalker } from './TreeWalker.js';
-export { type Constructor, type AbstractConstructor } from './utils.js';

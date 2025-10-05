@@ -6,16 +6,6 @@ import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { Text } from './Text.js';
 
-/**
- * @group Other
- */
-export type Constructor<T = any> = new (...args: any[]) => T;
-
-/**
- * @group Other
- */
-export type AbstractConstructor<T = any> = abstract new (...args: any[]) => T;
-
 export function isElement(node: Node): node is Element {
   return node.nodeType === Node.ELEMENT_NODE;
 }

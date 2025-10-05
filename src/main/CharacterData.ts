@@ -1,4 +1,4 @@
-import { Constructor, isEqualConstructor } from './utils.js';
+import { isEqualConstructor } from './utils.js';
 import { Node } from './Node.js';
 import { ChildNode } from './ChildNode.js';
 
@@ -17,7 +17,7 @@ export abstract class CharacterData extends ChildNode() {
   }
 
   set nodeValue(value: string | null) {
-    this.data = value === null || value === undefined ? '' : value;
+    this.data = value ?? '';
   }
 
   get textContent(): string | null {
@@ -25,7 +25,7 @@ export abstract class CharacterData extends ChildNode() {
   }
 
   set textContent(value: string | null) {
-    this.data = value === null || value === undefined ? '' : value;
+    this.data = value ?? '';
   }
 
   /**
@@ -87,7 +87,7 @@ export abstract class CharacterData extends ChildNode() {
   }
 
   cloneNode(deep?: boolean): CharacterData {
-    const node = new (this.constructor as Constructor)();
+    const node = new (this.constructor as new () => CharacterData)();
     node.data = this.data;
     return node;
   }

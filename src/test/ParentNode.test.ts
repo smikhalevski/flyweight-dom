@@ -1,5 +1,10 @@
 import { describe, expect, test } from 'vitest';
-import { Document, Element, ParentNode, Text } from '../main/index.js';
+import { ChildNode, Document, Element, Node, ParentNode, Text } from '../main/index.js';
+
+test('returns the cached constructor', () => {
+  expect(ParentNode()).toBe(ParentNode());
+  expect(ParentNode(Node)).toBe(ParentNode());
+});
 
 test('extends a class constructor', () => {
   class MockNode extends ParentNode() {
@@ -14,6 +19,19 @@ test('extends a class constructor', () => {
   const mockNode = new Element('aaa').appendChild(new MockNode()).append('ccc');
 
   expect(mockNode.firstChild).toEqual(new Text('ccc'));
+
+  expect(new MockNode() instanceof ParentNode()).toBe(true);
+});
+
+test('extends composite constructor', () => {
+  class MockNode extends ChildNode(ParentNode()) {
+    readonly nodeName = '#my-node';
+    readonly nodeType = 100;
+  }
+
+  expect(new MockNode() instanceof ParentNode()).toBe(true);
+  expect(new MockNode() instanceof ChildNode()).toBe(false);
+  expect(new MockNode() instanceof ChildNode(ParentNode())).toBe(true);
 });
 
 describe('hasChildNodes', () => {

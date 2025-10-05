@@ -28,10 +28,7 @@ The implementation provides classes for all DOM nodes:
 ```ts
 import { Element } from 'flyweight-dom';
 
-const element = new Element('div').append(
-  'Hello, ',
-  new Element('strong').append('world!')
-);
+const element = new Element('div').append('Hello, ', new Element('strong').append('world!'));
 
 element.classList.add('red');
 
@@ -82,6 +79,15 @@ class MyNode extends ChildNode(ParentNode()) {
   readonly nodeName = '#my-node';
   readonly nodeType = 100;
 }
+
+new MyNode() instanceof ParentNode();
+// ✅ true
+
+new MyNode() instanceof ChildNode(ParentNode());
+// ✅ true
+
+new MyNode() instanceof ChildNode();
+// ❌ false
 ```
 
 # Performance considerations
@@ -90,7 +96,7 @@ For better performance, prefer `nextSibling` and `previousSibling` over `childNo
 
 ```ts
 for (let child = node.firstChild; child !== null; child = child.nextSibling) {
-  // Process the child 
+  // Process the child
 }
 ```
 

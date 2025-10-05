@@ -1,6 +1,6 @@
 import { describe, measure, test, beforeIteration } from 'toofast';
 import * as domhandler from 'domhandler';
-import lib from '../../lib/index.js';
+import * as lib from '../../lib/index.js';
 
 describe('Element.appendChild', () => {
   test('lib', () => {

@@ -2,26 +2,17 @@
   "name": "flyweight-dom",
   "version": "2.1.0",
   "description": "The extremely fast DOM implementation.",
-  "main": "./index.js",
-  "module": "./index.mjs",
-  "types": "./index.d.ts",
   "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "import": "./index.mjs",
-      "require": "./index.js"
-    },
-    "./dsl": {
-      "types": "./dsl.d.ts",
-      "import": "./dsl.mjs",
-      "require": "./dsl.js"
-    },
+    ".": "./index.js",
+    "./dsl": "./dsl.js",
     "./package.json": "./package.json"
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsc --project tsconfig.build.json && node rewrite.mjs lib && tsc --project tsconfig.build.json --module CommonJS && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete type scripts devDependencies",
+    "build": "tsc --project tsconfig.build.json && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
     "clean": "rimraf lib docs coverage",
     "test": "vitest run",
     "perf": "toofast",
@@ -42,13 +33,13 @@
   "homepage": "https://github.com/smikhalevski/flyweight-dom#readme",
   "devDependencies": {
     "domhandler": "^5.0.3",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "toofast": "^3.0.3",
     "tslib": "^2.8.1",
-    "typedoc": "^0.28.4",
-    "typedoc-plugin-mdn-links": "^5.0.2",
-    "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "typedoc": "^0.28.13",
+    "typedoc-plugin-mdn-links": "^5.0.9",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   }
 }

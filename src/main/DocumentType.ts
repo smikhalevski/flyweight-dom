@@ -1,17 +1,12 @@
 import { Node } from './Node.js';
-import { ChildNode, extendChildNode } from './ChildNode.js';
+import { ChildNode } from './ChildNode.js';
 import { isEqualConstructor } from './utils.js';
-
-/**
- * @group Nodes
- */
-export interface DocumentType extends ChildNode {}
 
 /**
  * @see [DocumentType](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
  * @group Nodes
  */
-export class DocumentType extends Node {
+export class DocumentType extends ChildNode() {
   readonly nodeType: number = Node.DOCUMENT_TYPE_NODE;
   readonly nodeName: string;
 
@@ -49,9 +44,7 @@ export class DocumentType extends Node {
     );
   }
 
-  cloneNode(deep?: boolean): DocumentType {
-    return new DocumentType(this.name, this.publicId, this.systemId);
+  cloneNode(deep?: boolean): this {
+    return new DocumentType(this.name, this.publicId, this.systemId) as this;
   }
 }
-
-extendChildNode(DocumentType);

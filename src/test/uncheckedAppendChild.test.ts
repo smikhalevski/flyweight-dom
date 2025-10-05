@@ -8,7 +8,6 @@ test('appends the first child node to an element', () => {
 
   uncheckedAppendChild(parent, node);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBe(node);
   expect(parent.lastChild).toBe(node);
   expect(parent.firstElementChild).toBeNull();
@@ -32,7 +31,6 @@ test('appends multiple child nodes to an element', () => {
   uncheckedAppendChild(parent, node2);
   uncheckedAppendChild(parent, node3);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node3);
   expect(parent.firstElementChild).toBeNull();
@@ -80,7 +78,6 @@ test('appends the first element to an element', () => {
 
   uncheckedAppendChild(parent, node);
 
-  expect(parent['_children']).toBeUndefined();
   expect(parent.firstChild).toBe(node);
   expect(parent.lastChild).toBe(node);
   expect(parent.firstElementChild).toBe(node);
@@ -104,7 +101,6 @@ test('appends multiple elements to an element', () => {
   uncheckedAppendChild(parent, node2);
   uncheckedAppendChild(parent, node3);
 
-  expect(parent['_children']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node3);
   expect(parent.firstElementChild).toBe(node1);
@@ -157,7 +153,6 @@ test('appends mixed nodes to an element', () => {
   uncheckedAppendChild(parent, node2);
   uncheckedAppendChild(parent, node3);
 
-  expect(parent['_children']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node3);
   expect(parent.firstElementChild).toBe(node1);

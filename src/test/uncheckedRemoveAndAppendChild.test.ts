@@ -9,7 +9,6 @@ test('appends the first child node to an element', () => {
 
   uncheckedRemoveAndAppendChild(parent, node);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBe(node);
   expect(parent.lastChild).toBe(node);
 
@@ -28,7 +27,6 @@ test('appends multiple child nodes to an element', () => {
   uncheckedRemoveAndAppendChild(parent, node2);
   uncheckedRemoveAndAppendChild(parent, node3);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node3);
 

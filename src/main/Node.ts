@@ -3,12 +3,13 @@ import { isEqualChildNodes, isEqualConstructor } from './utils.js';
 import { ChildNode } from './ChildNode.js';
 import { ParentNode } from './ParentNode.js';
 import { uncheckedContains } from './uncheckedContains.js';
+import { NodeList } from './NodeList.js';
 
 /**
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
  * @group Nodes
  */
-export abstract class Node {
+export class Node {
   static readonly ELEMENT_NODE: number = 1;
   static readonly ATTRIBUTE_NODE: number = 2;
   static readonly TEXT_NODE: number = 3;
@@ -22,12 +23,12 @@ export abstract class Node {
   /**
    * @see [Node.nodeType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType) on MDN
    */
-  abstract readonly nodeType: number;
+  declare readonly nodeType: number;
 
   /**
    * @see [Node.nodeName](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName) on MDN
    */
-  abstract readonly nodeName: string;
+  declare readonly nodeName: string;
 
   /**
    * @see [Node.parentNode](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentNode) on MDN
@@ -64,9 +65,6 @@ export abstract class Node {
    */
   lastChild: ChildNode | null;
 
-  declare private _childNodes: ChildNode[] | undefined;
-  declare private _children: Element[] | undefined;
-
   /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
    */
@@ -88,17 +86,12 @@ export abstract class Node {
   /**
    * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
    */
-  get childNodes(): readonly ChildNode[] {
-    const nodes: ChildNode[] = [];
+  get childNodes(): NodeList {
+    const nodeList = new NodeList(this);
 
-    this._childNodes = nodes;
+    Object.defineProperty(this, 'childNodes', { value: nodeList });
 
-    for (let child = this.firstChild; child !== null; child = child.nextSibling) {
-      nodes.push(child);
-    }
-    Object.defineProperty(this, 'childNodes', { value: nodes });
-
-    return nodes;
+    return nodeList;
   }
 
   /**
@@ -110,6 +103,7 @@ export abstract class Node {
     while (parent !== null && parent.nodeType !== Node.ELEMENT_NODE) {
       parent = parent.parentNode;
     }
+
     return parent as Element | null;
   }
 

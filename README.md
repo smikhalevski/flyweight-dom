@@ -78,15 +78,10 @@ Custom nodes can extend
 ```ts
 import { Node, ChildNode, ParentNode } from 'flyweight-dom';
 
-interface MyNode extends ChildNode, ParentNode {}
-
-class MyNode extends Node {
+class MyNode extends ChildNode(ParentNode()) {
   readonly nodeName = '#my-node';
   readonly nodeType = 100;
 }
-
-ChildNode.extend(MyNode);
-ParentNode.extend(MyNode);
 ```
 
 # Performance considerations

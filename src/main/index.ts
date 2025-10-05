@@ -29,6 +29,7 @@ export { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
 export { Element, type InsertPosition, type Attributes } from './Element.js';
 export { Node } from './Node.js';
 export { NodeFilter } from './NodeFilter.js';
+export { NodeList } from './NodeList.js';
 export { ParentNode } from './ParentNode.js';
 export { ProcessingInstruction } from './ProcessingInstruction.js';
 export { Text } from './Text.js';

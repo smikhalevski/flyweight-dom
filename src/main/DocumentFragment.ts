@@ -1,18 +1,13 @@
 import { Node } from './Node.js';
-import { extendParentNode, ParentNode } from './ParentNode.js';
+import { ParentNode } from './ParentNode.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
 import { getTextContent, setTextContent } from './utils.js';
-
-/**
- * @group Nodes
- */
-export interface DocumentFragment extends Node, ParentNode {}
 
 /**
  * @see [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) on MDN
  * @group Nodes
  */
-export class DocumentFragment extends Node {
+export class DocumentFragment extends ParentNode() {
   readonly nodeType: number = Node.DOCUMENT_FRAGMENT_NODE;
   readonly nodeName: string = '#document-fragment';
 
@@ -32,5 +27,3 @@ export class DocumentFragment extends Node {
     return node;
   }
 }
-
-extendParentNode(DocumentFragment);

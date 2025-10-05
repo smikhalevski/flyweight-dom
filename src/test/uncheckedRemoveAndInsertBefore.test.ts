@@ -11,7 +11,6 @@ test('appends the first child node to an element', () => {
   uncheckedAppendChild(parent, node2);
   uncheckedRemoveAndInsertBefore(parent, node1, node2);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node2);
 

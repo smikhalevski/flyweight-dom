@@ -11,8 +11,6 @@ test('inserts an element before another element', () => {
   uncheckedAppendChild(parent, node2);
   uncheckedInsertBefore(parent, node1, node2);
 
-  expect(parent['_childNodes']).toBeUndefined();
-  expect(parent['_children']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node2);
   expect(parent.firstElementChild).toBe(node1);

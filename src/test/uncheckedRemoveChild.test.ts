@@ -10,7 +10,6 @@ test('removes the only child', () => {
   uncheckedAppendChild(parent, node);
   uncheckedRemoveChild(parent, node);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBeNull();
   expect(parent.lastChild).toBeNull();
   expect(parent.firstElementChild).toBeNull();
@@ -35,7 +34,6 @@ test('removes the middle child', () => {
   uncheckedAppendChild(parent, node3);
   uncheckedRemoveChild(parent, node2);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node3);
   expect(parent.firstElementChild).toBeNull();
@@ -91,7 +89,6 @@ test('removes the only element', () => {
   uncheckedAppendChild(parent, node);
   uncheckedRemoveChild(parent, node);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBeNull();
   expect(parent.lastChild).toBeNull();
   expect(parent.firstElementChild).toBeNull();
@@ -116,7 +113,6 @@ test('removes the middle element', () => {
   uncheckedAppendChild(parent, node3);
   uncheckedRemoveChild(parent, node2);
 
-  expect(parent['_childNodes']).toBeUndefined();
   expect(parent.firstChild).toBe(node1);
   expect(parent.lastChild).toBe(node3);
   expect(parent.firstElementChild).toBe(node1);

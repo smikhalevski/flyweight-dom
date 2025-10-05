@@ -6,9 +6,6 @@ import { isDocumentFragment } from './utils.js';
 
 export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {
   if (isDocumentFragment(node)) {
-    const childNodes = node['_childNodes'];
-    const children = node['_children'];
-
     let nodeChild = node.firstChild;
 
     while (nodeChild !== null) {
@@ -17,12 +14,6 @@ export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: Insertab
       nodeChild = nextSibling;
     }
 
-    if (childNodes !== undefined) {
-      childNodes.length = 0;
-    }
-    if (children !== undefined) {
-      children.length = 0;
-    }
     node.firstChild = node.lastChild = null;
     return;
   }

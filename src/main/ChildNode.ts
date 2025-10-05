@@ -4,7 +4,7 @@ import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.j
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { AbstractConstructor, Constructor, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
+import { getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
 
 /**
  * The node that can be a child of another node.
@@ -46,104 +46,110 @@ export interface ChildNode extends Node {
   cloneNode(deep?: boolean): ChildNode;
 }
 
+const childConstructorCache = new WeakMap();
+
 /**
  * The mixin that can extend the constructor prototype with properties and methods of the {@link ChildNode}.
  *
  * @group Nodes
  */
-export const ChildNode = {
-  /**
-   * Extends the constructor prototype with properties and methods of the {@link ChildNode}.
-   */
-  extend: extendChildNode,
-};
+export function ChildNode(): new () => ChildNode;
 
-export function extendChildNode(constructor: Constructor<ChildNode> | AbstractConstructor<ChildNode>): void {
-  const prototype = constructor.prototype;
+export function ChildNode<T extends Node>(constructor: new () => T): new () => T & ChildNode;
 
-  Object.defineProperties(prototype, {
-    previousElementSibling: {
-      get(this: ChildNode) {
-        return getPreviousSiblingOrSelf(this.previousSibling, Node.ELEMENT_NODE);
-      },
-    },
+export function ChildNode(constructor: new () => Node = Node) {
+  let childConstructor = childConstructorCache.get(constructor);
 
-    nextElementSibling: {
-      get(this: ChildNode) {
-        return getNextSiblingOrSelf(this.nextSibling, Node.ELEMENT_NODE);
-      },
-    },
-  });
-
-  prototype.after = after;
-  prototype.before = before;
-  prototype.remove = remove;
-  prototype.replaceWith = replaceWith;
-}
-
-function after(this: ChildNode /*...nodes: Array<Node | string>*/) {
-  const argumentsLength = arguments.length;
-
-  const { parentNode, nextSibling } = this;
-
-  if (parentNode === null) {
-    return this;
+  if (childConstructor !== undefined) {
+    return childConstructor;
   }
-  for (let i = 0; i < argumentsLength; ++i) {
-    assertInsertable(parentNode, arguments[i]);
-  }
-  if (nextSibling !== null) {
-    for (let i = 0; i < argumentsLength; ++i) {
-      uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), nextSibling);
+
+  childConstructor = class extends constructor implements ChildNode {
+    declare readonly nodeType: number;
+
+    declare readonly nodeName: string;
+
+    get previousElementSibling(): Element | null {
+      return getPreviousSiblingOrSelf(this.previousSibling, Node.ELEMENT_NODE) as Element | null;
     }
-  } else {
-    for (let i = 0; i < argumentsLength; ++i) {
-      uncheckedRemoveAndAppendChild(parentNode, uncheckedToInsertableNode(arguments[i]));
+
+    get nextElementSibling(): Element | null {
+      return getNextSiblingOrSelf(this.nextSibling, Node.ELEMENT_NODE) as Element | null;
     }
-  }
-  return this;
-}
 
-function before(this: ChildNode /*...nodes: Array<Node | string>*/) {
-  const argumentsLength = arguments.length;
+    after(/*...nodes: Array<Node | string>*/) {
+      const argumentsLength = arguments.length;
 
-  const { parentNode } = this;
+      const { parentNode, nextSibling } = this;
 
-  if (parentNode === null) {
-    return this;
-  }
-  for (let i = 0; i < argumentsLength; ++i) {
-    assertInsertable(parentNode, arguments[i]);
-  }
-  for (let i = 0; i < argumentsLength; ++i) {
-    uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
-  }
-  return this;
-}
+      if (parentNode === null) {
+        return this;
+      }
+      for (let i = 0; i < argumentsLength; ++i) {
+        assertInsertable(parentNode, arguments[i]);
+      }
+      if (nextSibling !== null) {
+        for (let i = 0; i < argumentsLength; ++i) {
+          uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), nextSibling);
+        }
+      } else {
+        for (let i = 0; i < argumentsLength; ++i) {
+          uncheckedRemoveAndAppendChild(parentNode, uncheckedToInsertableNode(arguments[i]));
+        }
+      }
+      return this;
+    }
 
-function remove(this: ChildNode) {
-  const { parentNode } = this;
+    before(/*...nodes: Array<Node | string>*/) {
+      const argumentsLength = arguments.length;
 
-  if (parentNode !== null) {
-    parentNode.removeChild(this);
-  }
-  return this;
-}
+      const { parentNode } = this;
 
-function replaceWith(this: ChildNode /*...nodes: Array<Node | string>*/) {
-  const argumentsLength = arguments.length;
+      if (parentNode === null) {
+        return this;
+      }
+      for (let i = 0; i < argumentsLength; ++i) {
+        assertInsertable(parentNode, arguments[i]);
+      }
+      for (let i = 0; i < argumentsLength; ++i) {
+        uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
+      }
+      return this;
+    }
 
-  const { parentNode } = this;
+    remove(): this {
+      const { parentNode } = this;
 
-  if (parentNode === null) {
-    return this;
-  }
-  for (let i = 0; i < argumentsLength; ++i) {
-    assertInsertable(parentNode, arguments[i]);
-  }
-  for (let i = 0; i < argumentsLength; ++i) {
-    uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
-  }
-  uncheckedRemoveChild(parentNode, this);
-  return this;
+      if (parentNode !== null) {
+        parentNode.removeChild(this);
+      }
+      return this;
+    }
+
+    replaceWith(/*...nodes: Array<Node | string>*/) {
+      const argumentsLength = arguments.length;
+
+      const { parentNode } = this;
+
+      if (parentNode === null) {
+        return this;
+      }
+      for (let i = 0; i < argumentsLength; ++i) {
+        assertInsertable(parentNode, arguments[i]);
+      }
+      for (let i = 0; i < argumentsLength; ++i) {
+        uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
+      }
+      uncheckedRemoveChild(parentNode, this);
+      return this;
+    }
+
+    cloneNode(deep?: boolean): ChildNode {
+      return super.cloneNode(deep) as ChildNode;
+    }
+  };
+
+  childConstructorCache.set(constructor, childConstructor);
+
+  return childConstructor;
 }

@@ -1,10 +1,8 @@
 import { describe, expect, test } from 'vitest';
-import { Document, Element, Node, ParentNode, Text } from '../main/index.js';
+import { Document, Element, ParentNode, Text } from '../main/index.js';
 
 test('extends a class constructor', () => {
-  interface MockNode extends ParentNode {}
-
-  class MockNode extends Node {
+  class MockNode extends ParentNode() {
     readonly nodeName = '';
     readonly nodeType = -1;
 
@@ -12,8 +10,6 @@ test('extends a class constructor', () => {
       return this;
     }
   }
-
-  ParentNode.extend(MockNode);
 
   const mockNode = new Element('aaa').appendChild(new MockNode()).append('ccc');
 

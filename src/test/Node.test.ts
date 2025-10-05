@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { Element, Node, Text } from '../main/index.js';
+import { NodeList } from '../main/NodeList.js';
 
 class MockNode extends Node {
   readonly nodeName = '';
@@ -14,7 +15,7 @@ test('creates a new MockNode instance', () => {
   const node = new MockNode();
 
   expect(node).toBeInstanceOf(Node);
-  expect(node.childNodes).toEqual([]);
+  expect(node.childNodes).toEqual(new NodeList(node));
   expect(node.parentNode).toBeNull();
   expect(node.parentElement).toBeNull();
   expect(node.previousSibling).toBeNull();
@@ -28,7 +29,7 @@ test('creates a new MockNode instance', () => {
 test('populates childNodes', () => {
   const node = new MockNode();
 
-  expect(node.childNodes).toEqual([]);
+  expect(node.childNodes).toEqual(new NodeList(node));
 });
 
 test('hasChildNodes return false', () => {

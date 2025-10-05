@@ -1,18 +1,8 @@
 import { ParentNode } from './ParentNode.js';
 import { ChildNode } from './ChildNode.js';
-import { isElement } from './utils.js';
 
 export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
-  const childNodes = parent['_childNodes'];
-  const children = parent['_children'];
-
   const { previousSibling, nextSibling } = child;
-
-  childNodes?.splice(childNodes.indexOf(child), 1);
-
-  if (isElement(child)) {
-    children?.splice(children.indexOf(child), 1);
-  }
 
   child.parentNode = null;
 

@@ -1,17 +1,12 @@
 import { Constructor, isEqualConstructor } from './utils.js';
 import { Node } from './Node.js';
-import { ChildNode, extendChildNode } from './ChildNode.js';
-
-/**
- * @group Nodes
- */
-export interface CharacterData extends ChildNode {}
+import { ChildNode } from './ChildNode.js';
 
 /**
  * @see [CharacterData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData) on MDN
  * @group Nodes
  */
-export abstract class CharacterData extends Node {
+export abstract class CharacterData extends ChildNode() {
   /**
    * @see [CharacterData.data](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data) on MDN
    */
@@ -88,7 +83,7 @@ export abstract class CharacterData extends Node {
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {
-    return isEqualConstructor(this, otherNode) && otherNode.data === this.data;
+    return isEqualConstructor<CharacterData>(this, otherNode) && otherNode.data === this.data;
   }
 
   cloneNode(deep?: boolean): CharacterData {
@@ -97,5 +92,3 @@ export abstract class CharacterData extends Node {
     return node;
   }
 }
-
-extendChildNode(CharacterData);

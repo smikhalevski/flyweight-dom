@@ -1,7 +1,7 @@
 import { Node } from './Node.js';
 import { getTextContent, isEqualChildNodes, isEqualConstructor, isSpaceChar, setTextContent } from './utils.js';
-import { ChildNode, extendChildNode } from './ChildNode.js';
-import { extendParentNode, ParentNode } from './ParentNode.js';
+import { ChildNode } from './ChildNode.js';
+import { ParentNode } from './ParentNode.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
 import { DOMTokenList } from './DOMTokenList.js';
 import { Text } from './Text.js';
@@ -19,15 +19,10 @@ export interface Attributes {
 export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
 
 /**
- * @group Nodes
- */
-export interface Element extends ChildNode, ParentNode {}
-
-/**
  * @see [Element](https://developer.mozilla.org/en-US/docs/Web/API/Element) on MDN
  * @group Nodes
  */
-export class Element extends Node {
+export class Element extends ParentNode(ChildNode()) {
   readonly nodeName: string;
   readonly nodeType: number = Node.ELEMENT_NODE;
 
@@ -36,7 +31,7 @@ export class Element extends Node {
    */
   readonly tagName: string;
 
-  private _attributes: Attributes | undefined;
+  private _attributes: Attributes | undefined = undefined;
 
   /**
    * @see [Element.id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) on MDN
@@ -204,9 +199,6 @@ export class Element extends Node {
     return node;
   }
 }
-
-extendChildNode(Element);
-extendParentNode(Element);
 
 function isEqualAttributes(attrs: Attributes | undefined, otherAttrs: Attributes | undefined): boolean {
   if (attrs === undefined) {

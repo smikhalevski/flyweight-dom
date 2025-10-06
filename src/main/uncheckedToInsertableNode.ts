@@ -13,6 +13,7 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   if (nodeType === Node.DOCUMENT_NODE || nodeType === Node.ATTRIBUTE_NODE) {
     throw new Error('Node cannot be a child');
   }
+
   if (uncheckedContains(node, parent)) {
     throw new Error('The new child element contains the parent');
   }

@@ -11,6 +11,7 @@ export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: Inserta
 
     while (nodeChild !== null) {
       const { nextSibling } = nodeChild;
+
       uncheckedInsertBefore(parent, nodeChild, child);
       nodeChild = nextSibling;
     }
@@ -24,5 +25,6 @@ export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: Inserta
   if (parentNode !== null) {
     uncheckedRemoveChild(parentNode, node);
   }
+
   uncheckedInsertBefore(parent, node, child);
 }

@@ -65,7 +65,8 @@ export function ParentNode(): new () => ParentNode;
 /**
  * The mixin that can extend the constructor prototype with properties and methods of the {@link ParentNode}.
  *
- * @template T The base node constructor.
+ * @param constructor The base node constructor.
+ * @template T The base node.
  * @group Nodes
  */
 export function ParentNode<T extends Node>(constructor: new () => T): new () => T & ParentNode;
@@ -79,15 +80,10 @@ export function ParentNode(constructor: new () => Node = Node) {
 
   parentConstructor = class extends constructor implements ParentNode {
     declare readonly nodeType: number;
-
     declare readonly nodeName: string;
 
     get children(): NodeList<Element> {
-      const nodeList = new NodeList(this, isElement);
-
-      Object.defineProperty(this, 'children', { value: nodeList });
-
-      return nodeList;
+      return Object.defineProperty(this, 'children', { value: new NodeList(this, isElement) }).children;
     }
 
     get childElementCount(): number {
@@ -118,13 +114,12 @@ export function ParentNode(constructor: new () => Node = Node) {
     insertBefore<T extends Node>(node: T, child: Node | null | undefined): T {
       assertInsertableNode(this, node);
 
-      if (child !== null && child !== undefined) {
-        if (child.parentNode !== this) {
-          throw new Error('The node before which the new node is to be inserted is not a child of this node');
-        }
-      } else {
+      if (child === null || child === undefined) {
         child = this.firstChild;
+      } else if (child.parentNode !== this) {
+        throw new Error('The node before which the new node is to be inserted is not a child of this node');
       }
+
       if (child !== null) {
         uncheckedRemoveAndInsertBefore(this, node, child as ChildNode);
       } else {
@@ -137,6 +132,7 @@ export function ParentNode(constructor: new () => Node = Node) {
       if (child.parentNode !== this) {
         throw new Error('The node to be removed is not a child of this node');
       }
+
       uncheckedRemoveChild(child.parentNode, child as Node as ChildNode);
       return child;
     }
@@ -147,37 +143,36 @@ export function ParentNode(constructor: new () => Node = Node) {
       if (child.parentNode !== this) {
         throw new Error('The node to be replaced is not a child of this node');
       }
+
       uncheckedRemoveAndInsertBefore(this, node, child as Node as ChildNode);
       uncheckedRemoveChild(this, child as Node as ChildNode);
       return child;
     }
 
     append(/*...nodes: Array<Node | string>*/) {
-      const argumentsLength = arguments.length;
-
-      for (let i = 0; i < argumentsLength; ++i) {
+      for (let i = 0; i < arguments.length; ++i) {
         assertInsertable(this, arguments[i]);
       }
-      for (let i = 0; i < argumentsLength; ++i) {
+
+      for (let i = 0; i < arguments.length; ++i) {
         uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(arguments[i]));
       }
       return this;
     }
 
     prepend(/*...nodes: Array<Node | string>*/) {
-      const argumentsLength = arguments.length;
-
       const { firstChild } = this;
 
-      for (let i = 0; i < argumentsLength; ++i) {
+      for (let i = 0; i < arguments.length; ++i) {
         assertInsertable(this, arguments[i]);
       }
+
       if (firstChild !== null) {
-        for (let i = 0; i < argumentsLength; ++i) {
+        for (let i = 0; i < arguments.length; ++i) {
           uncheckedRemoveAndInsertBefore(this, uncheckedToInsertableNode(arguments[i]), firstChild);
         }
       } else {
-        for (let i = 0; i < argumentsLength; ++i) {
+        for (let i = 0; i < arguments.length; ++i) {
           uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(arguments[i]));
         }
       }
@@ -185,9 +180,7 @@ export function ParentNode(constructor: new () => Node = Node) {
     }
 
     replaceChildren(/*...nodes: Array<Node | string>*/) {
-      const argumentsLength = arguments.length;
-
-      for (let i = 0; i < argumentsLength; ++i) {
+      for (let i = 0; i < arguments.length; ++i) {
         assertInsertable(this, arguments[i]);
       }
 
@@ -197,7 +190,7 @@ export function ParentNode(constructor: new () => Node = Node) {
 
       this.firstChild = this.lastChild = null;
 
-      for (let i = 0; i < argumentsLength; ++i) {
+      for (let i = 0; i < arguments.length; ++i) {
         uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(arguments[i]));
       }
       return this;

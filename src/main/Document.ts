@@ -29,6 +29,7 @@ export class Document extends ParentNode() {
 
   cloneNode(deep?: boolean): Document {
     const node = new Document();
+
     if (deep) {
       uncheckedCloneChildren(this, node);
     }

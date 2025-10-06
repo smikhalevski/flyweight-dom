@@ -28,9 +28,9 @@ export function getNextSiblingOrSelf(node: Node | null, nodeType: number): Node 
   return node;
 }
 
-// https://www.w3.org/TR/2009/WD-html5-20090212/infrastructure.html#space-character
+// https://www.w3.org/TR/xml/#NT-S
 export function isSpaceChar(charCode: number): boolean {
-  return charCode === 32 || charCode === 9 || charCode === 10 || charCode === 12 || charCode === 13;
+  return charCode == /* \s */ 32 || charCode === /* \n */ 10 || charCode === /* \t */ 9 || charCode === /* \r */ 13;
 }
 
 export function isEqualConstructor<T extends Node>(node: T, otherNode: Node | null | undefined): otherNode is T {
@@ -41,12 +41,12 @@ export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
   let child = node.firstChild;
   let otherChild = otherNode.firstChild;
 
-  while (child !== null && otherNode !== null && child.isEqualNode(otherChild)) {
+  while (child !== null && otherChild !== null && child.isEqualNode(otherChild)) {
     child = child.nextSibling;
-    otherChild = otherNode.nextSibling;
+    otherChild = otherChild.nextSibling;
   }
 
-  return child == null && otherChild == null;
+  return child === null && otherChild === null;
 }
 
 export function setTextContent(node: ParentNode, value: string | null): void {

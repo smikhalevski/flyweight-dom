@@ -35,35 +35,35 @@ export class Node {
    *
    * @readonly
    */
-  parentNode: ParentNode | null;
+  parentNode: ParentNode | null = null;
 
   /**
    * @see [Node.previousSibling](https://developer.mozilla.org/en-US/docs/Web/API/Node/previousSibling) on MDN
    *
    * @readonly
    */
-  previousSibling: ChildNode | null;
+  previousSibling: ChildNode | null = null;
 
   /**
    * @see [Node.nextSibling](https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling) on MDN
    *
    * @readonly
    */
-  nextSibling: ChildNode | null;
+  nextSibling: ChildNode | null = null;
 
   /**
    * @see [Node.firstChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/firstChild) on MDN
    *
    * @readonly
    */
-  firstChild: ChildNode | null;
+  firstChild: ChildNode | null = null;
 
   /**
    * @see [Node.lastChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/lastChild) on MDN
    *
    * @readonly
    */
-  lastChild: ChildNode | null;
+  lastChild: ChildNode | null = null;
 
   /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
@@ -87,11 +87,7 @@ export class Node {
    * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
    */
   get childNodes(): NodeList {
-    const nodeList = new NodeList(this);
-
-    Object.defineProperty(this, 'childNodes', { value: nodeList });
-
-    return nodeList;
+    return Object.defineProperty(this, 'childNodes', { value: new NodeList(this) }).childNodes;
   }
 
   /**
@@ -105,10 +101,6 @@ export class Node {
     }
 
     return parent as Element | null;
-  }
-
-  constructor() {
-    this.parentNode = this.previousSibling = this.nextSibling = this.firstChild = this.lastChild = null;
   }
 
   /**
@@ -136,7 +128,7 @@ export class Node {
    * @see [Node.contains](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains) on MDN
    */
   contains(node: Node | null | undefined): boolean {
-    return node !== null && node !== undefined ? uncheckedContains(this, node) : false;
+    return node !== null && node !== undefined && uncheckedContains(this, node);
   }
 
   /**

@@ -1,15 +1,15 @@
 import { Node } from './Node.js';
 
 export function uncheckedContains(parent: Node, node: Node): boolean {
-  if (parent.firstChild !== null) {
-    let ancestor: Node | null = node;
+  if (parent.firstChild === null) {
+    return parent === node;
+  }
 
-    while (ancestor !== null) {
-      if (parent === ancestor) {
-        return true;
-      }
-      ancestor = ancestor.parentNode;
+  for (let ancestor: Node | null = node; ancestor !== null; ancestor = ancestor.parentNode) {
+    if (parent === ancestor) {
+      return true;
     }
   }
+
   return parent === node;
 }

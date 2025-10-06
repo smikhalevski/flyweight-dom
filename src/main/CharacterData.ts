@@ -7,17 +7,12 @@ import { ChildNode } from './ChildNode.js';
  * @group Nodes
  */
 export abstract class CharacterData extends ChildNode() {
-  /**
-   * @see [CharacterData.data](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data) on MDN
-   */
-  data: string;
-
   get nodeValue(): string | null {
     return this.data;
   }
 
   set nodeValue(value: string | null) {
-    this.data = value ?? '';
+    this.data = value || '';
   }
 
   get textContent(): string | null {
@@ -25,15 +20,19 @@ export abstract class CharacterData extends ChildNode() {
   }
 
   set textContent(value: string | null) {
-    this.data = value ?? '';
+    this.data = value || '';
   }
 
   /**
    * Creates a new instance of {@link CharacterData}.
    */
-  constructor(data = '') {
+  constructor(
+    /**
+     * @see [CharacterData.data](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/data) on MDN
+     */
+    public data = ''
+  ) {
     super();
-    this.data = data;
   }
 
   /**

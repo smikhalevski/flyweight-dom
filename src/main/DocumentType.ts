@@ -11,28 +11,24 @@ export class DocumentType extends ChildNode() {
   readonly nodeName: string;
 
   /**
-   * @see [DocumentType.name](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
-   */
-  readonly name: string;
-
-  /**
-   * @see [DocumentType.publicId](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
-   */
-  readonly publicId: string;
-
-  /**
-   * @see [DocumentType.systemId](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
-   */
-  readonly systemId: string;
-
-  /**
    * Creates a new instance of {@link DocumentType}.
    */
-  constructor(name: string, publicId = '', systemId = '') {
+  constructor(
+    /**
+     * @see [DocumentType.name](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
+     */
+    readonly name: string,
+    /**
+     * @see [DocumentType.publicId](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
+     */
+    readonly publicId = '',
+    /**
+     * @see [DocumentType.systemId](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
+     */
+    readonly systemId = ''
+  ) {
     super();
-    this.nodeName = this.name = name;
-    this.publicId = publicId;
-    this.systemId = systemId;
+    this.nodeName = name;
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {
@@ -44,7 +40,7 @@ export class DocumentType extends ChildNode() {
     );
   }
 
-  cloneNode(deep?: boolean): this {
-    return new DocumentType(this.name, this.publicId, this.systemId) as this;
+  cloneNode(deep?: boolean): DocumentType {
+    return new DocumentType(this.name, this.publicId, this.systemId);
   }
 }

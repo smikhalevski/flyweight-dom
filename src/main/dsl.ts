@@ -6,7 +6,7 @@
  *
  * const element = dsl.div({ class: 'red' }, 'Hello, ', dsl.strong('world!'));
  *
- * element.getAttribute('class');
+ * element.className;
  * // ⮕ 'red'
  *
  * element.textContent;
@@ -16,7 +16,7 @@
  * @module dsl
  */
 
-import { Attributes, Element } from './Element.js';
+import { Element } from './Element.js';
 import { Node } from './Node.js';
 import { Text } from './Text.js';
 import { ParentNode } from './ParentNode.js';
@@ -58,7 +58,7 @@ export interface NodeFactories {
  * @group DSL
  */
 export interface ElementFactory {
-  (attributes: Attributes, ...children: Child[]): Element;
+  (attributes: Record<string, string>, ...children: Child[]): Element;
 
   (...children: Child[]): Element;
 }
@@ -147,14 +147,17 @@ function appendChild(parent: ParentNode, child: Child): void {
   if (child === null || child === undefined || typeof child === 'boolean') {
     return;
   }
+
   if (typeof child === 'string' || typeof child === 'number' || typeof child === 'bigint') {
     parent.appendChild(new Text(child.toString()));
     return;
   }
+
   if (child instanceof Node) {
     parent.appendChild(child);
     return;
   }
+
   throw new Error('Cannot append a child');
 }
 

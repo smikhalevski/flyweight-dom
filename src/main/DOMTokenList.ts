@@ -54,15 +54,13 @@ export class DOMTokenList {
   add(...tokens: string[]): void;
 
   add(): void {
-    const argumentsLength = arguments.length;
-
-    for (let i = 0; i < argumentsLength; ++i) {
+    for (let i = 0; i < arguments.length; ++i) {
       assertToken(arguments[i]);
     }
 
     const tokens = getTokens(this);
 
-    for (let i = 0; i < argumentsLength; ++i) {
+    for (let i = 0; i < arguments.length; ++i) {
       const token = arguments[i];
 
       if (tokens.indexOf(token) === -1) {
@@ -79,15 +77,13 @@ export class DOMTokenList {
   remove(...tokens: string[]): void;
 
   remove(): void {
-    const argumentsLength = arguments.length;
-
-    for (let i = 0; i < argumentsLength; ++i) {
+    for (let i = 0; i < arguments.length; ++i) {
       assertToken(arguments[i]);
     }
 
     const tokens = getTokens(this);
 
-    for (let i = 0; i < argumentsLength; ++i) {
+    for (let i = 0; i < arguments.length; ++i) {
       const index = tokens.indexOf(arguments[i]);
 
       if (index !== -1) {
@@ -211,12 +207,11 @@ function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
 }
 
 function assertToken(token: string): void {
-  const tokenLength = token.length;
-
-  if (tokenLength === 0) {
+  if (token.length === 0) {
     throw new Error('The token provided must not be empty');
   }
-  for (let i = 0; i < tokenLength; ++i) {
+
+  for (let i = 0; i < token.length; ++i) {
     if (isSpaceChar(token.charCodeAt(i))) {
       throw new Error(
         "The token provided ('" + token + "') contains HTML space characters, which are not valid in tokens"

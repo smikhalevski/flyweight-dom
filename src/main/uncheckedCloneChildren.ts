@@ -4,7 +4,7 @@ import { ChildNode } from './ChildNode.js';
 export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: ParentNode): void {
   const { firstChild } = sourceParent;
 
-  if (firstChild == null || sourceParent === targetParent) {
+  if (firstChild === null || sourceParent === targetParent) {
     return;
   }
 
@@ -21,6 +21,7 @@ export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: P
     } else {
       targetParent.firstChild = node;
     }
+
     lastChild = node;
   }
 

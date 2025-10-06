@@ -2,19 +2,17 @@ import { Node } from './Node.js';
 import { ChildNode } from './ChildNode.js';
 
 /**
- * Implemented according to https://dom.spec.whatwg.org/#treewalker
- *
  * @see [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) on MDN
  * @group Other
  */
 export class NodeList<T extends ChildNode = ChildNode> {
   [index: number]: T;
 
-  private _parentNode;
+  private _root;
   private _filter;
 
-  constructor(parentNode: Node, filter?: (node: Node) => node is T) {
-    this._parentNode = parentNode;
+  constructor(root: Node, filter?: (node: Node) => node is T) {
+    this._root = root;
     this._filter = filter;
 
     return new Proxy<NodeList<T>>(this, proxyHandler);
@@ -28,7 +26,7 @@ export class NodeList<T extends ChildNode = ChildNode> {
 
     let length = 0;
 
-    for (let child = this._parentNode.firstChild; child !== null; child = child.nextSibling) {
+    for (let child = this._root.firstChild; child !== null; child = child.nextSibling) {
       if (_filter === undefined || _filter(child)) {
         ++length;
       }
@@ -43,7 +41,7 @@ export class NodeList<T extends ChildNode = ChildNode> {
   item(index: number): T | null {
     const { _filter } = this;
 
-    for (let child = this._parentNode.firstChild, i = 0; child !== null; child = child.nextSibling) {
+    for (let child = this._root.firstChild, i = 0; child !== null; child = child.nextSibling) {
       if ((_filter === undefined || _filter(child)) && i++ === index) {
         return child as T;
       }
@@ -57,7 +55,7 @@ export class NodeList<T extends ChildNode = ChildNode> {
   *values(): IterableIterator<T> {
     const { _filter } = this;
 
-    for (let child = this._parentNode.firstChild; child !== null; child = child.nextSibling) {
+    for (let child = this._root.firstChild; child !== null; child = child.nextSibling) {
       if (_filter === undefined || _filter(child)) {
         yield child as T;
       }
@@ -69,7 +67,7 @@ export class NodeList<T extends ChildNode = ChildNode> {
   }
 }
 
-function parseIndex(str: string): number {
+function parseArrayIndex(str: string): number {
   if (str.length === 0) {
     return -1;
   }
@@ -99,7 +97,7 @@ const proxyHandler: ProxyHandler<NodeList> = {
   get(target, key, _receiver) {
     let index;
 
-    if (typeof key !== 'string' || (index = parseIndex(key)) === -1) {
+    if (typeof key !== 'string' || (index = parseArrayIndex(key)) === -1) {
       return target[key as keyof typeof target];
     } else {
       return target.item(index);

@@ -26,7 +26,7 @@ export { Document } from './Document.js';
 export { DocumentFragment } from './DocumentFragment.js';
 export { DocumentType } from './DocumentType.js';
 export { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
-export { Element, type InsertPosition, type Attributes } from './Element.js';
+export { Element, type InsertPosition } from './Element.js';
 export { Node } from './Node.js';
 export { NodeFilter } from './NodeFilter.js';
 export { NodeList } from './NodeList.js';

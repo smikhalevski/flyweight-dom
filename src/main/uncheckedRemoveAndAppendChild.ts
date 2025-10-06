@@ -10,6 +10,7 @@ export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: Insertab
 
     while (nodeChild !== null) {
       const { nextSibling } = nodeChild;
+
       uncheckedAppendChild(parent, nodeChild);
       nodeChild = nextSibling;
     }
@@ -23,5 +24,6 @@ export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: Insertab
   if (parentNode !== null) {
     uncheckedRemoveChild(parentNode, node);
   }
+
   uncheckedAppendChild(parent, node);
 }

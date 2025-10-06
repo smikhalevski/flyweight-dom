@@ -7,13 +7,6 @@ import { DOMTokenList } from './DOMTokenList.js';
 import { Text } from './Text.js';
 
 /**
- * @group Nodes
- */
-export interface Attributes {
-  [name: string]: string;
-}
-
-/**
  * @group Other
  */
 export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
@@ -23,36 +16,29 @@ export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'after
  * @group Nodes
  */
 export class Element extends ParentNode(ChildNode()) {
-  readonly nodeName: string;
   readonly nodeType: number = Node.ELEMENT_NODE;
-
-  /**
-   * @see [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) on MDN
-   */
-  readonly tagName: string;
-
-  private _attributes: Attributes | undefined = undefined;
+  readonly nodeName: string;
 
   /**
    * @see [Element.id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) on MDN
    */
   get id(): string {
-    return this.getAttribute('id') || '';
+    return this.attributes.id || '';
   }
 
   set id(value: string) {
-    this.setAttribute('id', value);
+    this.attributes.id = value;
   }
 
   /**
    * @see [Element.className](https://developer.mozilla.org/en-US/docs/Web/API/Element/className) on MDN
    */
   get className(): string {
-    return this.getAttribute('class') || '';
+    return this.attributes.class || '';
   }
 
   set className(value: string) {
-    this.setAttribute('class', value);
+    this.attributes.class = value;
   }
 
   /**
@@ -61,27 +47,14 @@ export class Element extends ParentNode(ChildNode()) {
   get classList(): DOMTokenList {
     const tokenList = new DOMTokenList({
       get: () => {
-        return this.getAttribute('class') || '';
+        return this.attributes.class || '';
       },
       set: value => {
-        this.setAttribute('class', value);
+        this.attributes.class = value;
       },
     });
 
-    Object.defineProperty(this, 'classList', { value: tokenList });
-
-    return tokenList;
-  }
-
-  /**
-   * Map from an attribute name to an attribute value. If an attribute is absent then value is `undefined`.
-   */
-  get attributes(): Attributes {
-    return this._attributes === undefined ? (this._attributes = {}) : this._attributes;
-  }
-
-  set attributes(value: Attributes) {
-    this._attributes = value;
+    return Object.defineProperty(this, 'classList', { value: tokenList }).classList;
   }
 
   get textContent(): string | null {
@@ -95,20 +68,25 @@ export class Element extends ParentNode(ChildNode()) {
   /**
    * Creates a new instance of {@link Element}.
    */
-  constructor(tagName: string, attributes?: Attributes) {
+  constructor(
+    /**
+     * @see [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) on MDN
+     */
+    readonly tagName: string,
+    /**
+     * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
+     */
+    readonly attributes: Record<string, string> = {}
+  ) {
     super();
-    this.nodeName = this.tagName = tagName;
-    this._attributes = attributes;
+    this.nodeName = tagName;
   }
 
   /**
    * @see [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) on MDN
    */
   setAttribute(name: string, value: string): this {
-    if (this._attributes === undefined) {
-      this._attributes = {};
-    }
-    this._attributes[name] = '' + value;
+    this.attributes[name] = value;
     return this;
   }
 
@@ -116,23 +94,21 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.getAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute) on MDN
    */
   getAttribute(name: string): string | null {
-    return this._attributes !== undefined && this._attributes[name] !== undefined ? this._attributes[name] : null;
+    return this.attributes[name] ?? null;
   }
 
   /**
    * @see [Element.hasAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute) on MDN
    */
   hasAttribute(name: string): boolean {
-    return this._attributes !== undefined && this._attributes[name] !== undefined;
+    return this.attributes[name] !== undefined;
   }
 
   /**
    * @see [Element.removeAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttribute) on MDN
    */
   removeAttribute(name: string): this {
-    if (this._attributes !== undefined) {
-      delete this._attributes[name];
-    }
+    delete this.attributes[name];
     return this;
   }
 
@@ -160,7 +136,7 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.getAttributeNames](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames) on MDN
    */
   getAttributeNames(): string[] {
-    return this._attributes !== undefined ? Object.keys(this._attributes) : [];
+    return Object.keys(this.attributes);
   }
 
   /**
@@ -174,7 +150,7 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.insertAdjacentText](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText) on MDN
    */
   insertAdjacentText(position: InsertPosition, data: string): void {
-    for (let i = 0, dataLength = data.length; i < dataLength; ++i) {
+    for (let i = 0; i < data.length; ++i) {
       if (!isSpaceChar(data.charCodeAt(i))) {
         insertAdjacentNode(this, position, new Text(data));
         break;
@@ -186,13 +162,14 @@ export class Element extends ParentNode(ChildNode()) {
     return (
       isEqualConstructor(this, otherNode) &&
       this.tagName === otherNode.tagName &&
-      isEqualAttributes(this._attributes, otherNode._attributes) &&
+      isEqualAttributes(this.attributes, otherNode.attributes) &&
       isEqualChildNodes(this, otherNode)
     );
   }
 
   cloneNode(deep?: boolean): Element {
-    const node = new Element(this.tagName, Object.assign({}, this._attributes));
+    const node = new Element(this.tagName);
+
     if (deep) {
       uncheckedCloneChildren(this, node);
     }
@@ -200,49 +177,49 @@ export class Element extends ParentNode(ChildNode()) {
   }
 }
 
-function isEqualAttributes(attrs: Attributes | undefined, otherAttrs: Attributes | undefined): boolean {
-  if (attrs === undefined) {
-    return otherAttrs === undefined || Object.keys(otherAttrs).length === 0;
-  }
-  if (otherAttrs === undefined) {
-    return Object.keys(attrs).length === 0;
-  }
-  let attributeCount = 0;
+function isEqualAttributes(attrs: Record<string, string>, otherAttrs: Record<string, string>): boolean {
+  let attrsCount = 0;
 
   for (const key in attrs) {
-    ++attributeCount;
+    ++attrsCount;
 
     if (attrs[key] !== otherAttrs[key]) {
       return false;
     }
   }
-  return Object.keys(otherAttrs).length === attributeCount;
+
+  return attrsCount === Object.keys(otherAttrs).length;
 }
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {
-  if (position === 'beforeBegin') {
-    if (element.parentNode === null) {
-      return null;
-    }
-    element.before(node);
-    return node;
+  switch (position) {
+    case 'beforeBegin':
+      if (element.parentNode === null) {
+        return null;
+      }
+      element.before(node);
+      break;
+
+    case 'afterBegin':
+      element.prepend(node);
+      break;
+
+    case 'beforeEnd':
+      element.append(node);
+      break;
+
+    case 'afterEnd':
+      if (element.parentNode === null) {
+        return null;
+      }
+      element.after(node);
+      break;
+
+    default:
+      throw new Error(
+        "The value provided ('" + position + "') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'"
+      );
   }
-  if (position === 'afterBegin') {
-    element.prepend(node);
-    return node;
-  }
-  if (position === 'beforeEnd') {
-    element.append(node);
-    return node;
-  }
-  if (position === 'afterEnd') {
-    if (element.parentNode === null) {
-      return null;
-    }
-    element.after(node);
-    return node;
-  }
-  throw new Error(
-    "The value provided ('" + position + "') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'"
-  );
+
+  return node;
 }

@@ -15,13 +15,13 @@ npm install --save-prod flyweight-dom
 The extremely fast DOM implementation.
 
 - DOM can be extended with custom nodes;
-- Low memory consumption;
+- Low memory consumption, minimal amount of allocations;
 - Zero dependencies;
 - [4 kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
 
 # Usage
 
-🔎 [API documentation is available here.](https://smikhalevski.github.io/flyweight-dom/)
+🔰 [API documentation is available here.](https://smikhalevski.github.io/flyweight-dom/)
 
 The implementation provides classes for all DOM nodes:
 
@@ -36,12 +36,15 @@ element.getAttribute('class');
 // ⮕ 'red'
 ```
 
-Use DSL to streamlines DOM authoring:
+Use DSL streamline DOM authoring:
 
 ```ts
 import dsl from 'flyweight-dom/dsl';
 
 const element = dsl.div({ class: 'red' }, 'Hello, ', dsl.strong('world!'));
+
+element.className;
+// ⮕ 'red'
 
 element.textContent;
 // ⮕ 'Hello, world!'
@@ -69,30 +72,34 @@ element.firstChild;
 ```
 
 Custom nodes can extend
-[`ChildNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/flyweight_dom.ChildNode.html) and
-[`ParenNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/flyweight_dom.ParenNode.html):
+[`ChildNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/flyweight-dom.ChildNode.html) and
+[`ParentNode`](https://smikhalevski.github.io/flyweight-dom/interfaces/flyweight-dom.ParentNode.html):
 
 ```ts
 import { Node, ChildNode, ParentNode } from 'flyweight-dom';
 
-class MyNode extends ChildNode(ParentNode()) {
+class MyNode extends ParentNode(ChildNode()) {
   readonly nodeName = '#my-node';
   readonly nodeType = 100;
 }
 
-new MyNode() instanceof ParentNode();
-// ✅ true
-
-new MyNode() instanceof ChildNode(ParentNode());
-// ✅ true
-
 new MyNode() instanceof ChildNode();
+// ✅ true
+
+new MyNode() instanceof ParentNode(ChildNode());
+// ✅ true
+
+new MyNode() instanceof ParentNode();
 // ❌ false
 ```
 
 # Performance considerations
 
-For better performance, prefer `nextSibling` and `previousSibling` over `childNodes` and `children` whenever possible.
+For better performance, prefer
+[`nextSibling`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#nextsibling)
+and [`previousSibling`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#previoussiblingg)
+over [`childNodes`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#childnodesg)
+and [`children`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#children):
 
 ```ts
 for (let child = node.firstChild; child !== null; child = child.nextSibling) {
@@ -100,6 +107,6 @@ for (let child = node.firstChild; child !== null; child = child.nextSibling) {
 }
 ```
 
-When you read the `childNodes` or `children` properties for the first time an array of nodes is created and then stored
-on the node instance. Later when you modify child nodes using `appendChild`, `removeChild` or any other method, these
-arrays are updated which may introduce a performance impact.
+When the `childNodes` or `children` properties are accessed for the first time,
+a [`NodeList`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.NodeList.html) is created and then
+stored on the node instance.

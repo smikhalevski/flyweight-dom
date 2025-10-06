@@ -14,21 +14,6 @@ export class TreeWalker {
   currentNode: Node;
 
   /**
-   * @see [TreeWalker.root](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/root) on MDN
-   */
-  readonly root: Node;
-
-  /**
-   * @see [TreeWalker.whatToShow](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow) on MDN
-   */
-  readonly whatToShow: number;
-
-  /**
-   * @see [TreeWalker.filter](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter) on MDN
-   */
-  readonly filter: NodeFilter | null;
-
-  /**
    * Creates a new {@link TreeWalker} instance.
    *
    * @param root A root {@link Node} of this {@link TreeWalker} traversal.
@@ -37,10 +22,23 @@ export class TreeWalker {
    * @param filter A {@link NodeFilter}, that is an object with a method `acceptNode`, which is called by the
    * {@link TreeWalker} to determine whether to accept a node that has passed the `whatToShow` check.
    */
-  constructor(root: Node, whatToShow?: number, filter: NodeFilter | null = null) {
-    this.currentNode = this.root = root;
-    this.whatToShow = whatToShow !== undefined ? whatToShow : NodeFilter.SHOW_ALL;
-    this.filter = filter;
+  constructor(
+    /**
+     * @see [TreeWalker.root](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/root) on MDN
+     */
+    readonly root: Node,
+
+    /**
+     * @see [TreeWalker.whatToShow](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow) on MDN
+     */
+    readonly whatToShow: number = NodeFilter.SHOW_ALL,
+
+    /**
+     * @see [TreeWalker.filter](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter) on MDN
+     */
+    readonly filter: NodeFilter | null = null
+  ) {
+    this.currentNode = root;
   }
 
   /**
@@ -58,6 +56,7 @@ export class TreeWalker {
         return (this.currentNode = node);
       }
     }
+
     return null;
   }
 
@@ -77,6 +76,7 @@ export class TreeWalker {
       if (result === NodeFilter.FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
+
       if (result === NodeFilter.FILTER_SKIP && (candidate = node.firstChild) !== null) {
         node = candidate;
         continue;
@@ -87,13 +87,16 @@ export class TreeWalker {
           node = candidate;
           break;
         }
+
         if ((candidate = node.parentNode) !== null && candidate !== root && candidate !== currentNode) {
           node = candidate;
           continue;
         }
+
         return null;
       }
     }
+
     return null;
   }
 
@@ -113,6 +116,7 @@ export class TreeWalker {
       if (result === NodeFilter.FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
+
       if (result === NodeFilter.FILTER_SKIP && (candidate = node.lastChild) !== null) {
         node = candidate;
         continue;
@@ -123,13 +127,16 @@ export class TreeWalker {
           node = candidate;
           break;
         }
+
         if ((candidate = node.parentNode) !== null && candidate !== root && candidate !== currentNode) {
           node = candidate;
           continue;
         }
+
         return null;
       }
     }
+
     return null;
   }
 
@@ -157,14 +164,15 @@ export class TreeWalker {
         if (result === NodeFilter.FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
-        if (result === NodeFilter.FILTER_REJECT || (candidate = node.firstChild) == null) {
+
+        if (result === NodeFilter.FILTER_REJECT || (candidate = node.firstChild) === null) {
           candidate = node.nextSibling;
         }
       }
 
       candidate = node.parentNode;
 
-      if (candidate == null || candidate === root || filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
+      if (candidate === null || candidate === root || filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
         return null;
       }
 
@@ -196,14 +204,15 @@ export class TreeWalker {
         if (result === NodeFilter.FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
-        if (result === NodeFilter.FILTER_REJECT || (candidate = node.lastChild) == null) {
+
+        if (result === NodeFilter.FILTER_REJECT || (candidate = node.lastChild) === null) {
           candidate = node.previousSibling;
         }
       }
 
       candidate = node.parentNode;
 
-      if (candidate == null || candidate === root || filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
+      if (candidate === null || candidate === root || filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
         return null;
       }
 
@@ -235,6 +244,7 @@ export class TreeWalker {
         if (parent === root) {
           return null;
         }
+
         if ((candidate = parent.nextSibling) !== null) {
           node = candidate;
           break;
@@ -271,14 +281,17 @@ export class TreeWalker {
         }
       }
 
-      if (node === root || (candidate = node.parentNode) == null) {
+      if (node === root || (candidate = node.parentNode) === null) {
         break;
       }
+
       if (filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
         return (this.currentNode = candidate);
       }
+
       node = candidate;
     }
+
     return null;
   }
 }
@@ -291,6 +304,7 @@ export function filterNode(treeWalker: TreeWalker, node: Node): number {
   if ((((1 << node.nodeType) >> 1) & treeWalker.whatToShow) === 0) {
     return NodeFilter.FILTER_SKIP;
   }
+
   if (filter !== null) {
     result = typeof filter === 'function' ? filter(node) : filter.acceptNode(node);
 
@@ -298,5 +312,6 @@ export function filterNode(treeWalker: TreeWalker, node: Node): number {
       return result;
     }
   }
+
   return NodeFilter.FILTER_ACCEPT;
 }

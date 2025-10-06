@@ -39,9 +39,9 @@ element.getAttribute('class');
 Use DSL streamline DOM authoring:
 
 ```ts
-import dsl from 'flyweight-dom/dsl';
+import { f } from 'flyweight-dom/dsl';
 
-const element = dsl.div({ class: 'red' }, 'Hello, ', dsl.strong('world!'));
+const element = f.div({ class: 'red' }, 'Hello, ', f.strong('world!'));
 
 element.className;
 // ⮕ 'red'

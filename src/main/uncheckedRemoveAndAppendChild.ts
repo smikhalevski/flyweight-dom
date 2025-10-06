@@ -1,7 +1,7 @@
+import type { ParentNode } from './ParentNode.js';
+import type { InsertableNode } from './uncheckedToInsertableNode.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
-import { ParentNode } from './ParentNode.js';
-import { InsertableNode } from './uncheckedToInsertableNode.js';
 import { isDocumentFragment } from './utils.js';
 
 export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {

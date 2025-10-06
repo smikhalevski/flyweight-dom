@@ -1,14 +1,14 @@
-import { Node } from './Node.js';
 import { ParentNode } from './ParentNode.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { getTextContent, setTextContent } from './utils.js';
+import { getTextContent, setTextContent } from './Text.js';
+import { DOCUMENT_FRAGMENT_NODE } from './utils.js';
 
 /**
  * @see [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) on MDN
  * @group Nodes
  */
 export class DocumentFragment extends ParentNode() {
-  readonly nodeType: number = Node.DOCUMENT_FRAGMENT_NODE;
+  readonly nodeType: number = DOCUMENT_FRAGMENT_NODE;
   readonly nodeName: string = '#document-fragment';
 
   get textContent(): string | null {

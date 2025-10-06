@@ -1,10 +1,10 @@
+import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { Element } from './Element.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
 import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
 
 /**
  * The node that can be a child of another node.
@@ -76,11 +76,11 @@ export function ChildNode(constructor: new () => Node = Node) {
     declare readonly nodeName: string;
 
     get previousElementSibling(): Element | null {
-      return getPreviousSiblingOrSelf(this.previousSibling, Node.ELEMENT_NODE) as Element | null;
+      return getPreviousSiblingOrSelf(this.previousSibling, ELEMENT_NODE) as Element | null;
     }
 
     get nextElementSibling(): Element | null {
-      return getNextSiblingOrSelf(this.nextSibling, Node.ELEMENT_NODE) as Element | null;
+      return getNextSiblingOrSelf(this.nextSibling, ELEMENT_NODE) as Element | null;
     }
 
     after(/*...nodes: Array<Node | string>*/) {

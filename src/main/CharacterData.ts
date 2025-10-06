@@ -1,5 +1,5 @@
+import type { Node } from './Node.js';
 import { isEqualConstructor } from './utils.js';
-import { Node } from './Node.js';
 import { ChildNode } from './ChildNode.js';
 
 /**

@@ -1,6 +1,6 @@
+import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { Element } from './Element.js';
-import { getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.js';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
 import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
@@ -98,11 +98,11 @@ export function ParentNode(constructor: new () => Node = Node) {
     }
 
     get firstElementChild(): Element | null {
-      return getNextSiblingOrSelf(this.firstChild, Node.ELEMENT_NODE) as Element | null;
+      return getNextSiblingOrSelf(this.firstChild, ELEMENT_NODE) as Element | null;
     }
 
     get lastElementChild(): Element | null {
-      return getPreviousSiblingOrSelf(this.lastChild, Node.ELEMENT_NODE) as Element | null;
+      return getPreviousSiblingOrSelf(this.lastChild, ELEMENT_NODE) as Element | null;
     }
 
     appendChild<T extends Node>(node: T): T {

@@ -1,8 +1,8 @@
+import type { ParentNode } from './ParentNode.js';
+import type { ChildNode } from './ChildNode.js';
+import type { InsertableNode } from './uncheckedToInsertableNode.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
-import { ParentNode } from './ParentNode.js';
-import { ChildNode } from './ChildNode.js';
-import { InsertableNode } from './uncheckedToInsertableNode.js';
 import { isDocumentFragment } from './utils.js';
 
 export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {

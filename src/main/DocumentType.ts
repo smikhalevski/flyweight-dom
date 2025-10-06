@@ -1,13 +1,13 @@
-import { Node } from './Node.js';
+import type { Node } from './Node.js';
 import { ChildNode } from './ChildNode.js';
-import { isEqualConstructor } from './utils.js';
+import { DOCUMENT_TYPE_NODE, isEqualConstructor } from './utils.js';
 
 /**
  * @see [DocumentType](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
  * @group Nodes
  */
 export class DocumentType extends ChildNode() {
-  readonly nodeType: number = Node.DOCUMENT_TYPE_NODE;
+  readonly nodeType: number = DOCUMENT_TYPE_NODE;
   readonly nodeName: string;
 
   /**

@@ -2,9 +2,9 @@
  * The DSL that streamlines DOM authoring.
  *
  * ```ts
- * import dsl from 'flyweight-dom/dsl';
+ * import { f } from 'flyweight-dom/dsl';
  *
- * const element = dsl.div({ class: 'red' }, 'Hello, ', dsl.strong('world!'));
+ * const element = f.div({ class: 'red' }, 'Hello, ', f.strong('world!'));
  *
  * element.className;
  * // ⮕ 'red'
@@ -16,9 +16,9 @@
  * @module dsl
  */
 
-import { Element } from './Element.js';
 import { Node } from './Node.js';
 import { Text } from './Text.js';
+import { Element } from './Element.js';
 import { ParentNode } from './ParentNode.js';
 import { Document } from './Document.js';
 import { DocumentType } from './DocumentType.js';
@@ -164,6 +164,4 @@ function appendChild(parent: ParentNode, child: Child): void {
 /**
  * @group DSL
  */
-const dsl: DSL = new Proxy(nodeFactories, proxyHandler);
-
-export default dsl;
+export const f: DSL = new Proxy(nodeFactories, proxyHandler);

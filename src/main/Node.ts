@@ -1,7 +1,7 @@
-import { Element } from './Element.js';
-import { isEqualChildNodes, isEqualConstructor } from './utils.js';
-import { ChildNode } from './ChildNode.js';
-import { ParentNode } from './ParentNode.js';
+import type { Element } from './Element.js';
+import type { ChildNode } from './ChildNode.js';
+import type { ParentNode } from './ParentNode.js';
+import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
 import { uncheckedContains } from './uncheckedContains.js';
 import { NodeList } from './NodeList.js';
 
@@ -96,7 +96,7 @@ export class Node {
   get parentElement(): Element | null {
     let parent = this.parentNode;
 
-    while (parent !== null && parent.nodeType !== Node.ELEMENT_NODE) {
+    while (parent !== null && parent.nodeType !== ELEMENT_NODE) {
       parent = parent.parentNode;
     }
 

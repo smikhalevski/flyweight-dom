@@ -1,14 +1,17 @@
+import type { ParentNode } from './ParentNode.js';
+import type { Node } from './Node.js';
 import { CharacterData } from './CharacterData.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
-import { Node } from './Node.js';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
+import { TEXT_NODE } from './utils.js';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
  * @group Nodes
  */
 export class Text extends CharacterData {
-  readonly nodeType: number = Node.TEXT_NODE;
+  readonly nodeType: number = TEXT_NODE;
   readonly nodeName: string = '#text';
 
   /**
@@ -53,4 +56,24 @@ export class Text extends CharacterData {
     }
     return node;
   }
+}
+
+export function setTextContent(node: ParentNode, value: string | null): void {
+  while (node.firstChild !== null) {
+    uncheckedRemoveChild(node, node.firstChild);
+  }
+
+  if (value !== null && value.length !== 0) {
+    uncheckedAppendChild(node, new Text(value));
+  }
+}
+
+export function getTextContent(node: Node): string {
+  let value = '';
+
+  for (let child = node.firstChild; child !== null; child = child.nextSibling) {
+    value += child.textContent;
+  }
+
+  return value;
 }

@@ -1,17 +1,17 @@
 import { expect, test } from 'vitest';
 import { Document, Element, Text } from '../main/index.js';
-import dsl from '../main/dsl.js';
+import { f } from '../main/dsl.js';
 
 test('creates an document', () => {
-  const fragment = dsl.f(dsl.div(dsl.span({ className: 'xxx' }, 'yyy')));
+  const fragment = f.f(f.div(f.span({ className: 'xxx' }, 'yyy')));
 
-  const document = dsl.doc(dsl.doctype('html'), fragment);
+  const document = f.doc(f.doctype('html'), fragment);
 
   expect(document).toBeInstanceOf(Document);
 });
 
 test('creates an element', () => {
-  const element = dsl.span({ className: 'xxx' }, 'yyy');
+  const element = f.span({ className: 'xxx' }, 'yyy');
 
   expect(element).toBeInstanceOf(Element);
   expect(element.tagName).toBe('span');

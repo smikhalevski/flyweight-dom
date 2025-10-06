@@ -1,16 +1,17 @@
-import { Node } from './Node.js';
-import { ParentNode } from './ParentNode.js';
+import type { ParentNode } from './ParentNode.js';
+import type { ChildNode } from './ChildNode.js';
+import type { Node } from './Node.js';
 import { Text } from './Text.js';
-import { ChildNode } from './ChildNode.js';
 import { DocumentFragment } from './DocumentFragment.js';
 import { uncheckedContains } from './uncheckedContains.js';
+import { ATTRIBUTE_NODE, DOCUMENT_NODE } from './utils.js';
 
 export type InsertableNode = DocumentFragment | ChildNode;
 
 export function assertInsertableNode(parent: ParentNode, node: Node): asserts node is InsertableNode {
   const { nodeType } = node;
 
-  if (nodeType === Node.DOCUMENT_NODE || nodeType === Node.ATTRIBUTE_NODE) {
+  if (nodeType === DOCUMENT_NODE || nodeType === ATTRIBUTE_NODE) {
     throw new Error('Node cannot be a child');
   }
 

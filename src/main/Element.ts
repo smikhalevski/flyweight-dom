@@ -1,10 +1,10 @@
-import { Node } from './Node.js';
-import { getTextContent, isEqualChildNodes, isEqualConstructor, isSpaceChar, setTextContent } from './utils.js';
+import type { Node } from './Node.js';
+import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils.js';
 import { ChildNode } from './ChildNode.js';
 import { ParentNode } from './ParentNode.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
 import { DOMTokenList } from './DOMTokenList.js';
-import { Text } from './Text.js';
+import { getTextContent, setTextContent, Text } from './Text.js';
 
 /**
  * @group Other
@@ -16,7 +16,7 @@ export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'after
  * @group Nodes
  */
 export class Element extends ParentNode(ChildNode()) {
-  readonly nodeType: number = Node.ELEMENT_NODE;
+  readonly nodeType: number = ELEMENT_NODE;
   readonly nodeName: string;
 
   /**

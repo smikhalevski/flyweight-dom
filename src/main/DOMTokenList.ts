@@ -172,13 +172,7 @@ export class DOMTokenList {
   }
 }
 
-function getTokens(tokenList: DOMTokenList): string[] {
-  let value = tokenList['_valueAccessor'].get();
-
-  if (value === tokenList['_tokenizedValue'] && tokenList['_tokens'] !== undefined) {
-    return tokenList['_tokens'];
-  }
-
+export function splitTokens(value: string): string[] {
   value = value.trim();
 
   const tokens = value.length === 0 ? [] : value.split(SEPARATOR_REGEX);
@@ -191,6 +185,18 @@ function getTokens(tokenList: DOMTokenList): string[] {
       tokens.splice(j, 1);
     }
   }
+
+  return tokens;
+}
+
+function getTokens(tokenList: DOMTokenList): string[] {
+  let value = tokenList['_valueAccessor'].get();
+
+  if (value === tokenList['_tokenizedValue'] && tokenList['_tokens'] !== undefined) {
+    return tokenList['_tokens'];
+  }
+
+  const tokens = splitTokens(value);
 
   tokenList['_tokenizedValue'] = value;
   tokenList['_tokens'] = tokens;

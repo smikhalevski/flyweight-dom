@@ -34,3 +34,7 @@ export { ParentNode } from './ParentNode.js';
 export { ProcessingInstruction } from './ProcessingInstruction.js';
 export { Text } from './Text.js';
 export { TreeWalker } from './TreeWalker.js';
+export { getElementById } from './getElementById.js';
+export { getElementsByClassName } from './getElementsByClassName.js';
+export { getElementsByName } from './getElementsByName.js';
+export { getElementsByTagName } from './getElementsByTagName.js';

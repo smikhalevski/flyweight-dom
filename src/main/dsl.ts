@@ -13,7 +13,7 @@
  * // ⮕ 'Hello, world!'
  * ```
  *
- * @module dsl
+ * @module flyweight-dom/dsl
  */
 
 import { Node } from './Node.js';

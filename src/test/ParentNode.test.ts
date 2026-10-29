@@ -323,3 +323,11 @@ describe('replaceChildren', () => {
     expect(parent.childNodes.length).toBe(1);
   });
 });
+
+describe('Symbol.iterator', () => {
+  test('yields child nodes', () => {
+    const node = new Element('aaa').append('text1', 'text2');
+
+    expect(Array.from(node)).toEqual([node.childNodes[0], node.childNodes[1]]);
+  });
+});

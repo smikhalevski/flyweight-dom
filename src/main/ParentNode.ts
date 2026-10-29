@@ -14,7 +14,7 @@ import { NodeList } from './NodeList.js';
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
  * @group Nodes
  */
-export interface ParentNode extends Node {
+export interface ParentNode extends Node, Iterable<ChildNode> {
   /**
    * @see [Element.children](https://developer.mozilla.org/en-US/docs/Web/API/Element/children) on MDN
    */
@@ -198,6 +198,12 @@ export function ParentNode(constructor: new () => Node = Node) {
 
     cloneNode(deep?: boolean): ParentNode {
       return super.cloneNode(deep) as ParentNode;
+    }
+
+    *[Symbol.iterator](): Iterator<ChildNode> {
+      for (let child = this.firstChild; child !== null; child = child.nextSibling) {
+        yield child;
+      }
     }
   };
 

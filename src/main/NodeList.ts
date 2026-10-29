@@ -5,7 +5,7 @@ import type { ChildNode } from './ChildNode.js';
  * @see [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) on MDN
  * @group Other
  */
-export class NodeList<T extends ChildNode = ChildNode> {
+export class NodeList<T extends ChildNode = ChildNode> implements Iterable<T> {
   [index: number]: T;
 
   private _root;
@@ -62,7 +62,7 @@ export class NodeList<T extends ChildNode = ChildNode> {
     }
   }
 
-  [Symbol.iterator](): IterableIterator<T> {
+  [Symbol.iterator](): ArrayIterator<T> {
     return this.values();
   }
 }

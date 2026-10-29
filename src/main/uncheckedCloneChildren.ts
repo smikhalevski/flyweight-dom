@@ -1,5 +1,5 @@
-import type { ParentNode } from './ParentNode.js';
 import type { ChildNode } from './ChildNode.js';
+import type { ParentNode } from './ParentNode.js';
 
 export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: ParentNode): void {
   const { firstChild } = sourceParent;

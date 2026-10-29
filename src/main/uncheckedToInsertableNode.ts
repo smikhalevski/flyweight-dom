@@ -1,8 +1,8 @@
-import type { ParentNode } from './ParentNode.js';
 import type { ChildNode } from './ChildNode.js';
+import type { DocumentFragment } from './DocumentFragment.js';
 import type { Node } from './Node.js';
+import type { ParentNode } from './ParentNode.js';
 import { Text } from './Text.js';
-import { DocumentFragment } from './DocumentFragment.js';
 import { uncheckedContains } from './uncheckedContains.js';
 import { ATTRIBUTE_NODE, DOCUMENT_NODE } from './utils.js';
 

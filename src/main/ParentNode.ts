@@ -1,12 +1,12 @@
+import { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.js';
+import { NodeList } from './NodeList.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
-import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
-import { ChildNode } from './ChildNode.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { NodeList } from './NodeList.js';
+import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.js';
 
 /**
  * The node that can be a parent of another node.

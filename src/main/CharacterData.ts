@@ -1,6 +1,6 @@
+import { ChildNode } from './ChildNode.js';
 import type { Node } from './Node.js';
 import { isEqualConstructor } from './utils.js';
-import { ChildNode } from './ChildNode.js';
 
 /**
  * @see [CharacterData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData) on MDN

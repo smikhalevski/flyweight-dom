@@ -1,6 +1,6 @@
-import type { ParentNode } from './ParentNode.js';
-import type { Node } from './Node.js';
 import { CharacterData } from './CharacterData.js';
+import type { Node } from './Node.js';
+import type { ParentNode } from './ParentNode.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';

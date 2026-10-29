@@ -1,9 +1,9 @@
-import type { Element } from './Element.js';
 import type { ChildNode } from './ChildNode.js';
-import type { ParentNode } from './ParentNode.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
-import { uncheckedContains } from './uncheckedContains.js';
+import type { Element } from './Element.js';
 import { NodeList } from './NodeList.js';
+import type { ParentNode } from './ParentNode.js';
+import { uncheckedContains } from './uncheckedContains.js';
+import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
 
 /**
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { Document, Element, Text } from '../main/index.js';
 import { f } from '../main/dsl.js';
+import { Document, Element, Text } from '../main/index.js';
 
 test('creates an document', () => {
   const fragment = f.f(f.div(f.span({ className: 'xxx' }, 'yyy')));

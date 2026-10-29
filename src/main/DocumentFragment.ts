@@ -1,6 +1,6 @@
 import { ParentNode } from './ParentNode.js';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
 import { getTextContent, setTextContent } from './Text.js';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
 import { DOCUMENT_FRAGMENT_NODE } from './utils.js';
 
 /**

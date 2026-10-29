@@ -1,8 +1,8 @@
-import type { Element } from './Element.js';
 import type { DocumentType } from './DocumentType.js';
+import type { Element } from './Element.js';
 import { ParentNode } from './ParentNode.js';
-import { DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ELEMENT_NODE, getNextSiblingOrSelf } from './utils.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
+import { DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ELEMENT_NODE, getNextSiblingOrSelf } from './utils.js';
 
 /**
  * @see [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document) on MDN

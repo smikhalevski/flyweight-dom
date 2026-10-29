@@ -1,5 +1,5 @@
-import type { ParentNode } from './ParentNode.js';
 import type { ChildNode } from './ChildNode.js';
+import type { ParentNode } from './ParentNode.js';
 
 export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
   const { previousSibling, nextSibling } = child;

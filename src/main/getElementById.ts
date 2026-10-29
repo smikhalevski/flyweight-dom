@@ -1,7 +1,7 @@
 import { Element } from './Element.js';
 import { Node } from './Node.js';
-import { TreeWalker } from './TreeWalker.js';
 import { NodeFilter } from './NodeFilter.js';
+import { TreeWalker } from './TreeWalker.js';
 
 /**
  * Returns an element whose `id` property matches the specified string.
@@ -14,7 +14,7 @@ import { NodeFilter } from './NodeFilter.js';
 export function getElementById(root: Node, id: string): Element | null {
   const treeWalker = new TreeWalker(root, NodeFilter.SHOW_ELEMENT);
 
-  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null; ) {
+  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
     if (element.id === id) {
       return element;
     }

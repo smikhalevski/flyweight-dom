@@ -96,17 +96,25 @@ new MyNode() instanceof ParentNode();
 # Performance considerations
 
 For better performance, prefer
-[`nextSibling`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#nextsibling)
-and [`previousSibling`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#previoussiblingg)
-over [`childNodes`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#childnodesg)
-and [`children`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#children):
+[`nextSibling`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#nextsibling) and
+[`previousSibling`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#previoussiblingg)
+over [`childNodes`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#childnodesg) and
+[`children`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.Element.html#children):
 
 ```ts
-for (let child = node.firstChild; child !== null; child = child.nextSibling) {
+for (let child = parent.firstChild; child !== null; child = child.nextSibling) {
   // Process the child
 }
 ```
 
-When the `childNodes` or `children` properties are accessed for the first time,
-a [`NodeList`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.NodeList.html) is created and then
+Or use the iterator:
+
+```ts
+for (const child of parent) {
+  // Process the child
+}
+```
+
+When the `childNodes` or `children` properties are accessed for the first time, a
+[`NodeList`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom.NodeList.html) is created and then
 stored on the node instance.

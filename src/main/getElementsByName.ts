@@ -1,7 +1,7 @@
 import { Element } from './Element.js';
 import { Node } from './Node.js';
-import { TreeWalker } from './TreeWalker.js';
 import { NodeFilter } from './NodeFilter.js';
+import { TreeWalker } from './TreeWalker.js';
 
 /**
  * Returns an array elements which `name` property matches the specified string.
@@ -15,7 +15,7 @@ export function getElementsByName(root: Node, name: string): Element[] {
   const treeWalker = new TreeWalker(root, NodeFilter.SHOW_ELEMENT);
   const elements = [];
 
-  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null; ) {
+  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
     if (element.attributes.name === name) {
       elements.push(element);
     }

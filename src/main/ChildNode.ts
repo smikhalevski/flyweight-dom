@@ -2,8 +2,8 @@ import type { Element } from './Element.js';
 import { Node } from './Node.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
-import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
+import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
 import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
 
 /**

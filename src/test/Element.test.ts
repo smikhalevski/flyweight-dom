@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { DOMTokenList, Element, Node, Text } from '../main/index.js';
 import { InsertPosition } from '../main/Element.js';
+import { DOMTokenList, Element, Node, Text } from '../main/index.js';
 
 test('creates an Element instance', () => {
   const node = new Element('aaa');

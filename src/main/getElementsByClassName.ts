@@ -1,8 +1,8 @@
-import { Node } from './Node.js';
-import { Element } from './Element.js';
-import { TreeWalker } from './TreeWalker.js';
-import { NodeFilter } from './NodeFilter.js';
 import { splitTokens } from './DOMTokenList.js';
+import { Element } from './Element.js';
+import { Node } from './Node.js';
+import { NodeFilter } from './NodeFilter.js';
+import { TreeWalker } from './TreeWalker.js';
 
 /**
  * Returns an array elements which have all of the given class name(s).
@@ -22,7 +22,7 @@ export function getElementsByClassName(root: Node, className: string): Element[]
   const treeWalker = new TreeWalker(root, NodeFilter.SHOW_ELEMENT);
   const elements = [];
 
-  nextNode: for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null; ) {
+  nextNode: for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
     for (let i = 0; i < classNames.length; ++i) {
       if (!element.classList.contains(classNames[i])) {
         continue nextNode;

@@ -1,6 +1,6 @@
-import type { Node } from './Node.js';
-import type { Element } from './Element.js';
 import type { DocumentFragment } from './DocumentFragment.js';
+import type { Element } from './Element.js';
+import type { Node } from './Node.js';
 
 export const ELEMENT_NODE: number = 1;
 export const ATTRIBUTE_NODE: number = 2;

@@ -1,10 +1,10 @@
-import type { Node } from './Node.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils.js';
 import { ChildNode } from './ChildNode.js';
-import { ParentNode } from './ParentNode.js';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
 import { DOMTokenList } from './DOMTokenList.js';
+import type { Node } from './Node.js';
+import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
+import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils.js';
 
 /**
  * @group Other

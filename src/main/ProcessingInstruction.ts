@@ -1,5 +1,5 @@
-import { Node } from './Node.js';
 import { CharacterData } from './CharacterData.js';
+import { Node } from './Node.js';
 import { isEqualConstructor, PROCESSING_INSTRUCTION_NODE } from './utils.js';
 
 /**

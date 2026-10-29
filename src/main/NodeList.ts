@@ -1,5 +1,5 @@
-import type { Node } from './Node.js';
 import type { ChildNode } from './ChildNode.js';
+import type { Node } from './Node.js';
 
 /**
  * @see [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) on MDN

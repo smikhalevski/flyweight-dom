@@ -16,21 +16,16 @@
  * @module flyweight-dom/dsl
  */
 
-import { Node } from './Node.js';
-import { Text } from './Text.js';
-import { Element } from './Element.js';
-import { ParentNode } from './ParentNode.js';
-import { Document } from './Document.js';
-import { DocumentType } from './DocumentType.js';
-import { DocumentFragment } from './DocumentFragment.js';
-import { ProcessingInstruction } from './ProcessingInstruction.js';
-import { Comment } from './Comment.js';
 import { CDATASection } from './CDATASection.js';
-
-/**
- * @group DSL
- */
-export type DSL = NodeFactories & ElementFactories;
+import { Comment } from './Comment.js';
+import { Document } from './Document.js';
+import { DocumentFragment } from './DocumentFragment.js';
+import { DocumentType } from './DocumentType.js';
+import { Element } from './Element.js';
+import { Node } from './Node.js';
+import { ParentNode } from './ParentNode.js';
+import { ProcessingInstruction } from './ProcessingInstruction.js';
+import { Text } from './Text.js';
 
 /**
  * @group DSL
@@ -164,4 +159,4 @@ function appendChild(parent: ParentNode, child: Child): void {
 /**
  * @group DSL
  */
-export const f: DSL = new Proxy(nodeFactories, proxyHandler);
+export const f: NodeFactories & ElementFactories = new Proxy(nodeFactories, proxyHandler);

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { ChildNode, Document, Element, Node, ParentNode, Text } from '../main/index.js';
+import { getChildNodes } from './utils.js';
 
 test('returns the cached constructor', () => {
   expect(ParentNode()).toBe(ParentNode());
@@ -72,15 +73,27 @@ describe('appendChild', () => {
 });
 
 describe('insertBefore', () => {
-  test('inserts a node as the first child', () => {
+  test('appends a node if child is null', () => {
     const parent = new Element('aaa');
-    const text = new Text('text');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
 
-    parent.insertBefore(text, null);
+    parent.appendChild(text1);
+    parent.insertBefore(text2, null);
 
-    expect(text.parentNode).toBe(parent);
-    expect(parent.firstChild).toBe(text);
-    expect(parent.lastChild).toBe(text);
+    expect(getChildNodes(parent)).toEqual([text1, text2]);
+  });
+
+  test('does not move a node inserted before itself', () => {
+    const parent = new Element('aaa');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+    const text3 = new Text('text3');
+
+    parent.append(text1, text2, text3);
+    parent.insertBefore(text2, text2);
+
+    expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
   });
 
   test('throws if parent does not contain a child', () => {
@@ -166,6 +179,31 @@ describe('replaceChild', () => {
     expect(() => parent.replaceChild(text2, text1)).toThrow(
       new Error('The node to be replaced is not a child of this node')
     );
+  });
+
+  test('does not move a child replaced with itself', () => {
+    const parent = new Element('aaa');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+    const text3 = new Text('text3');
+
+    parent.append(text1, text2, text3);
+    parent.replaceChild(text2, text2);
+
+    expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
+  });
+
+  test('replaces a child with its next sibling', () => {
+    const parent = new Element('aaa');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+    const text3 = new Text('text3');
+
+    parent.append(text1, text2, text3);
+    parent.replaceChild(text2, text1);
+
+    expect(text1.parentNode).toBeNull();
+    expect(getChildNodes(parent)).toEqual([text2, text3]);
   });
 });
 
@@ -286,6 +324,17 @@ describe('prepend', () => {
     expect(parent.firstChild).toBe(text2);
     expect(parent.lastChild).toBe(text1);
   });
+
+  test('prepends the first child', () => {
+    const parent = new Element('aaa');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+
+    parent.append(text1, text2);
+    parent.prepend(text2, text1);
+
+    expect(getChildNodes(parent)).toEqual([text2, text1]);
+  });
 });
 
 describe('replaceChildren', () => {
@@ -321,6 +370,29 @@ describe('replaceChildren', () => {
     expect(parent.lastChild).toBe(child2);
     expect(parent.children.length).toBe(1);
     expect(parent.childNodes.length).toBe(1);
+  });
+
+  test('detaches all previous children', () => {
+    const parent = new Element('aaa');
+    const child1 = new Element('bbb');
+    const child2 = new Element('ccc');
+
+    parent.append(child1, child2);
+    parent.replaceChildren();
+
+    expect(child2.parentNode).toBeNull();
+    expect(child2.previousSibling).toBeNull();
+  });
+
+  test('inserts previous children in the given order', () => {
+    const parent = new Element('aaa');
+    const child1 = new Element('bbb');
+    const child2 = new Element('ccc');
+
+    parent.append(child1, child2);
+    parent.replaceChildren(child2, child1);
+
+    expect(getChildNodes(parent)).toEqual([child2, child1]);
   });
 });
 

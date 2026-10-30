@@ -1,10 +1,11 @@
 import { CharacterData } from './CharacterData.js';
+import type { ChildNode } from './ChildNode.js';
 import type { Node } from './Node.js';
 import type { ParentNode } from './ParentNode.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { TEXT_NODE } from './utils.js';
+import { assertOffset, ELEMENT_NODE, isText, TEXT_NODE } from './utils.js';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
@@ -18,17 +19,16 @@ export class Text extends CharacterData {
    * @see [Text.wholeText](https://developer.mozilla.org/en-US/docs/Web/API/Text/wholeText) on MDN
    */
   get wholeText(): string {
-    const { nodeType } = this;
-
     let text: Text = this;
 
-    for (let node = text.previousSibling; node !== null && node.nodeType === nodeType; node = node.previousSibling) {
-      text = node as Text;
+    // CDATASection is a Text too, so adjacent text and CDATA sections are joined
+    for (let node = this.previousSibling; node !== null && isText(node); node = node.previousSibling) {
+      text = node;
     }
 
     let str = '';
 
-    for (let node: Text | null = text; node !== null && node.nodeType === nodeType; node = node.nextSibling as Text) {
+    for (let node: ChildNode | null = text; node !== null && isText(node); node = node.nextSibling) {
       str += node.data;
     }
 
@@ -40,6 +40,8 @@ export class Text extends CharacterData {
    */
   splitText(offset: number): this {
     const { data, parentNode, nextSibling } = this;
+
+    assertOffset(data, offset);
 
     this.data = data.substring(0, offset);
 
@@ -68,11 +70,18 @@ export function setTextContent(node: ParentNode, value: string | null): void {
   }
 }
 
+/**
+ * Returns the concatenated data of all text descendants, ignoring comments, processing instructions and doctypes.
+ */
 export function getTextContent(node: Node): string {
   let value = '';
 
   for (let child = node.firstChild; child !== null; child = child.nextSibling) {
-    value += child.textContent;
+    if (isText(child)) {
+      value += child.data;
+    } else if (child.nodeType === ELEMENT_NODE) {
+      value += getTextContent(child);
+    }
   }
 
   return value;

@@ -41,6 +41,6 @@ export class DocumentType extends ChildNode() {
   }
 
   cloneNode(deep?: boolean): DocumentType {
-    return new DocumentType(this.name, this.publicId, this.systemId);
+    return new (this.constructor as typeof DocumentType)(this.name, this.publicId, this.systemId);
   }
 }

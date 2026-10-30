@@ -1,6 +1,8 @@
+import type { ChildNode } from './ChildNode.js';
 import type { DocumentFragment } from './DocumentFragment.js';
 import type { Element } from './Element.js';
 import type { Node } from './Node.js';
+import type { Text } from './Text.js';
 
 export const ELEMENT_NODE: number = 1;
 export const ATTRIBUTE_NODE: number = 2;
@@ -34,9 +36,37 @@ export function getNextSiblingOrSelf(node: Node | null, nodeType: number): Node 
   return node;
 }
 
-// https://www.w3.org/TR/xml/#NT-S
+/**
+ * Returns the node or its first following sibling that isn't one of the given nodes.
+ *
+ * @see [Viable next sibling](https://dom.spec.whatwg.org/#dom-childnode-after)
+ */
+export function getViableNextSibling(node: ChildNode | null, nodes: ArrayLike<unknown>): ChildNode | null {
+  while (node !== null && Array.prototype.indexOf.call(nodes, node) !== -1) {
+    node = node.nextSibling;
+  }
+  return node;
+}
+
+export function isText(node: Node): node is Text {
+  return node.nodeType === TEXT_NODE || node.nodeType === CDATA_SECTION_NODE;
+}
+
+export function assertOffset(data: string, offset: number): void {
+  if (offset < 0 || offset > data.length) {
+    throw new Error('The offset ' + offset + ' is out of range');
+  }
+}
+
+// https://infra.spec.whatwg.org/#ascii-whitespace
 export function isSpaceChar(charCode: number): boolean {
-  return charCode == /* \s */ 32 || charCode === /* \n */ 10 || charCode === /* \t */ 9 || charCode === /* \r */ 13;
+  return (
+    charCode === /* \s */ 32 ||
+    charCode === /* \n */ 10 ||
+    charCode === /* \t */ 9 ||
+    charCode === /* \r */ 13 ||
+    charCode === /* \f */ 12
+  );
 }
 
 export function isEqualConstructor<T extends Node>(node: T, otherNode: Node | null | undefined): otherNode is T {

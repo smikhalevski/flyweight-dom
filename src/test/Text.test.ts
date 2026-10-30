@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { CharacterData, Node, Text } from '../main/index.js';
+import { CDATASection, CharacterData, Element, Node, Text } from '../main/index.js';
 
 test('creates a new Text instance', () => {
   const node = new Text();
@@ -35,6 +35,18 @@ test('splits a Text', () => {
 
   expect(node2).toBeInstanceOf(Text);
   expect(node2.data).toBe('bbb');
+});
+
+test('throws if split offset is out of range', () => {
+  expect(() => new Text('aaa').splitText(4)).toThrow('The offset 4 is out of range');
+});
+
+test('returns whole text of adjacent Text and CDATASection nodes', () => {
+  const text = new Text('bbb');
+
+  new Element('aaa').append(new CDATASection('ccc'), text, new Element('ddd'), 'eee');
+
+  expect(text.wholeText).toBe('cccbbb');
 });
 
 test('creates a new Text instance with data', () => {

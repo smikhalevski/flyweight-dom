@@ -55,3 +55,9 @@ test('setting textContent replaces children', () => {
   expect(fragment.textContent).toBe('ddd');
   expect(fragment.firstChild).toBeInstanceOf(Text);
 });
+
+test('clones an instance of a subclass', () => {
+  class MockDocumentFragment extends DocumentFragment {}
+
+  expect(new MockDocumentFragment().cloneNode()).toBeInstanceOf(MockDocumentFragment);
+});

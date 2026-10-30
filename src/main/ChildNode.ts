@@ -1,10 +1,9 @@
 import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
-import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
+import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertInsertable, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
+import { assertInsertable } from './uncheckedToInsertableNode.js';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, getViableNextSibling } from './utils.js';
 
 /**
  * The node that can be a child of another node.
@@ -84,7 +83,7 @@ export function ChildNode(constructor: new () => Node = Node) {
     }
 
     after(/*...nodes: Array<Node | string>*/) {
-      const { parentNode, nextSibling } = this;
+      const { parentNode } = this;
 
       if (parentNode === null) {
         return this;
@@ -94,16 +93,7 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      if (nextSibling !== null) {
-        for (let i = 0; i < arguments.length; ++i) {
-          uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), nextSibling);
-        }
-      } else {
-        for (let i = 0; i < arguments.length; ++i) {
-          uncheckedRemoveAndAppendChild(parentNode, uncheckedToInsertableNode(arguments[i]));
-        }
-      }
-
+      uncheckedInsertNodes(parentNode, arguments, getViableNextSibling(this.nextSibling, arguments));
       return this;
     }
 
@@ -118,10 +108,8 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      for (let i = 0; i < arguments.length; ++i) {
-        uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
-      }
-
+      // This node may be among inserted nodes, so insert before the first node that stays in place
+      uncheckedInsertNodes(parentNode, arguments, getViableNextSibling(this, arguments));
       return this;
     }
 
@@ -145,11 +133,10 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      for (let i = 0; i < arguments.length; ++i) {
-        uncheckedRemoveAndInsertBefore(parentNode, uncheckedToInsertableNode(arguments[i]), this);
-      }
+      const nextSibling = getViableNextSibling(this.nextSibling, arguments);
 
       uncheckedRemoveChild(parentNode, this);
+      uncheckedInsertNodes(parentNode, arguments, nextSibling);
       return this;
     }
 

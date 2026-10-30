@@ -13,3 +13,17 @@ test('returns the element with given class names', () => {
 
   expect(getElementsByClassName(root, 'aaa vvv')).toStrictEqual([root.childNodes[0]]);
 });
+
+test('does not create classList on visited elements', () => {
+  const root = f.doc(f.xxx({ class: 'aaa' }));
+
+  getElementsByClassName(root, 'aaa');
+
+  expect(Object.getOwnPropertyDescriptor(root.firstChild, 'classList')).toBeUndefined();
+});
+
+test('does not match a class name that is a part of another class name', () => {
+  const root = f.doc(f.xxx({ class: 'aaabbb bbbaaa' }));
+
+  expect(getElementsByClassName(root, 'aaa')).toStrictEqual([]);
+});

@@ -2,11 +2,18 @@ import { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
 import { Node } from './Node.js';
 import { NodeList } from './NodeList.js';
+import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.js';
+import { assertInsertable, assertInsertableNode } from './uncheckedToInsertableNode.js';
+import {
+  ELEMENT_NODE,
+  getNextSiblingOrSelf,
+  getPreviousSiblingOrSelf,
+  getViableNextSibling,
+  isElement,
+} from './utils.js';
 
 /**
  * The node that can be a parent of another node.
@@ -115,13 +122,19 @@ export function ParentNode(constructor: new () => Node = Node) {
       assertInsertableNode(this, node);
 
       if (child === null || child === undefined) {
-        child = this.firstChild;
-      } else if (child.parentNode !== this) {
+        uncheckedRemoveAndAppendChild(this, node);
+        return node;
+      }
+
+      if (child.parentNode !== this) {
         throw new Error('The node before which the new node is to be inserted is not a child of this node');
       }
 
-      if (child !== null) {
-        uncheckedRemoveAndInsertBefore(this, node, child as ChildNode);
+      // Inserting a node before itself is the same as inserting it before its next sibling
+      const referenceChild = child === node ? node.nextSibling : (child as ChildNode);
+
+      if (referenceChild !== null) {
+        uncheckedRemoveAndInsertBefore(this, node, referenceChild);
       } else {
         uncheckedRemoveAndAppendChild(this, node);
       }
@@ -144,8 +157,19 @@ export function ParentNode(constructor: new () => Node = Node) {
         throw new Error('The node to be replaced is not a child of this node');
       }
 
-      uncheckedRemoveAndInsertBefore(this, node, child as Node as ChildNode);
+      let { nextSibling } = child;
+
+      if (nextSibling === node) {
+        nextSibling = node.nextSibling;
+      }
+
       uncheckedRemoveChild(this, child as Node as ChildNode);
+
+      if (nextSibling !== null) {
+        uncheckedRemoveAndInsertBefore(this, node, nextSibling);
+      } else {
+        uncheckedRemoveAndAppendChild(this, node);
+      }
       return child;
     }
 
@@ -154,28 +178,16 @@ export function ParentNode(constructor: new () => Node = Node) {
         assertInsertable(this, arguments[i]);
       }
 
-      for (let i = 0; i < arguments.length; ++i) {
-        uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(arguments[i]));
-      }
+      uncheckedInsertNodes(this, arguments, null);
       return this;
     }
 
     prepend(/*...nodes: Array<Node | string>*/) {
-      const { firstChild } = this;
-
       for (let i = 0; i < arguments.length; ++i) {
         assertInsertable(this, arguments[i]);
       }
 
-      if (firstChild !== null) {
-        for (let i = 0; i < arguments.length; ++i) {
-          uncheckedRemoveAndInsertBefore(this, uncheckedToInsertableNode(arguments[i]), firstChild);
-        }
-      } else {
-        for (let i = 0; i < arguments.length; ++i) {
-          uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(arguments[i]));
-        }
-      }
+      uncheckedInsertNodes(this, arguments, getViableNextSibling(this.firstChild, arguments));
       return this;
     }
 
@@ -184,15 +196,16 @@ export function ParentNode(constructor: new () => Node = Node) {
         assertInsertable(this, arguments[i]);
       }
 
-      for (let child = this.firstChild; child !== null; child = child.nextSibling) {
+      for (let child = this.firstChild; child !== null;) {
+        const { nextSibling } = child;
+
         child.parentNode = child.previousSibling = child.nextSibling = null;
+        child = nextSibling;
       }
 
       this.firstChild = this.lastChild = null;
 
-      for (let i = 0; i < arguments.length; ++i) {
-        uncheckedRemoveAndAppendChild(this, uncheckedToInsertableNode(arguments[i]));
-      }
+      uncheckedInsertNodes(this, arguments, null);
       return this;
     }
 

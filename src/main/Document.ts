@@ -27,7 +27,7 @@ export class Document extends ParentNode() {
   }
 
   cloneNode(deep?: boolean): Document {
-    const node = new Document();
+    const node = new (this.constructor as typeof Document)();
 
     if (deep) {
       uncheckedCloneChildren(this, node);

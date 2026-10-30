@@ -33,3 +33,9 @@ test('clones a DocumentType instance', () => {
   expect(node.publicId).toBe('bbb');
   expect(node.systemId).toBe('ccc');
 });
+
+test('clones an instance of a subclass', () => {
+  class MockDocumentType extends DocumentType {}
+
+  expect(new MockDocumentType('aaa').cloneNode()).toBeInstanceOf(MockDocumentType);
+});

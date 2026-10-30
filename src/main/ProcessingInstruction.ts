@@ -24,6 +24,6 @@ export class ProcessingInstruction extends CharacterData {
   }
 
   cloneNode(deep?: boolean): ProcessingInstruction {
-    return new ProcessingInstruction(this.target, this.data);
+    return new (this.constructor as typeof ProcessingInstruction)(this.target, this.data);
   }
 }

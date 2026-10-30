@@ -85,6 +85,13 @@ test('deletes data', () => {
   expect(node.data).toBe('aab');
 });
 
+test('throws if offset is out of range', () => {
+  const node = new MockCharacterData();
+  node.data = 'aaa';
+
+  expect(() => node.deleteData(4, 1)).toThrow('The offset 4 is out of range');
+});
+
 test('replaces data', () => {
   const node = new MockCharacterData();
   node.data = 'aaabbb';

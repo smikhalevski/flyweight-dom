@@ -103,9 +103,12 @@ const nodeFactories: NodeFactories = {
   },
 };
 
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
 const proxyHandler: ProxyHandler<any> = {
   get(target, key, _receiver) {
-    if (typeof key === 'string' && !target.hasOwnProperty(key)) {
+    // Not target.hasOwnProperty, since it can be replaced by an element factory
+    if (typeof key === 'string' && !hasOwnProperty.call(target, key)) {
       target[key] = createElementFactory(key);
     }
 

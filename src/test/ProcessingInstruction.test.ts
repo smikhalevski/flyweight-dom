@@ -20,3 +20,9 @@ test('clones a ProcessingInstruction instance', () => {
   expect(node.target).toBe('xml');
   expect(node.data).toBe('aaa');
 });
+
+test('clones an instance of a subclass', () => {
+  class MockProcessingInstruction extends ProcessingInstruction {}
+
+  expect(new MockProcessingInstruction('aaa').cloneNode()).toBeInstanceOf(MockProcessingInstruction);
+});

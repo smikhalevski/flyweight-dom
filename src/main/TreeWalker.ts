@@ -240,7 +240,9 @@ export class TreeWalker {
         }
       }
 
-      for (let parent: Node | null = node; parent !== null; parent = parent.parentNode) {
+      let parent: Node | null = node;
+
+      while (parent !== null) {
         if (parent === root) {
           return null;
         }
@@ -249,6 +251,13 @@ export class TreeWalker {
           node = candidate;
           break;
         }
+
+        parent = parent.parentNode;
+      }
+
+      if (parent === null) {
+        // The current node isn't inside the root, for example, it was removed from the tree
+        return null;
       }
 
       result = filterNode(this, node);
@@ -299,19 +308,17 @@ export class TreeWalker {
 export function filterNode(treeWalker: TreeWalker, node: Node): number {
   const { filter } = treeWalker;
 
-  let result;
-
   if ((((1 << node.nodeType) >> 1) & treeWalker.whatToShow) === 0) {
     return NodeFilter.FILTER_SKIP;
   }
 
-  if (filter !== null) {
-    result = typeof filter === 'function' ? filter(node) : filter.acceptNode(node);
-
-    if (result === NodeFilter.FILTER_SKIP || result === NodeFilter.FILTER_REJECT) {
-      return result;
-    }
+  if (filter === null) {
+    return NodeFilter.FILTER_ACCEPT;
   }
 
-  return NodeFilter.FILTER_ACCEPT;
+  const result = typeof filter === 'function' ? filter(node) : filter.acceptNode(node);
+
+  // Same conversion to unsigned short as in browsers: true becomes FILTER_ACCEPT, while false and undefined become 0,
+  // which traversal methods don't accept
+  return result & 0xffff;
 }

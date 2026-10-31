@@ -12,6 +12,11 @@ import { TreeWalker } from './TreeWalker.js';
  * @group Other
  */
 export function getElementById(root: Node, id: string): Element | null {
+  // An element with an empty id attribute has no ID, and an element without the attribute must not match either
+  if (id.length === 0) {
+    return null;
+  }
+
   const treeWalker = new TreeWalker(root, NodeFilter.SHOW_ELEMENT);
 
   for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {

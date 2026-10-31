@@ -104,7 +104,12 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) on MDN
    */
   setAttribute(name: string, value: string): this {
-    this.attributes[name] = value;
+    if (name === '__proto__') {
+      // Assignment would call the inherited __proto__ setter, which ignores strings, so define an own property instead
+      Object.defineProperty(this.attributes, name, { value, writable: true, enumerable: true, configurable: true });
+    } else {
+      this.attributes[name] = value;
+    }
     return this;
   }
 

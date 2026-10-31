@@ -102,7 +102,7 @@ describe('insertBefore', () => {
     const text2 = new Text('text2');
 
     expect(() => parent.insertBefore(text2, text1)).toThrow(
-      new Error('The node before which the new node is to be inserted is not a child of this node')
+      'The node before which the new node is to be inserted is not a child of this node'
     );
   });
 
@@ -154,7 +154,7 @@ describe('removeChild', () => {
     const parent = new Element('aaa');
     const text = new Text('text');
 
-    expect(() => parent.removeChild(text)).toThrow(new Error('The node to be removed is not a child of this node'));
+    expect(() => parent.removeChild(text)).toThrow('The node to be removed is not a child of this node');
   });
 });
 
@@ -176,9 +176,7 @@ describe('replaceChild', () => {
     const text1 = new Text('text1');
     const text2 = new Text('text2');
 
-    expect(() => parent.replaceChild(text2, text1)).toThrow(
-      new Error('The node to be replaced is not a child of this node')
-    );
+    expect(() => parent.replaceChild(text2, text1)).toThrow('The node to be replaced is not a child of this node');
   });
 
   test('does not move a child replaced with itself', () => {
@@ -293,7 +291,7 @@ describe('append', () => {
     const child1 = new Text('child1');
     const child2 = new Document();
 
-    expect(() => parent.append(child1, child2)).toThrow(new Error('Node cannot be a child'));
+    expect(() => parent.append(child1, child2)).toThrow('Node cannot be a child');
     expect(parent.firstChild).toBeNull();
     expect(child1.parentNode).toBeNull();
     expect(child2.parentNode).toBeNull();

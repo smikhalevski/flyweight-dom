@@ -7,3 +7,7 @@ test('returns the element with the given ID', () => {
 
   expect(getElementById(root, 'aaa')).toBe(root.childNodes[0].childNodes[1]);
 });
+
+test('returns null if ID is empty', () => {
+  expect(getElementById(f.doc(f.aaa()), '')).toBeNull();
+});

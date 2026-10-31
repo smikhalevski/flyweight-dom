@@ -17,13 +17,13 @@ describe('assertInsertableNode', () => {
   test('throws on DOCUMENT_NODE nodes', () => {
     const node = new MockNode(Node.DOCUMENT_NODE);
 
-    expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow(new Error('Node cannot be a child'));
+    expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow('Node cannot be a child');
   });
 
   test('throws on ATTRIBUTE_NODE nodes', () => {
     const node = new MockNode(Node.ATTRIBUTE_NODE);
 
-    expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow(new Error('Node cannot be a child'));
+    expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow('Node cannot be a child');
   });
 
   test('throws if a child contains a parent', () => {
@@ -36,9 +36,7 @@ describe('assertInsertableNode', () => {
 
     assertInsertableNode(element1, element3);
 
-    expect(() => assertInsertableNode(element3, element1)).toThrow(
-      new Error('The new child element contains the parent')
-    );
+    expect(() => assertInsertableNode(element3, element1)).toThrow('The new child element contains the parent');
   });
 });
 

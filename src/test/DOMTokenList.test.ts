@@ -59,7 +59,7 @@ test('throws if an added token contains space chars', () => {
 
   tokenList.add('ccc');
   expect(() => tokenList.add('aaa', 'b\tbb')).toThrow(
-    new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens")
+    "The token provided ('b	bb') contains HTML space characters, which are not valid in tokens"
   );
 
   expect(tokenList.value).toBe('ccc');
@@ -99,7 +99,7 @@ test('throws if a removed token contains space chars', () => {
 
   tokenList.add('aaa', 'bbb');
   expect(() => tokenList.remove('aaa', 'b\tbb')).toThrow(
-    new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens")
+    "The token provided ('b	bb') contains HTML space characters, which are not valid in tokens"
   );
 
   expect(tokenList.value).toBe('aaa bbb');
@@ -158,7 +158,7 @@ describe('replace', () => {
     tokenList.add('aaa', 'bbb');
 
     expect(() => tokenList.replace('a\taa', 'ccc')).toThrow(
-      new Error("The token provided ('a\taa') contains HTML space characters, which are not valid in tokens")
+      "The token provided ('a\taa') contains HTML space characters, which are not valid in tokens"
     );
   });
 
@@ -168,7 +168,7 @@ describe('replace', () => {
     tokenList.add('aaa', 'bbb');
 
     expect(() => tokenList.replace('aaa', 'c\tcc')).toThrow(
-      new Error("The token provided ('c\tcc') contains HTML space characters, which are not valid in tokens")
+      "The token provided ('c\tcc') contains HTML space characters, which are not valid in tokens"
     );
     expect(tokenList.value).toBe('aaa bbb');
   });

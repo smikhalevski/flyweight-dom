@@ -3,7 +3,7 @@ import type { Element } from './Element.js';
 import { NodeList } from './NodeList.js';
 import type { ParentNode } from './ParentNode.js';
 import { uncheckedContains } from './uncheckedContains.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.js';
 
 /**
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
@@ -94,13 +94,9 @@ export class Node {
    * @see [Node.parentElement](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement) on MDN
    */
   get parentElement(): Element | null {
-    let parent = this.parentNode;
+    const { parentNode } = this;
 
-    while (parent !== null && parent.nodeType !== ELEMENT_NODE) {
-      parent = parent.parentNode;
-    }
-
-    return parent as Element | null;
+    return parentNode !== null && isElement(parentNode) ? parentNode : null;
   }
 
   /**

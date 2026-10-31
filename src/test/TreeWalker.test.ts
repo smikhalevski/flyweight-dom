@@ -145,7 +145,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.nextSibling()).toBeNull();
     });
 
-    test('returns null the current element is the root', () => {
+    test('returns null if the current element is the root', () => {
       expect(new TreeWalker(element1).nextSibling()).toBeNull();
     });
 
@@ -201,7 +201,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.previousSibling()).toBeNull();
     });
 
-    test('returns null the current element is the root', () => {
+    test('returns null if the current element is the root', () => {
       expect(new TreeWalker(element3).previousSibling()).toBeNull();
     });
 
@@ -247,7 +247,7 @@ describe('TreeWalker', () => {
       expect(new TreeWalker(document).nextNode()).toBe(element1);
     });
 
-    test('returns null is there is no next node', () => {
+    test('returns null if there is no next node', () => {
       const treeWalker = new TreeWalker(document);
       treeWalker.currentNode = element4;
 
@@ -274,6 +274,16 @@ describe('TreeWalker', () => {
     test('does not leave the root node', () => {
       const treeWalker = new TreeWalker(element1);
       treeWalker.currentNode = text1;
+
+      expect(treeWalker.nextNode()).toBeNull();
+    });
+
+    test('returns null if the current node was removed from the tree', () => {
+      const element = new Element('aaa');
+      const treeWalker = new TreeWalker(new Element('bbb').append(element));
+      treeWalker.currentNode = element;
+
+      element.remove();
 
       expect(treeWalker.nextNode()).toBeNull();
     });
@@ -348,7 +358,13 @@ describe('filterNode', () => {
     expect(acceptNodeMock).toHaveBeenNthCalledWith(1, element4);
   });
 
-  test('return FILTER_ACCEPT is invalid value is returned from filter', () => {
-    expect(filterNode(new TreeWalker(document, undefined, () => 111), element4)).toBe(NodeFilter.FILTER_ACCEPT);
+  test('returns FILTER_ACCEPT if filter returns true', () => {
+    // @ts-expect-error Filters written in JavaScript can return booleans
+    expect(filterNode(new TreeWalker(document, undefined, () => true), element4)).toBe(NodeFilter.FILTER_ACCEPT);
+  });
+
+  test('does not accept a node if filter returns false', () => {
+    // @ts-expect-error Filters written in JavaScript can return booleans
+    expect(filterNode(new TreeWalker(document, undefined, () => false), element4)).toBe(0);
   });
 });

@@ -1,6 +1,6 @@
 import { ChildNode } from './ChildNode.js';
 import type { Node } from './Node.js';
-import { assertOffset, isEqualConstructor } from './utils.js';
+import { assertOffset, isEqualConstructor, toUnsignedLong } from './utils.js';
 
 /**
  * @see [CharacterData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData) on MDN
@@ -56,7 +56,7 @@ export abstract class CharacterData extends ChildNode() {
   deleteData(offset: number, count: number): this {
     assertOffset(this.data, offset);
 
-    this.data = this.data.substring(0, offset) + this.data.substring(offset + count);
+    this.data = this.data.substring(0, offset) + this.data.substring(offset + toUnsignedLong(count));
     return this;
   }
 
@@ -76,7 +76,7 @@ export abstract class CharacterData extends ChildNode() {
   replaceData(offset: number, count: number, data: string): this {
     assertOffset(this.data, offset);
 
-    this.data = this.data.substring(0, offset) + data + this.data.substring(offset + count);
+    this.data = this.data.substring(0, offset) + data + this.data.substring(offset + toUnsignedLong(count));
     return this;
   }
 
@@ -86,7 +86,7 @@ export abstract class CharacterData extends ChildNode() {
   substringData(offset: number, count: number): string {
     assertOffset(this.data, offset);
 
-    return this.data.substring(offset, offset + count);
+    return this.data.substring(offset, offset + toUnsignedLong(count));
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {

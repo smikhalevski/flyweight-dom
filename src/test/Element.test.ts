@@ -89,6 +89,14 @@ test('sets/gets an attribute', () => {
   expect(element.getAttribute('bbb')).toBe('ccc');
 });
 
+test('sets an attribute named __proto__', () => {
+  const element = new Element('aaa');
+
+  element.setAttribute('__proto__', 'bbb');
+
+  expect(element.getAttribute('__proto__')).toBe('bbb');
+});
+
 test('returns null if attribute is absent', () => {
   const element = new Element('aaa');
 
@@ -224,12 +232,12 @@ test('inserts adjacent element with a lowercase position', () => {
   expect(element1.firstChild).toBe(element2);
 });
 
-test('throw is invalid position is provided', () => {
+test('throws if invalid position is provided', () => {
   const element1 = new Element('aaa');
   const element2 = new Element('bbb');
 
   expect(() => element1.insertAdjacentElement('xxx' as InsertPosition, element2)).toThrow(
-    new Error("The value provided ('xxx') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'")
+    "The value provided ('xxx') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'"
   );
 });
 
@@ -298,7 +306,7 @@ test('deeply clones an Element instance', () => {
   expect(node.firstChild!.nodeType).toBe(Node.ELEMENT_NODE);
 });
 
-test('elements are equal is tags are equal', () => {
+test('elements are equal if tags are equal', () => {
   expect(new Element('aaa').isEqualNode(new Element('aaa'))).toBe(true);
   expect(new Element('aaa').isEqualNode(new Element('bbb'))).toBe(false);
 });

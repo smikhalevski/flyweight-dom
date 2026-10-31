@@ -58,6 +58,14 @@ export function assertOffset(data: string, offset: number): void {
   }
 }
 
+/**
+ * Converts a count the same way browsers convert unsigned long arguments, so a negative count spans to the end of
+ * the data, and NaN becomes 0.
+ */
+export function toUnsignedLong(count: number): number {
+  return count >>> 0;
+}
+
 // https://infra.spec.whatwg.org/#ascii-whitespace
 export function isSpaceChar(charCode: number): boolean {
   return (

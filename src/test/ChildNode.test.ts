@@ -41,7 +41,7 @@ describe('after', () => {
     element1.append(element2);
     element2.append(element3);
 
-    expect(() => element3.after(element1)).toThrow(new Error('The new child element contains the parent'));
+    expect(() => element3.after(element1)).toThrow('The new child element contains the parent');
   });
 
   test('appends a node as the last child', () => {
@@ -115,7 +115,7 @@ describe('before', () => {
     element1.append(element2);
     element2.append(element3);
 
-    expect(() => element3.before(element1)).toThrow(new Error('The new child element contains the parent'));
+    expect(() => element3.before(element1)).toThrow('The new child element contains the parent');
   });
 
   test('inserts a node as the first child', () => {

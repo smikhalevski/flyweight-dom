@@ -99,8 +99,9 @@ const proxyHandler: ProxyHandler<NodeList> = {
 
     if (typeof key !== 'string' || (index = parseArrayIndex(key)) === -1) {
       return target[key as keyof typeof target];
-    } else {
-      return target.item(index);
     }
+
+    // Unlike item(), an out-of-range index returns undefined, the same as in browsers
+    return target.item(index) ?? undefined;
   },
 };

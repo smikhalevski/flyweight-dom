@@ -2,12 +2,13 @@ import { expect, test } from 'vitest';
 import { f } from '../main/dsl.js';
 import { Document, Element, Text } from '../main/index.js';
 
-test('creates an document', () => {
-  const fragment = f.f(f.div(f.span({ className: 'xxx' }, 'yyy')));
-
-  const document = f.doc(f.doctype('html'), fragment);
+test('creates a document', () => {
+  const doctype = f.doctype('html');
+  const element = f.html();
+  const document = f.doc(doctype, f.f(element));
 
   expect(document).toBeInstanceOf(Document);
+  expect(Array.from(document)).toStrictEqual([doctype, element]);
 });
 
 test('creates an element', () => {

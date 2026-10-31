@@ -1,7 +1,7 @@
 import { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { NodeList } from './NodeList.js';
+import { type NodeList, LiveNodeList } from './NodeList.js';
 import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
@@ -95,9 +95,16 @@ export function ParentNode(constructor: new () => Node = Node) {
      */
     declare private _children: NodeList<Element> | undefined;
 
+    get childNodes(): NodeList {
+      if (this._childNodes === undefined) {
+        this._childNodes = new LiveNodeList(this);
+      }
+      return this._childNodes;
+    }
+
     get children(): NodeList<Element> {
       if (this._children === undefined) {
-        this._children = new NodeList(this, isElement);
+        this._children = new LiveNodeList(this, isElement);
       }
       return this._children;
     }

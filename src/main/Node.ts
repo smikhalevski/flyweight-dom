@@ -1,6 +1,6 @@
 import type { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
-import { NodeList } from './NodeList.js';
+import { EmptyNodeList, type NodeList } from './NodeList.js';
 import type { ParentNode } from './ParentNode.js';
 import { uncheckedContains } from './uncheckedContains.js';
 import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.js';
@@ -68,8 +68,10 @@ export class Node {
   /**
    * Backs {@link childNodes}. Initialized on construction, so creating the list later doesn't change the hidden class of
    * the node.
+   *
+   * @hidden
    */
-  private _childNodes: NodeList | undefined = undefined;
+  protected _childNodes: NodeList | undefined = undefined;
 
   /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
@@ -94,7 +96,7 @@ export class Node {
    */
   get childNodes(): NodeList {
     if (this._childNodes === undefined) {
-      this._childNodes = new NodeList(this);
+      this._childNodes = new EmptyNodeList();
     }
     return this._childNodes;
   }

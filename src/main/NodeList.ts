@@ -5,22 +5,72 @@ import type { Node } from './Node.js';
  * @see [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) on MDN
  * @group Other
  */
-export class NodeList<T extends ChildNode = ChildNode> implements Iterable<T> {
+export abstract class NodeList<T extends ChildNode = ChildNode> implements Iterable<T> {
   [index: number]: T;
-
-  private _root;
-  private _filter;
-
-  constructor(root: Node, filter?: (node: Node) => node is T) {
-    this._root = root;
-    this._filter = filter;
-
-    return new Proxy<NodeList<T>>(this, proxyHandler);
-  }
 
   /**
    * @see [NodeList.length](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/length) on MDN
    */
+  abstract readonly length: number;
+
+  /**
+   * @see [NodeList.item](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/item) on MDN
+   */
+  abstract item(index: number): T | null;
+
+  /**
+   * @see [NodeList.values](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/values) on MDN
+   */
+  abstract values(): IterableIterator<T>;
+
+  [Symbol.iterator](): IterableIterator<T> {
+    return this.values();
+  }
+}
+
+/**
+ * The {@link NodeList} of a node that can't have children. It doesn't use a Proxy, since there are no indices to
+ * resolve, so creating and reading it costs as little as an ordinary object.
+ *
+ * @group Other
+ */
+export class EmptyNodeList<T extends ChildNode = ChildNode> extends NodeList<T> {
+  get length(): number {
+    return 0;
+  }
+
+  item(index: number): T | null {
+    return null;
+  }
+
+  *values(): IterableIterator<T> {}
+}
+
+/**
+ * The live {@link NodeList} of children of a node. Index access goes through a Proxy, since the list doesn't store
+ * nodes, and reads them from the root on each access.
+ *
+ * @group Other
+ */
+export class LiveNodeList<T extends ChildNode = ChildNode> extends NodeList<T> {
+  private _root;
+  private _filter;
+
+  /**
+   * Creates a new instance of {@link LiveNodeList}.
+   *
+   * @param root The node whose children the list contains.
+   * @param filter The callback that returns `true` for children that the list contains, or `undefined` if the list
+   * contains all children.
+   */
+  constructor(root: Node, filter?: (node: Node) => node is T) {
+    super();
+    this._root = root;
+    this._filter = filter;
+
+    return new Proxy<LiveNodeList<T>>(this, proxyHandler);
+  }
+
   get length(): number {
     const { _filter } = this;
 
@@ -35,9 +85,6 @@ export class NodeList<T extends ChildNode = ChildNode> implements Iterable<T> {
     return length;
   }
 
-  /**
-   * @see [NodeList.item](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/item) on MDN
-   */
   item(index: number): T | null {
     const { _filter } = this;
 
@@ -49,9 +96,6 @@ export class NodeList<T extends ChildNode = ChildNode> implements Iterable<T> {
     return null;
   }
 
-  /**
-   * @see [NodeList.values](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/values) on MDN
-   */
   *values(): IterableIterator<T> {
     const { _filter } = this;
 
@@ -60,10 +104,6 @@ export class NodeList<T extends ChildNode = ChildNode> implements Iterable<T> {
         yield child as T;
       }
     }
-  }
-
-  [Symbol.iterator](): ArrayIterator<T> {
-    return this.values();
   }
 }
 
@@ -93,7 +133,7 @@ function parseArrayIndex(str: string): number {
   return index;
 }
 
-const proxyHandler: ProxyHandler<NodeList> = {
+const proxyHandler: ProxyHandler<LiveNodeList> = {
   get(target, key, _receiver) {
     let index;
 

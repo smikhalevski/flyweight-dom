@@ -66,3 +66,9 @@ test('returns null textContent', () => {
 
   expect(document.textContent).toBeNull();
 });
+
+test('clones an instance of a subclass', () => {
+  class MockDocument extends Document {}
+
+  expect(new MockDocument().cloneNode()).toBeInstanceOf(MockDocument);
+});

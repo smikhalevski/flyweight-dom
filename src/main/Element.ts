@@ -4,12 +4,24 @@ import type { Node } from './Node.js';
 import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor, isSpaceChar } from './utils.js';
+import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
 
 /**
+ * The position is case-insensitive.
+ *
  * @group Other
  */
-export type InsertPosition = 'beforeBegin' | 'afterBegin' | 'beforeEnd' | 'afterEnd';
+export type InsertPosition =
+  | 'beforebegin'
+  | 'afterbegin'
+  | 'beforeend'
+  | 'afterend'
+  | 'beforeBegin'
+  | 'afterBegin'
+  | 'beforeEnd'
+  | 'afterEnd';
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
  * @see [Element](https://developer.mozilla.org/en-US/docs/Web/API/Element) on MDN
@@ -47,7 +59,7 @@ export class Element extends ParentNode(ChildNode()) {
   get classList(): DOMTokenList {
     const tokenList = new DOMTokenList({
       get: () => {
-        return this.attributes.class || '';
+        return this.getAttribute('class');
       },
       set: value => {
         this.attributes.class = value;
@@ -66,20 +78,26 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   /**
+   * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
+   */
+  readonly attributes: Record<string, string>;
+
+  /**
    * Creates a new instance of {@link Element}.
+   *
+   * @param tagName The tag name of the element.
+   * @param attributes Attributes to copy, so the element never shares state with the caller or other elements.
    */
   constructor(
     /**
      * @see [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) on MDN
      */
     readonly tagName: string,
-    /**
-     * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
-     */
-    readonly attributes: Record<string, string> = {}
+    attributes?: Record<string, string>
   ) {
     super();
     this.nodeName = tagName;
+    this.attributes = attributes !== undefined ? { ...attributes } : {};
   }
 
   /**
@@ -94,14 +112,15 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.getAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute) on MDN
    */
   getAttribute(name: string): string | null {
-    return this.attributes[name] ?? null;
+    // Own property check, so inherited Object.prototype members aren't reported as attributes
+    return hasOwnProperty.call(this.attributes, name) ? this.attributes[name] : null;
   }
 
   /**
    * @see [Element.hasAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute) on MDN
    */
   hasAttribute(name: string): boolean {
-    return this.attributes[name] !== undefined;
+    return hasOwnProperty.call(this.attributes, name);
   }
 
   /**
@@ -150,12 +169,7 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.insertAdjacentText](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText) on MDN
    */
   insertAdjacentText(position: InsertPosition, data: string): void {
-    for (let i = 0; i < data.length; ++i) {
-      if (!isSpaceChar(data.charCodeAt(i))) {
-        insertAdjacentNode(this, position, new Text(data));
-        break;
-      }
-    }
+    insertAdjacentNode(this, position, new Text(data));
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {
@@ -168,7 +182,7 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   cloneNode(deep?: boolean): Element {
-    const node = new Element(this.tagName);
+    const node = new (this.constructor as typeof Element)(this.tagName, this.attributes);
 
     if (deep) {
       uncheckedCloneChildren(this, node);
@@ -192,23 +206,23 @@ function isEqualAttributes(attrs: Record<string, string>, otherAttrs: Record<str
 }
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {
-  switch (position) {
-    case 'beforeBegin':
+  switch (position.toLowerCase()) {
+    case 'beforebegin':
       if (element.parentNode === null) {
         return null;
       }
       element.before(node);
       break;
 
-    case 'afterBegin':
+    case 'afterbegin':
       element.prepend(node);
       break;
 
-    case 'beforeEnd':
+    case 'beforeend':
       element.append(node);
       break;
 
-    case 'afterEnd':
+    case 'afterend':
       if (element.parentNode === null) {
         return null;
       }

@@ -20,7 +20,7 @@ export class DocumentFragment extends ParentNode() {
   }
 
   cloneNode(deep?: boolean): DocumentFragment {
-    const node = new DocumentFragment();
+    const node = new (this.constructor as typeof DocumentFragment)();
 
     if (deep) {
       uncheckedCloneChildren(this, node);

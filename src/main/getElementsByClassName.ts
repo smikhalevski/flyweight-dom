@@ -3,6 +3,7 @@ import { Element } from './Element.js';
 import { Node } from './Node.js';
 import { NodeFilter } from './NodeFilter.js';
 import { TreeWalker } from './TreeWalker.js';
+import { isSpaceChar } from './utils.js';
 
 /**
  * Returns an array elements which have all of the given class name(s).
@@ -23,8 +24,11 @@ export function getElementsByClassName(root: Node, className: string): Element[]
   const elements = [];
 
   nextNode: for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
+    // Not element.classList, since it would permanently attach a DOMTokenList to every visited element
+    const { className } = element;
+
     for (let i = 0; i < classNames.length; ++i) {
-      if (!element.classList.contains(classNames[i])) {
+      if (!hasToken(className, classNames[i])) {
         continue nextNode;
       }
     }
@@ -33,4 +37,21 @@ export function getElementsByClassName(root: Node, className: string): Element[]
   }
 
   return elements;
+}
+
+/**
+ * Returns `true` if the whitespace-separated value contains the token. Doesn't allocate.
+ */
+function hasToken(value: string, token: string): boolean {
+  for (let index = value.indexOf(token); index !== -1; index = value.indexOf(token, index + 1)) {
+    const endIndex = index + token.length;
+
+    if (
+      (index === 0 || isSpaceChar(value.charCodeAt(index - 1))) &&
+      (endIndex === value.length || isSpaceChar(value.charCodeAt(endIndex)))
+    ) {
+      return true;
+    }
+  }
+  return false;
 }

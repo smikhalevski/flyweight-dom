@@ -1,13 +1,15 @@
 import { isSpaceChar } from './utils.js';
 
-const SEPARATOR_REGEX = /\s+/;
 const SEPARATOR = ' ';
 
 /**
  * @group Other
  */
 export interface ValueAccessor {
-  get(): string;
+  /**
+   * Returns the value, or `null` if it is absent. An absent value isn't created when the token list stays empty.
+   */
+  get(): string | null;
 
   set(value: string): void;
 }
@@ -28,7 +30,7 @@ export class DOMTokenList {
    * @see [DOMTokenList.value](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/value) on MDN
    */
   get value(): string {
-    return this._valueAccessor.get();
+    return this._valueAccessor.get() ?? '';
   }
 
   set value(value: string) {
@@ -108,7 +110,16 @@ export class DOMTokenList {
       return false;
     }
 
-    tokens.splice(index, 1, token);
+    const tokenIndex = tokens.indexOf(token);
+
+    if (tokenIndex === -1) {
+      tokens[index] = token;
+    } else if (tokenIndex !== index) {
+      // The token is already present, so keep it at whichever position comes first
+      tokens[Math.min(index, tokenIndex)] = token;
+      tokens.splice(Math.max(index, tokenIndex), 1);
+    }
+
     setTokens(this, tokens);
     return true;
   }
@@ -165,32 +176,53 @@ export class DOMTokenList {
   }
 
   /**
+   * @see [DOMTokenList.values](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/values) on MDN
+   */
+  values(): IterableIterator<string> {
+    return getTokens(this).values();
+  }
+
+  [Symbol.iterator](): IterableIterator<string> {
+    return this.values();
+  }
+
+  /**
    * @hidden
    */
   toString() {
-    return this._valueAccessor.get();
+    return this.value;
   }
 }
 
+/**
+ * Splits the value into unique tokens separated by ASCII whitespace.
+ */
 export function splitTokens(value: string): string[] {
-  value = value.trim();
+  const tokens: string[] = [];
 
-  const tokens = value.length === 0 ? [] : value.split(SEPARATOR_REGEX);
+  let tokenStartIndex = 0;
 
-  // Make unique
-  for (let i = 0; i < tokens.length; ++i) {
-    const token = tokens[i];
-
-    for (let j = tokens.indexOf(token, i + 1); j !== -1; j = tokens.indexOf(token, j)) {
-      tokens.splice(j, 1);
+  for (let i = 0; i <= value.length; ++i) {
+    if (i < value.length && !isSpaceChar(value.charCodeAt(i))) {
+      continue;
     }
+
+    if (tokenStartIndex < i) {
+      const token = value.substring(tokenStartIndex, i);
+
+      if (tokens.indexOf(token) === -1) {
+        tokens.push(token);
+      }
+    }
+
+    tokenStartIndex = i + 1;
   }
 
   return tokens;
 }
 
 function getTokens(tokenList: DOMTokenList): string[] {
-  let value = tokenList['_valueAccessor'].get();
+  const value = tokenList.value;
 
   if (value === tokenList['_tokenizedValue'] && tokenList['_tokens'] !== undefined) {
     return tokenList['_tokens'];
@@ -205,9 +237,16 @@ function getTokens(tokenList: DOMTokenList): string[] {
 }
 
 function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
+  const valueAccessor = tokenList['_valueAccessor'];
+
+  // https://dom.spec.whatwg.org/#concept-dtl-update
+  if (tokens.length === 0 && valueAccessor.get() === null) {
+    return;
+  }
+
   const value = tokens.join(SEPARATOR);
 
-  tokenList['_valueAccessor'].set(value);
+  valueAccessor.set(value);
   tokenList['_tokenizedValue'] = value;
   tokenList['_tokens'] = tokens;
 }

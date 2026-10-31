@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { DOMTokenList, ValueAccessor } from '../main/index.js';
 
-let valueMock = '';
+let valueMock: string | null = '';
 
 const valueAccessorMock: ValueAccessor = {
   get: () => valueMock,
@@ -75,6 +75,25 @@ test('removes a token', () => {
   expect(tokenList.length).toBe(1);
 });
 
+test('does not create an absent value if no tokens remain', () => {
+  const tokenList = new DOMTokenList(valueAccessorMock);
+
+  valueMock = null;
+
+  tokenList.remove('aaa');
+
+  expect(valueMock).toBeNull();
+});
+
+test('splits tokens by ASCII whitespace only', () => {
+  const tokenList = new DOMTokenList(valueAccessorMock);
+
+  valueMock = 'aaa\u00A0bbb\fccc';
+
+  expect(tokenList.length).toBe(2);
+  expect(tokenList.item(0)).toBe('aaa\u00A0bbb');
+});
+
 test('throws if a removed token contains space chars', () => {
   const tokenList = new DOMTokenList(valueAccessorMock);
 
@@ -117,6 +136,20 @@ describe('replace', () => {
     expect(tokenList.replace('ccc', 'eee')).toBe(false);
     expect(tokenList.value).toBe('aaa bbb');
     expect(tokenList.length).toBe(2);
+  });
+
+  test('removes the replaced token if the replacement is already present', () => {
+    const tokenList = new DOMTokenList(valueAccessorMock);
+
+    valueMock = 'aaa bbb ccc';
+    tokenList.replace('ccc', 'aaa');
+
+    expect(tokenList.value).toBe('aaa bbb');
+
+    valueMock = 'aaa bbb ccc';
+    tokenList.replace('aaa', 'ccc');
+
+    expect(tokenList.value).toBe('ccc bbb');
   });
 
   test('throws if a replaced token contains space chars', () => {
@@ -201,6 +234,16 @@ describe('item', () => {
     expect(tokenList.item(2)).toBe('ccc');
     expect(tokenList.item(3)).toBeNull();
     expect(tokenList.item(0.5)).toBeNull();
+  });
+});
+
+describe('Symbol.iterator', () => {
+  test('yields tokens', () => {
+    const tokenList = new DOMTokenList(valueAccessorMock);
+
+    valueMock = 'aaa bbb';
+
+    expect(Array.from(tokenList)).toEqual(['aaa', 'bbb']);
   });
 });
 

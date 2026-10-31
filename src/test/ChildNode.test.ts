@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { ChildNode, Element, Node, Text } from '../main/index.js';
+import { getChildNodes } from './utils.js';
 
 test('returns the cached constructor', () => {
   expect(ChildNode()).toBe(ChildNode());
@@ -70,6 +71,31 @@ describe('after', () => {
     expect(parent.childNodes[2]).toBe(text3);
     expect(text2.parentNode).toBe(parent);
   });
+
+  test('inserts the next sibling after the node', () => {
+    const parent = new Element('parent');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+    const text3 = new Text('text3');
+
+    parent.append(text1, text2, text3);
+    text1.after(text2);
+
+    expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
+  });
+
+  test('inserts nodes before the first following sibling that is not inserted', () => {
+    const parent = new Element('parent');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+    const text3 = new Text('text3');
+    const text4 = new Text('text4');
+
+    parent.append(text1, text2, text3);
+    text1.after(text2, text4);
+
+    expect(getChildNodes(parent)).toEqual([text1, text2, text4, text3]);
+  });
 });
 
 describe('before', () => {
@@ -119,6 +145,18 @@ describe('before', () => {
     expect(parent.childNodes[2]).toBe(text3);
     expect(text2.parentNode).toBe(parent);
   });
+
+  test('inserts a node before itself', () => {
+    const parent = new Element('parent');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+    const text3 = new Text('text3');
+
+    parent.append(text1, text2, text3);
+    text2.before(text2);
+
+    expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
+  });
 });
 
 describe('remove', () => {
@@ -161,5 +199,17 @@ describe('replaceWith', () => {
     expect(text2.parentNode).toBe(parent);
     expect(parent.firstChild).toBe(text2);
     expect(parent.lastChild).toBe(text2);
+  });
+
+  test('replaces a node with itself', () => {
+    const parent = new Element('parent');
+    const text1 = new Text('text1');
+    const text2 = new Text('text2');
+    const text3 = new Text('text3');
+
+    parent.append(text1, text2, text3);
+    text2.replaceWith(text2);
+
+    expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
   });
 });

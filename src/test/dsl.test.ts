@@ -19,3 +19,9 @@ test('creates an element', () => {
   expect(element.childNodes.length).toBe(1);
   expect(element.childNodes[0]).toBeInstanceOf(Text);
 });
+
+test('creates element factories after hasOwnProperty is read', () => {
+  f.hasOwnProperty;
+
+  expect(f.aaa()).toBeInstanceOf(Element);
+});

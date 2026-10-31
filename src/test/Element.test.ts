@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { InsertPosition } from '../main/Element.js';
-import { DOMTokenList, Element, Node, Text } from '../main/index.js';
+import { Comment, DOMTokenList, Element, Node, Text } from '../main/index.js';
 
 test('creates an Element instance', () => {
   const node = new Element('aaa');
@@ -93,6 +93,21 @@ test('returns null if attribute is absent', () => {
   const element = new Element('aaa');
 
   expect(element.getAttribute('bbb')).toBeNull();
+});
+
+test('does not treat inherited properties as attributes', () => {
+  const element = new Element('aaa');
+
+  expect(element.getAttribute('constructor')).toBeNull();
+  expect(element.hasAttribute('toString')).toBe(false);
+});
+
+test('copies attributes passed to the constructor', () => {
+  const attributes = { bbb: '111' };
+
+  new Element('aaa', attributes).setAttribute('bbb', '222');
+
+  expect(attributes.bbb).toBe('111');
 });
 
 test('returns true if an attribute is present', () => {
@@ -200,6 +215,15 @@ test('inserts adjacent element afterEnd', () => {
   expect(element1.lastChild).toBe(element3);
 });
 
+test('inserts adjacent element with a lowercase position', () => {
+  const element1 = new Element('aaa');
+  const element2 = new Element('bbb');
+
+  element1.insertAdjacentElement('beforeend', element2);
+
+  expect(element1.firstChild).toBe(element2);
+});
+
 test('throw is invalid position is provided', () => {
   const element1 = new Element('aaa');
   const element2 = new Element('bbb');
@@ -220,7 +244,7 @@ test('inserts adjacent text', () => {
   expect(element1.firstChild).toEqual(new Text(' ccc '));
 });
 
-test('does not insert text if it consists of spaces', () => {
+test('inserts adjacent text that consists of spaces', () => {
   const element1 = new Element('aaa');
   const element2 = new Element('bbb');
 
@@ -228,7 +252,7 @@ test('does not insert text if it consists of spaces', () => {
 
   element2.insertAdjacentText('beforeBegin', ' \t');
 
-  expect(element1.firstChild).toEqual(element2);
+  expect(element1.firstChild).toEqual(new Text(' \t'));
 });
 
 test('shallow clones an Element instance', () => {
@@ -241,6 +265,24 @@ test('shallow clones an Element instance', () => {
 
   expect(node).toBeInstanceOf(Element);
   expect(node.firstChild).toBeNull();
+});
+
+test('clones attributes', () => {
+  const element = new Element('aaa', { bbb: '111' });
+
+  const node = element.cloneNode();
+
+  expect(node.attributes).toEqual({ bbb: '111' });
+  expect(node.attributes).not.toBe(element.attributes);
+});
+
+test('clones an instance of a subclass', () => {
+  class MockElement extends Element {}
+
+  const element = new MockElement('aaa');
+
+  expect(element.cloneNode()).toBeInstanceOf(MockElement);
+  expect(element.cloneNode().isEqualNode(element)).toBe(true);
 });
 
 test('deeply clones an Element instance', () => {
@@ -287,4 +329,10 @@ test('returns concatenated textContent', () => {
   const element = new Element('aaa').append(new Text('bbb'), new Text('ccc'));
 
   expect(element.textContent).toBe('bbbccc');
+});
+
+test('returns textContent of text descendants only', () => {
+  const element = new Element('aaa').append(new Comment('bbb'), 'ccc', new Element('ddd').append('eee'));
+
+  expect(element.textContent).toBe('ccceee');
 });

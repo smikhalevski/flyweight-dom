@@ -5,16 +5,13 @@ import type { ParentNode } from './ParentNode.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertOffset, ELEMENT_NODE, isText, TEXT_NODE } from './utils.js';
+import { assertOffset, defineNodeType, ELEMENT_NODE, isText, TEXT_NODE } from './utils.js';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
  * @group Nodes
  */
 export class Text extends CharacterData {
-  readonly nodeType: number = TEXT_NODE;
-  readonly nodeName: string = '#text';
-
   /**
    * @see [Text.wholeText](https://developer.mozilla.org/en-US/docs/Web/API/Text/wholeText) on MDN
    */
@@ -59,6 +56,8 @@ export class Text extends CharacterData {
     return node;
   }
 }
+
+defineNodeType(Text, TEXT_NODE, '#text');
 
 export function setTextContent(node: ParentNode, value: string | null): void {
   while (node.firstChild !== null) {

@@ -1,14 +1,12 @@
 import { CharacterData } from './CharacterData.js';
 import { Node } from './Node.js';
-import { isEqualConstructor, PROCESSING_INSTRUCTION_NODE } from './utils.js';
+import { defineNodeType, isEqualConstructor, PROCESSING_INSTRUCTION_NODE } from './utils.js';
 
 /**
  * @see [ProcessingInstruction](https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction) on MDN
  * @group Nodes
  */
 export class ProcessingInstruction extends CharacterData {
-  readonly nodeType: number = PROCESSING_INSTRUCTION_NODE;
-  readonly nodeName: string;
   readonly target: string;
 
   /**
@@ -16,7 +14,7 @@ export class ProcessingInstruction extends CharacterData {
    */
   constructor(target: string, data?: string) {
     super(data);
-    this.nodeName = this.target = target;
+    this.target = target;
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {
@@ -27,3 +25,5 @@ export class ProcessingInstruction extends CharacterData {
     return new (this.constructor as typeof ProcessingInstruction)(this.target, this.data);
   }
 }
+
+defineNodeType(ProcessingInstruction, PROCESSING_INSTRUCTION_NODE, node => node.target);

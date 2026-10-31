@@ -1,15 +1,12 @@
 import { ChildNode } from './ChildNode.js';
 import type { Node } from './Node.js';
-import { DOCUMENT_TYPE_NODE, isEqualConstructor } from './utils.js';
+import { defineNodeType, DOCUMENT_TYPE_NODE, isEqualConstructor } from './utils.js';
 
 /**
  * @see [DocumentType](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
  * @group Nodes
  */
 export class DocumentType extends ChildNode() {
-  readonly nodeType: number = DOCUMENT_TYPE_NODE;
-  readonly nodeName: string;
-
   /**
    * Creates a new instance of {@link DocumentType}.
    */
@@ -28,7 +25,6 @@ export class DocumentType extends ChildNode() {
     readonly systemId = ''
   ) {
     super();
-    this.nodeName = name;
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {
@@ -44,3 +40,5 @@ export class DocumentType extends ChildNode() {
     return new (this.constructor as typeof DocumentType)(this.name, this.publicId, this.systemId);
   }
 }
+
+defineNodeType(DocumentType, DOCUMENT_TYPE_NODE, node => node.name);

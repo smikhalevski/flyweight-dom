@@ -14,6 +14,45 @@ export const DOCUMENT_NODE: number = 9;
 export const DOCUMENT_TYPE_NODE: number = 10;
 export const DOCUMENT_FRAGMENT_NODE: number = 11;
 
+/**
+ * Defines {@link Node.nodeType} and {@link Node.nodeName} on the prototype of a node class, so nodes don't spend memory
+ * on values that are the same for all instances of a class, or that duplicate another property.
+ *
+ * Both properties stay assignable, so subclasses that declare them as fields keep working.
+ *
+ * @param constructor The node class.
+ * @param nodeType The node type of class instances.
+ * @param nodeName The node name of class instances, or a callback that derives it from a node.
+ * @template TNode The node class instance.
+ */
+export function defineNodeType<TNode extends Node>(
+  constructor: { prototype: TNode },
+  nodeType: number,
+  nodeName: string | ((node: TNode) => string)
+): void {
+  const { prototype } = constructor;
+
+  Object.defineProperty(prototype, 'nodeType', { value: nodeType, writable: true, configurable: true });
+
+  if (typeof nodeName === 'string') {
+    Object.defineProperty(prototype, 'nodeName', { value: nodeName, writable: true, configurable: true });
+    return;
+  }
+
+  Object.defineProperty(prototype, 'nodeName', {
+    configurable: true,
+
+    get(this: TNode) {
+      return nodeName(this);
+    },
+
+    set(this: TNode, value: string) {
+      // Same as an own field would be
+      Object.defineProperty(this, 'nodeName', { value, writable: true, enumerable: true, configurable: true });
+    },
+  });
+}
+
 export function isElement(node: Node): node is Element {
   return node.nodeType === ELEMENT_NODE;
 }

@@ -1,11 +1,10 @@
 import { CharacterData } from './CharacterData.js';
-import { COMMENT_NODE } from './utils.js';
+import { COMMENT_NODE, defineNodeType } from './utils.js';
 
 /**
  * @see [Comment](https://developer.mozilla.org/en-US/docs/Web/API/Comment) on MDN
  * @group Nodes
  */
-export class Comment extends CharacterData {
-  readonly nodeType: number = COMMENT_NODE;
-  readonly nodeName: string = '#comment';
-}
+export class Comment extends CharacterData {}
+
+defineNodeType(Comment, COMMENT_NODE, '#comment');

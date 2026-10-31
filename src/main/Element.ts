@@ -4,7 +4,7 @@ import type { Node } from './Node.js';
 import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import { defineNodeType, ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
 
 /**
  * The position is case-insensitive.
@@ -28,9 +28,6 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * @group Nodes
  */
 export class Element extends ParentNode(ChildNode()) {
-  readonly nodeType: number = ELEMENT_NODE;
-  readonly nodeName: string;
-
   /**
    * @see [Element.id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) on MDN
    */
@@ -96,7 +93,6 @@ export class Element extends ParentNode(ChildNode()) {
     attributes?: Record<string, string>
   ) {
     super();
-    this.nodeName = tagName;
     this.attributes = attributes !== undefined ? { ...attributes } : {};
   }
 
@@ -195,6 +191,8 @@ export class Element extends ParentNode(ChildNode()) {
     return node;
   }
 }
+
+defineNodeType(Element, ELEMENT_NODE, element => element.tagName);
 
 function isEqualAttributes(attrs: Record<string, string>, otherAttrs: Record<string, string>): boolean {
   let attrsCount = 0;

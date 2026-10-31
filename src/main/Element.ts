@@ -1,5 +1,5 @@
 import { ChildNode } from './ChildNode.js';
-import { DOMTokenList } from './DOMTokenList.js';
+import { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
 import type { Node } from './Node.js';
 import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
@@ -54,14 +54,7 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) on MDN
    */
   get classList(): DOMTokenList {
-    const tokenList = new DOMTokenList({
-      get: () => {
-        return this.getAttribute('class');
-      },
-      set: value => {
-        this.attributes.class = value;
-      },
-    });
+    const tokenList = new DOMTokenList(new ClassAttributeAccessor(this));
 
     return Object.defineProperty(this, 'classList', { value: tokenList }).classList;
   }
@@ -83,17 +76,18 @@ export class Element extends ParentNode(ChildNode()) {
    * Creates a new instance of {@link Element}.
    *
    * @param tagName The tag name of the element.
-   * @param attributes Attributes to copy, so the element never shares state with the caller or other elements.
+   * @param attributes The attributes of the element. The object isn't copied, to avoid an allocation per element, so
+   * the element owns it, and it must not be passed to other elements.
    */
   constructor(
     /**
      * @see [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) on MDN
      */
     readonly tagName: string,
-    attributes?: Record<string, string>
+    attributes: Record<string, string> = {}
   ) {
     super();
-    this.attributes = attributes !== undefined ? { ...attributes } : {};
+    this.attributes = attributes;
   }
 
   /**
@@ -183,7 +177,8 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   cloneNode(deep?: boolean): Element {
-    const node = new (this.constructor as typeof Element)(this.tagName, this.attributes);
+    // The constructor doesn't copy attributes, so the clone would share them otherwise
+    const node = new (this.constructor as typeof Element)(this.tagName, { ...this.attributes });
 
     if (deep) {
       uncheckedCloneChildren(this, node);
@@ -193,6 +188,22 @@ export class Element extends ParentNode(ChildNode()) {
 }
 
 defineNodeType(Element, ELEMENT_NODE, element => element.tagName);
+
+/**
+ * Reads and writes the class attribute for {@link Element.classList}. A class takes less memory than an object with
+ * two closures that capture the element.
+ */
+class ClassAttributeAccessor implements ValueAccessor {
+  constructor(private readonly element: Element) {}
+
+  get(): string | null {
+    return this.element.getAttribute('class');
+  }
+
+  set(value: string): void {
+    this.element.attributes.class = value;
+  }
+}
 
 function isEqualAttributes(attrs: Record<string, string>, otherAttrs: Record<string, string>): boolean {
   let attrsCount = 0;

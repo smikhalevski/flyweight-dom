@@ -110,12 +110,10 @@ test('does not treat inherited properties as attributes', () => {
   expect(element.hasAttribute('toString')).toBe(false);
 });
 
-test('copies attributes passed to the constructor', () => {
+test('uses attributes passed to the constructor as is', () => {
   const attributes = { bbb: '111' };
 
-  new Element('aaa', attributes).setAttribute('bbb', '222');
-
-  expect(attributes.bbb).toBe('111');
+  expect(new Element('aaa', attributes).attributes).toBe(attributes);
 });
 
 test('returns true if an attribute is present', () => {

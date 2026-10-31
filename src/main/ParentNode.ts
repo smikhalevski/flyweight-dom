@@ -89,8 +89,17 @@ export function ParentNode(constructor: new () => Node = Node) {
     declare readonly nodeType: number;
     declare readonly nodeName: string;
 
+    /**
+     * Initialized by classes that extend the mixin, since an initializer here would add a constructor to the mixin,
+     * which V8 can't skip during instantiation. Classes that don't initialize it get the property on first access.
+     */
+    declare private _children: NodeList<Element> | undefined;
+
     get children(): NodeList<Element> {
-      return Object.defineProperty(this, 'children', { value: new NodeList(this, isElement) }).children;
+      if (this._children === undefined) {
+        this._children = new NodeList(this, isElement);
+      }
+      return this._children;
     }
 
     get childElementCount(): number {

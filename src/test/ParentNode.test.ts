@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ChildNode, Document, Element, Node, ParentNode, Text } from '../main/index.js';
+import { ChildNode, Document, Element, Node, NodeList, ParentNode, Text } from '../main/index.js';
 import { getChildNodes } from './utils.js';
 
 test('returns the cached constructor', () => {
@@ -224,26 +224,25 @@ describe('children', () => {
 
     expect(element.children).toBe(element.children);
   });
+
+  test('returns the same array for a class that does not initialize it', () => {
+    class MockNode extends ParentNode() {
+      readonly nodeName = '';
+      readonly nodeType = -1;
+    }
+
+    const node = new MockNode();
+
+    expect(node.children).toBeInstanceOf(NodeList);
+    expect(node.children).toBe(node.children);
+  });
 });
 
 describe('childElementCount', () => {
   test('returns the number of child elements', () => {
-    const parent = new Element('aaa');
-    const child1 = new Text('child1');
-    const child2 = new Element('child2');
-    const child3 = new Element('child3');
+    const parent = new Element('aaa').append(new Text('child1'), new Element('child2'), new Element('child3'));
 
-    parent.append(child1, child2, child3);
-
-    expect(parent.children.length).toBe(2);
-    expect(parent.children[0]).toBe(child2);
-    expect(parent.children[1]).toBe(child3);
-  });
-
-  test('returns the same array', () => {
-    const element = new Element('aaa');
-
-    expect(element.children).toBe(element.children);
+    expect(parent.childElementCount).toBe(2);
   });
 });
 

@@ -66,6 +66,12 @@ export class Node {
   lastChild: ChildNode | null = null;
 
   /**
+   * Backs {@link childNodes}. Initialized on construction, so creating the list later doesn't change the hidden class of
+   * the node.
+   */
+  private _childNodes: NodeList | undefined = undefined;
+
+  /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
    */
   get nodeValue(): string | null {
@@ -87,7 +93,10 @@ export class Node {
    * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
    */
   get childNodes(): NodeList {
-    return Object.defineProperty(this, 'childNodes', { value: new NodeList(this) }).childNodes;
+    if (this._childNodes === undefined) {
+      this._childNodes = new NodeList(this);
+    }
+    return this._childNodes;
   }
 
   /**

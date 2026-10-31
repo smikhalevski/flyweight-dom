@@ -1,6 +1,7 @@
 import { ChildNode } from './ChildNode.js';
 import { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
 import type { Node } from './Node.js';
+import type { NodeList } from './NodeList.js';
 import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
@@ -29,6 +30,17 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 export class Element extends ParentNode(ChildNode()) {
   /**
+   * Backs {@link children}. Initialized here rather than in the {@link ParentNode} mixin, see there.
+   */
+  private _children: NodeList<Element> | undefined = undefined;
+
+  /**
+   * Backs {@link classList}. Initialized on construction, so creating the list later doesn't change the hidden class of
+   * the element.
+   */
+  private _classList: DOMTokenList | undefined = undefined;
+
+  /**
    * @see [Element.id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) on MDN
    */
   get id(): string {
@@ -54,9 +66,10 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) on MDN
    */
   get classList(): DOMTokenList {
-    const tokenList = new DOMTokenList(new ClassAttributeAccessor(this));
-
-    return Object.defineProperty(this, 'classList', { value: tokenList }).classList;
+    if (this._classList === undefined) {
+      this._classList = new DOMTokenList(new ClassAttributeAccessor(this));
+    }
+    return this._classList;
   }
 
   get textContent(): string | null {

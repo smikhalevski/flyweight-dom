@@ -1,5 +1,6 @@
 import type { DocumentType } from './DocumentType.js';
 import type { Element } from './Element.js';
+import type { NodeList } from './NodeList.js';
 import { ParentNode } from './ParentNode.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
 import { defineNodeType, DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ELEMENT_NODE, getNextSiblingOrSelf } from './utils.js';
@@ -9,6 +10,11 @@ import { defineNodeType, DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ELEMENT_NODE, getNex
  * @group Nodes
  */
 export class Document extends ParentNode() {
+  /**
+   * Backs {@link children}. Initialized here rather than in the {@link ParentNode} mixin, see there.
+   */
+  private _children: NodeList<Element> | undefined = undefined;
+
   /**
    * @see [Document.doctype](https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype) on MDN
    */

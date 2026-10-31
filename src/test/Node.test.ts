@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { ChildNode, Element, Node, ParentNode, Text } from '../main/index.js';
+import { ChildNode, Document, DocumentFragment, Element, Node, ParentNode, Text } from '../main/index.js';
 import { NodeList } from '../main/NodeList.js';
 
 class MockNode extends Node {
@@ -35,6 +35,32 @@ test('populates childNodes', () => {
   const node = new MockNode();
 
   expect(node.childNodes).toEqual(new NodeList(node));
+});
+
+test('returns the same childNodes instance', () => {
+  const node = new MockNode();
+
+  expect(node.childNodes).toBe(node.childNodes);
+});
+
+test('creating childNodes, children and classList does not add properties to nodes', () => {
+  const element = new Element('aaa');
+  const document = new Document();
+  const fragment = new DocumentFragment();
+  const text = new Text();
+  const nodes = [element, document, fragment, text];
+  const propertyNames = nodes.map(node => Object.getOwnPropertyNames(node));
+
+  element.childNodes;
+  element.children;
+  element.classList;
+  document.childNodes;
+  document.children;
+  fragment.childNodes;
+  fragment.children;
+  text.childNodes;
+
+  expect(nodes.map(node => Object.getOwnPropertyNames(node))).toStrictEqual(propertyNames);
 });
 
 test('hasChildNodes return false', () => {

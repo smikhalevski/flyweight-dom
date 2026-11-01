@@ -23,6 +23,11 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
 export function assertInsertable(parent: ParentNode, value: unknown): void {
   if (value instanceof Node) {
     assertInsertableNode(parent, value);
+    return;
+  }
+
+  if ((typeof value === 'object' && value !== null) || typeof value === 'function') {
+    throw new Error('The value must be a Node or a primitive');
   }
 }
 

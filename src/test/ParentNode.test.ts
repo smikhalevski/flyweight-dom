@@ -273,6 +273,14 @@ describe('lastElementChild', () => {
 });
 
 describe('append', () => {
+  test('does not insert anything if a value is an object that is not a node', () => {
+    const parent = new Element('aaa');
+
+    // @ts-expect-error Objects aren't insertable
+    expect(() => parent.append('aaa', {})).toThrow('The value must be a Node or a primitive');
+    expect(parent.firstChild).toBeNull();
+  });
+
   test('appends the child', () => {
     const parent = new Element('aaa');
     const child1 = new Text('child1');

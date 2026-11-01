@@ -1,9 +1,9 @@
 import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
+import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
 import { assertInsertable } from './uncheckedToInsertableNode.js';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, getViableNextSibling } from './utils.js';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
 
 /**
  * The node that can be a child of another node.
@@ -93,7 +93,9 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      uncheckedInsertNodes(parentNode, arguments, getViableNextSibling(this.nextSibling, arguments));
+      for (let i = 0, anchor: ChildNode | null = this; i < arguments.length; ++i) {
+        anchor = uncheckedInsertNodeAfter(parentNode, arguments[i], anchor);
+      }
       return this;
     }
 
@@ -108,8 +110,9 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      // This node may be among inserted nodes, so insert before the first node that stays in place
-      uncheckedInsertNodes(parentNode, arguments, getViableNextSibling(this, arguments));
+      for (let i = 0, anchor = this.previousSibling; i < arguments.length; ++i) {
+        anchor = uncheckedInsertNodeAfter(parentNode, arguments[i], anchor);
+      }
       return this;
     }
 
@@ -133,10 +136,14 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      const nextSibling = getViableNextSibling(this.nextSibling, arguments);
+      let anchor = this.previousSibling;
 
+      // This node may be among inserted values, so it is removed first, and inserted again when its turn comes
       uncheckedRemoveChild(parentNode, this);
-      uncheckedInsertNodes(parentNode, arguments, nextSibling);
+
+      for (let i = 0; i < arguments.length; ++i) {
+        anchor = uncheckedInsertNodeAfter(parentNode, arguments[i], anchor);
+      }
       return this;
     }
 

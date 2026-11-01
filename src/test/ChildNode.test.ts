@@ -157,6 +157,18 @@ describe('before', () => {
 
     expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
   });
+
+  test('inserts nodes after the first preceding sibling that is not inserted', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const text3 = new Text('ccc');
+    const text4 = new Text('ddd');
+    const parent = new Element('aaa').append(text1, text2, text3);
+
+    text3.before(text4, text2);
+
+    expect(getChildNodes(parent)).toStrictEqual([text1, text4, text2, text3]);
+  });
 });
 
 describe('remove', () => {

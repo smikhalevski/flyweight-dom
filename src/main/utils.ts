@@ -1,4 +1,3 @@
-import type { ChildNode } from './ChildNode.js';
 import type { DocumentFragment } from './DocumentFragment.js';
 import type { Element } from './Element.js';
 import type { Node } from './Node.js';
@@ -70,18 +69,6 @@ export function getPreviousSiblingOrSelf(node: Node | null, nodeType: number): N
 
 export function getNextSiblingOrSelf(node: Node | null, nodeType: number): Node | null {
   while (node !== null && node.nodeType !== nodeType) {
-    node = node.nextSibling;
-  }
-  return node;
-}
-
-/**
- * Returns the node or its first following sibling that isn't one of the given nodes.
- *
- * @see [Viable next sibling](https://dom.spec.whatwg.org/#dom-childnode-after)
- */
-export function getViableNextSibling(node: ChildNode | null, nodes: ArrayLike<unknown>): ChildNode | null {
-  while (node !== null && Array.prototype.indexOf.call(nodes, node) !== -1) {
     node = node.nextSibling;
   }
   return node;

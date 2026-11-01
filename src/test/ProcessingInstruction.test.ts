@@ -26,3 +26,10 @@ test('clones an instance of a subclass', () => {
 
   expect(new MockProcessingInstruction('aaa').cloneNode()).toBeInstanceOf(MockProcessingInstruction);
 });
+
+test('processing instructions are equal if target and data are equal', () => {
+  expect(new ProcessingInstruction('aaa', 'bbb').isEqualNode(new ProcessingInstruction('aaa', 'bbb'))).toBe(true);
+
+  expect(new ProcessingInstruction('aaa', 'bbb').isEqualNode(new ProcessingInstruction('xxx', 'bbb'))).toBe(false);
+  expect(new ProcessingInstruction('aaa', 'bbb').isEqualNode(new ProcessingInstruction('aaa', 'xxx'))).toBe(false);
+});

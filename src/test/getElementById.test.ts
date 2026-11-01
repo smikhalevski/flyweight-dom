@@ -11,3 +11,7 @@ test('returns the element with the given ID', () => {
 test('returns null if ID is empty', () => {
   expect(getElementById(f.doc(f.aaa()), '')).toBeNull();
 });
+
+test('returns null if there is no element with the given ID', () => {
+  expect(getElementById(f.aaa(f.bbb({ id: 'ccc' })), 'ddd')).toBeNull();
+});

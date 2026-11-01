@@ -10,7 +10,7 @@ import {
   ProcessingInstruction,
   Text,
 } from '../main/index.js';
-import { coerceToNonNegativeInteger, defineNodeType } from '../main/utils.js';
+import { coerceToNonNegativeInteger, coerceToString, defineNodeType } from '../main/utils.js';
 
 describe('defineNodeType', () => {
   test('defines nodeType and nodeName on the prototype', () => {
@@ -82,5 +82,15 @@ describe('coerceToNonNegativeInteger', () => {
 
   test('does not wrap a number greater than the maximum 32-bit integer', () => {
     expect(coerceToNonNegativeInteger(2 ** 31)).toBe(2 ** 31);
+  });
+});
+
+describe('coerceToString', () => {
+  test('returns an empty string for null', () => {
+    expect(coerceToString(null)).toBe('');
+  });
+
+  test('stringifies a number', () => {
+    expect(coerceToString(111)).toBe('111');
   });
 });

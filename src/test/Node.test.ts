@@ -52,6 +52,7 @@ test('creating childNodes, children and classList does not add properties to nod
   element.childNodes;
   element.children;
   element.classList;
+  element.attributes;
   document.childNodes;
   document.children;
   fragment.childNodes;
@@ -96,4 +97,15 @@ test('parentElement is null if parent is not an element', () => {
   new Element('aaa').appendChild(new MockParentNode()).appendChild(node);
 
   expect(node.parentElement).toBeNull();
+});
+
+test('contains a descendant', () => {
+  const text = new Text();
+
+  expect(new Element('aaa').append(new Element('bbb').append(text)).contains(text)).toBe(true);
+});
+
+test('does not contain null or undefined', () => {
+  expect(new Element('aaa').contains(null)).toBe(false);
+  expect(new Element('aaa').contains(undefined)).toBe(false);
 });

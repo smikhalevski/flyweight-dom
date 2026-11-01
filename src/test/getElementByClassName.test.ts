@@ -27,3 +27,7 @@ test('does not match a class name that is a part of another class name', () => {
 
   expect(getElementsByClassName(root, 'aaa')).toStrictEqual([]);
 });
+
+test('returns an empty array if class names are blank', () => {
+  expect(getElementsByClassName(f.aaa(f.bbb({ class: 'ccc' })), ' \t')).toStrictEqual([]);
+});

@@ -92,6 +92,10 @@ describe('TreeWalker', () => {
         ).firstChild()
       ).toBe(element3);
     });
+
+    test('returns null if no descendant is accepted', () => {
+      expect(new TreeWalker(document, undefined, () => NodeFilter.FILTER_SKIP).firstChild()).toBeNull();
+    });
   });
 
   describe('lastChild', () => {
@@ -127,6 +131,10 @@ describe('TreeWalker', () => {
           node.nodeName === 'element4' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
         ).lastChild()
       ).toBe(element3);
+    });
+
+    test('returns null if no descendant is accepted', () => {
+      expect(new TreeWalker(document, undefined, () => NodeFilter.FILTER_SKIP).lastChild()).toBeNull();
     });
   });
 
@@ -326,6 +334,22 @@ describe('TreeWalker', () => {
       treeWalker.currentNode = element4;
 
       expect(treeWalker.previousNode()).toBe(text1);
+    });
+
+    test('returns an ancestor of a skipped parent', () => {
+      const treeWalker = new TreeWalker(document, undefined, node =>
+        node.nodeName === 'element2' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
+      );
+      treeWalker.currentNode = text1;
+
+      expect(treeWalker.previousNode()).toBe(element1);
+    });
+
+    test('returns null if the current node is not inside the root', () => {
+      const treeWalker = new TreeWalker(document);
+      treeWalker.currentNode = new Text();
+
+      expect(treeWalker.previousNode()).toBeNull();
     });
   });
 });

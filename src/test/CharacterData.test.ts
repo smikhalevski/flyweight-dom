@@ -94,6 +94,15 @@ test('deletes data to the end if count exceeds the maximum 32-bit integer', () =
   expect(node.data).toBe('aa');
 });
 
+test('inserts data', () => {
+  const node = new MockCharacterData();
+  node.data = 'aaabbb';
+
+  node.insertData(3, 'ccc');
+
+  expect(node.data).toBe('aaacccbbb');
+});
+
 test('replaces data', () => {
   const node = new MockCharacterData();
   node.data = 'aaabbb';

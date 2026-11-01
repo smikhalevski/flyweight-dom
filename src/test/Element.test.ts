@@ -75,6 +75,14 @@ test('returns a DOMTokenList backed by a class attribute', () => {
   expect(element.getAttribute('class')).toBe('bbb ccc');
 });
 
+test('adds a class to an element that has no attributes', () => {
+  const element = new Element('aaa');
+
+  element.classList.add('bbb');
+
+  expect(element.getAttribute('class')).toBe('bbb');
+});
+
 test('returns the same DOMTokenList instance', () => {
   const element = new Element('aaa');
 
@@ -124,6 +132,21 @@ test('uses attributes passed to the constructor as is', () => {
   expect(new Element('aaa', attributes).attributes).toBe(attributes);
 });
 
+test('returns the same empty attributes object if no attributes were passed to the constructor', () => {
+  const element = new Element('aaa');
+
+  expect(element.attributes).toStrictEqual({});
+  expect(element.attributes).toBe(element.attributes);
+});
+
+test('reads attributes that were written to the attributes object', () => {
+  const element = new Element('aaa');
+
+  element.attributes.bbb = '111';
+
+  expect(element.getAttribute('bbb')).toBe('111');
+});
+
 test('returns true if an attribute is present', () => {
   const element = new Element('aaa', { bbb: 'ccc' });
 
@@ -137,6 +160,14 @@ test('removes an attribute', () => {
   element.removeAttribute('bbb');
 
   expect(element.hasAttribute('bbb')).toBe(false);
+});
+
+test('does nothing if the removed attribute is absent', () => {
+  const element = new Element('aaa');
+
+  element.removeAttribute('bbb');
+
+  expect(element.getAttributeNames()).toStrictEqual([]);
 });
 
 test('toggles an attribute on', () => {
@@ -229,6 +260,13 @@ test('inserts adjacent element afterEnd', () => {
   expect(element1.lastChild).toBe(element3);
 });
 
+test('returns null if an adjacent element is inserted beside an element without a parent', () => {
+  const element = new Element('aaa');
+
+  expect(element.insertAdjacentElement('beforeBegin', new Element('bbb'))).toBeNull();
+  expect(element.insertAdjacentElement('afterEnd', new Element('bbb'))).toBeNull();
+});
+
 test('inserts adjacent element with a lowercase position', () => {
   const element1 = new Element('aaa');
   const element2 = new Element('bbb');
@@ -297,6 +335,14 @@ test('clones attributes', () => {
   expect(node.attributes).not.toBe(element.attributes);
 });
 
+test('does not share attributes with a clone of an element that has no attributes', () => {
+  const element = new Element('aaa');
+
+  element.cloneNode().setAttribute('bbb', '111');
+
+  expect(element.hasAttribute('bbb')).toBe(false);
+});
+
 test('clones an instance of a subclass', () => {
   class MockElement extends Element {}
 
@@ -337,6 +383,11 @@ test('elements are equal when attributes are equal', () => {
   );
 });
 
+test('an element without attributes is equal to an element with an empty attributes object', () => {
+  expect(new Element('aaa').isEqualNode(new Element('aaa', {}))).toBe(true);
+  expect(new Element('aaa', {}).isEqualNode(new Element('aaa'))).toBe(true);
+});
+
 test('compares attributes the same way regardless of the order of elements', () => {
   const element1 = new Element('aaa', Object.create({ xxx: 'yyy' }));
   const element2 = new Element('aaa', { xxx: 'yyy' });
@@ -363,4 +414,30 @@ test('returns textContent of text descendants only', () => {
   const element = new Element('aaa').append(new Comment('bbb'), 'ccc', new Element('ddd').append('eee'));
 
   expect(element.textContent).toBe('ccceee');
+});
+
+test('setting textContent replaces children', () => {
+  const element = new Element('aaa').append(new Element('bbb'), 'ccc');
+
+  element.textContent = 'ddd';
+
+  expect(element.childNodes.length).toBe(1);
+  expect(element.textContent).toBe('ddd');
+});
+
+test('setting an empty textContent removes children', () => {
+  const element = new Element('aaa').append('bbb');
+
+  element.textContent = '';
+
+  expect(element.firstChild).toBeNull();
+});
+
+test('setting nodeValue does nothing', () => {
+  const element = new Element('aaa');
+
+  element.nodeValue = 'bbb';
+
+  expect(element.nodeValue).toBeNull();
+  expect(element.firstChild).toBeNull();
 });

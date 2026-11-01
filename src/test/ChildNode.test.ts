@@ -1,10 +1,14 @@
 import { describe, expect, test } from 'vitest';
-import { ChildNode, Element, Node, Text } from '../main/index.js';
+import { ChildNode, DocumentFragment, Element, Node, Text } from '../main/index.js';
 import { getChildNodes } from './utils.js';
 
 test('returns the cached constructor', () => {
   expect(ChildNode()).toBe(ChildNode());
   expect(ChildNode(Node)).toBe(ChildNode());
+});
+
+test('cloneNode throws if the base class does not support it', () => {
+  expect(() => new (ChildNode())().cloneNode()).toThrow('This node type does not support this method');
 });
 
 test('extends a class constructor', () => {
@@ -95,6 +99,17 @@ describe('after', () => {
     text1.after(text2, text4);
 
     expect(getChildNodes(parent)).toEqual([text1, text2, text4, text3]);
+  });
+
+  test('inserts nodes after an empty fragment', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const text3 = new Text('ccc');
+    const parent = new Element('aaa').append(text1, text2);
+
+    text1.after(new DocumentFragment(), text3);
+
+    expect(getChildNodes(parent)).toStrictEqual([text1, text3, text2]);
   });
 });
 

@@ -72,3 +72,11 @@ test('clones an instance of a subclass', () => {
 
   expect(new MockDocument().cloneNode()).toBeInstanceOf(MockDocument);
 });
+
+test('setting textContent does nothing', () => {
+  const document = new Document();
+
+  document.textContent = 'aaa';
+
+  expect(document.firstChild).toBeNull();
+});

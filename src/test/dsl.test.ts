@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { f } from '../main/dsl.js';
-import { Document, Element, Text } from '../main/index.js';
+import { CDATASection, Comment, Document, Element, ProcessingInstruction, Text } from '../main/index.js';
 
 test('creates a document', () => {
   const doctype = f.doctype('html');
@@ -36,4 +36,19 @@ test('creates element factories after hasOwnProperty is read', () => {
   f.hasOwnProperty;
 
   expect(f.aaa()).toBeInstanceOf(Element);
+});
+
+test('creates a processing instruction, a CDATA section and a comment', () => {
+  expect(f.pi('aaa', 'bbb')).toStrictEqual(new ProcessingInstruction('aaa', 'bbb'));
+  expect(f.cdata('aaa')).toStrictEqual(new CDATASection('aaa'));
+  expect(f.comment('aaa')).toStrictEqual(new Comment('aaa'));
+});
+
+test('skips null, undefined and boolean children', () => {
+  expect(f.div(null, undefined, true, false).firstChild).toBeNull();
+});
+
+test('throws if a child is an object that is not a node', () => {
+  // @ts-expect-error Objects aren't children
+  expect(() => f.div('aaa', {})).toThrow('Cannot append a child');
 });

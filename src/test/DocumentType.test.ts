@@ -39,3 +39,11 @@ test('clones an instance of a subclass', () => {
 
   expect(new MockDocumentType('aaa').cloneNode()).toBeInstanceOf(MockDocumentType);
 });
+
+test('doctypes are equal if name, publicId and systemId are equal', () => {
+  expect(new DocumentType('aaa', 'bbb', 'ccc').isEqualNode(new DocumentType('aaa', 'bbb', 'ccc'))).toBe(true);
+
+  expect(new DocumentType('aaa', 'bbb', 'ccc').isEqualNode(new DocumentType('xxx', 'bbb', 'ccc'))).toBe(false);
+  expect(new DocumentType('aaa', 'bbb', 'ccc').isEqualNode(new DocumentType('aaa', 'xxx', 'ccc'))).toBe(false);
+  expect(new DocumentType('aaa', 'bbb', 'ccc').isEqualNode(new DocumentType('aaa', 'bbb', 'xxx'))).toBe(false);
+});

@@ -2,6 +2,10 @@ import { describe, expect, test } from 'vitest';
 import { ChildNode, Document, Element, Node, NodeList, ParentNode, Text } from '../main/index.js';
 import { getChildNodes } from './utils.js';
 
+test('cloneNode throws if the base class does not support it', () => {
+  expect(() => new (ParentNode())().cloneNode()).toThrow('This node type does not support this method');
+});
+
 test('returns the cached constructor', () => {
   expect(ParentNode()).toBe(ParentNode());
   expect(ParentNode(Node)).toBe(ParentNode());
@@ -135,6 +139,16 @@ describe('insertBefore', () => {
     expect(parent.childNodes[2]).toBe(text3);
     expect(parent.firstChild).toBe(text1);
     expect(parent.lastChild).toBe(text3);
+  });
+
+  test('does not move the last child inserted before itself', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const parent = new Element('aaa').append(text1, text2);
+
+    parent.insertBefore(text2, text2);
+
+    expect(getChildNodes(parent)).toStrictEqual([text1, text2]);
   });
 });
 
@@ -302,6 +316,13 @@ describe('append', () => {
     expect(parent.firstChild).toBeNull();
     expect(child1.parentNode).toBeNull();
     expect(child2.parentNode).toBeNull();
+  });
+
+  test('skips null and undefined', () => {
+    // @ts-expect-error null and undefined are outside the declared type, but JS callers pass them
+    const parent = new Element('aaa').append('bbb', null, undefined);
+
+    expect(parent.childNodes.length).toBe(1);
   });
 });
 

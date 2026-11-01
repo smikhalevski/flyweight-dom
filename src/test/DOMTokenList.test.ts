@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { DOMTokenList, ValueAccessor } from '../main/index.js';
 
 let valueMock: string | null = '';
@@ -44,6 +44,14 @@ test('returns the underlying value as is', () => {
   expect(tokenList.value).toBe('aaa   bbb');
 });
 
+test('sets the underlying value as is', () => {
+  const tokenList = new DOMTokenList(valueAccessorMock);
+
+  tokenList.value = 'aaa   bbb';
+
+  expect(valueMock).toBe('aaa   bbb');
+});
+
 test('adds a new token', () => {
   const tokenList = new DOMTokenList(valueAccessorMock);
 
@@ -52,6 +60,19 @@ test('adds a new token', () => {
 
   expect(tokenList.value).toBe('aaa bbb ccc');
   expect(tokenList.length).toBe(3);
+});
+
+test('does not add a token that is already present', () => {
+  const tokenList = new DOMTokenList(valueAccessorMock);
+
+  valueMock = 'aaa';
+  tokenList.add('aaa');
+
+  expect(tokenList.value).toBe('aaa');
+});
+
+test('throws if an added token is empty', () => {
+  expect(() => new DOMTokenList(valueAccessorMock).add('')).toThrow('The token provided must not be empty');
 });
 
 test('throws if an added token contains space chars', () => {
@@ -172,6 +193,15 @@ describe('replace', () => {
     );
     expect(tokenList.value).toBe('aaa bbb');
   });
+
+  test('replaces a token with itself', () => {
+    const tokenList = new DOMTokenList(valueAccessorMock);
+
+    valueMock = 'aaa bbb';
+
+    expect(tokenList.replace('aaa', 'aaa')).toBe(true);
+    expect(tokenList.value).toBe('aaa bbb');
+  });
 });
 
 describe('add', () => {
@@ -234,6 +264,22 @@ describe('item', () => {
     expect(tokenList.item(2)).toBe('ccc');
     expect(tokenList.item(3)).toBeNull();
     expect(tokenList.item(0.5)).toBeNull();
+  });
+});
+
+describe('forEach', () => {
+  test('calls the callback with each token, its index and the list', () => {
+    const tokenList = new DOMTokenList(valueAccessorMock);
+    const callbackMock = vi.fn();
+    const thisArg = {};
+
+    valueMock = 'aaa bbb';
+    tokenList.forEach(callbackMock, thisArg);
+
+    expect(callbackMock).toHaveBeenCalledTimes(2);
+    expect(callbackMock).toHaveBeenNthCalledWith(1, 'aaa', 0, tokenList);
+    expect(callbackMock).toHaveBeenNthCalledWith(2, 'bbb', 1, tokenList);
+    expect(callbackMock.mock.contexts[0]).toBe(thisArg);
   });
 });
 

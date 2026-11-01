@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { DocumentFragment, Element, Node, Text } from '../main/index.js';
+import { Document, DocumentFragment, Element, Node, Text } from '../main/index.js';
 
 test('creates a new DocumentFragment instance', () => {
   const node = new DocumentFragment();
@@ -60,4 +60,11 @@ test('clones an instance of a subclass', () => {
   class MockDocumentFragment extends DocumentFragment {}
 
   expect(new MockDocumentFragment().cloneNode()).toBeInstanceOf(MockDocumentFragment);
+});
+
+test('fragments are equal if children are equal', () => {
+  expect(new DocumentFragment().append('aaa').isEqualNode(new DocumentFragment().append('aaa'))).toBe(true);
+
+  expect(new DocumentFragment().append('aaa').isEqualNode(new DocumentFragment().append('bbb'))).toBe(false);
+  expect(new DocumentFragment().isEqualNode(new Document())).toBe(false);
 });

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { ChildNode, Document, DocumentFragment, Element, Node, ParentNode, Text } from '../main/index.js';
-import { EmptyNodeList, LiveNodeList } from '../main/NodeList.js';
+import { EmptyNodeList, ChildNodeList } from '../main/NodeList.js';
 
 class MockNode extends Node {
   readonly nodeName = '';
@@ -31,8 +31,8 @@ test('creates a new MockNode instance', () => {
   expect(node.nodeName).toBe('');
 });
 
-test('childNodes of a parent node is a LiveNodeList', () => {
-  expect(new Element('aaa').childNodes).toBeInstanceOf(LiveNodeList);
+test('childNodes of a parent node is a ChildNodeList', () => {
+  expect(new Element('aaa').childNodes).toBeInstanceOf(ChildNodeList);
 });
 
 test('returns the same childNodes instance', () => {

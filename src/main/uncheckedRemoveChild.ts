@@ -4,6 +4,8 @@ import type { ParentNode } from './ParentNode.js';
 export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
   const { previousSibling, nextSibling } = child;
 
+  parent['_notifyChildrenChanged']();
+
   child.parentNode = null;
 
   if (previousSibling !== null) {

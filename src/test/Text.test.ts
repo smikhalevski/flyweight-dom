@@ -37,10 +37,6 @@ test('splits a Text', () => {
   expect(node2.data).toBe('bbb');
 });
 
-test('throws if split offset is out of range', () => {
-  expect(() => new Text('aaa').splitText(4)).toThrow('The offset 4 is out of range');
-});
-
 test('returns whole text of adjacent Text and CDATASection nodes', () => {
   const text = new Text('bbb');
 

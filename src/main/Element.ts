@@ -1,11 +1,10 @@
 import { ChildNode } from './ChildNode.js';
 import { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
 import type { Node } from './Node.js';
-import type { NodeList } from './NodeList.js';
 import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { defineNodeType, ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import { coerceToString, defineNodeType, ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
 
 /**
  * The position is case-insensitive.
@@ -30,11 +29,6 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 export class Element extends ParentNode(ChildNode()) {
   /**
-   * Backs {@link children}. Initialized here rather than in the {@link ParentNode} mixin, see there.
-   */
-  private _children: NodeList<Element> | undefined = undefined;
-
-  /**
    * Backs {@link classList}. Initialized on construction, so creating the list later doesn't change the hidden class of
    * the element.
    */
@@ -48,7 +42,7 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   set id(value: string) {
-    this.attributes.id = value;
+    this.attributes.id = coerceToString(value);
   }
 
   /**
@@ -59,7 +53,7 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   set className(value: string) {
-    this.attributes.class = value;
+    this.attributes.class = coerceToString(value);
   }
 
   /**
@@ -76,14 +70,9 @@ export class Element extends ParentNode(ChildNode()) {
     return getTextContent(this);
   }
 
-  set textContent(value: string | null) {
+  set textContent(value: string | null | undefined) {
     setTextContent(this, value);
   }
-
-  /**
-   * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
-   */
-  readonly attributes: Record<string, string>;
 
   /**
    * Creates a new instance of {@link Element}.
@@ -97,16 +86,20 @@ export class Element extends ParentNode(ChildNode()) {
      * @see [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) on MDN
      */
     readonly tagName: string,
-    attributes: Record<string, string> = {}
+    /**
+     * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
+     */
+    readonly attributes: Record<string, string> = {}
   ) {
     super();
-    this.attributes = attributes;
   }
 
   /**
    * @see [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) on MDN
    */
   setAttribute(name: string, value: string): this {
+    value = coerceToString(value);
+
     if (name === '__proto__') {
       // Assignment would call the inherited __proto__ setter, which ignores strings, so define an own property instead
       Object.defineProperty(this.attributes, name, { value, writable: true, enumerable: true, configurable: true });
@@ -177,7 +170,9 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.insertAdjacentText](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText) on MDN
    */
   insertAdjacentText(position: InsertPosition, data: string): void {
-    insertAdjacentNode(this, position, new Text(data));
+    if (data !== null && data !== undefined) {
+      insertAdjacentNode(this, position, new Text(data));
+    }
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {

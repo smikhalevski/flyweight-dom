@@ -1,7 +1,7 @@
 import { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { type NodeList, LiveNodeList } from './NodeList.js';
+import { ChildNodeList, type NodeList } from './NodeList.js';
 import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
@@ -90,21 +90,27 @@ export function ParentNode(constructor: new () => Node = Node) {
     declare readonly nodeName: string;
 
     /**
-     * Initialized by classes that extend the mixin, since an initializer here would add a constructor to the mixin,
-     * which V8 can't skip during instantiation. Classes that don't initialize it get the property on first access.
+     * Backs {@link children}.
      */
-    declare private _children: NodeList<Element> | undefined;
+    private _children: NodeList<Element> | undefined = undefined;
+
+    /**
+     * See {@link Node._childrenVersion}.
+     *
+     * @hidden
+     */
+    protected _childrenVersion = 0;
 
     get childNodes(): NodeList {
       if (this._childNodes === undefined) {
-        this._childNodes = new LiveNodeList(this);
+        this._childNodes = new ChildNodeList(this);
       }
       return this._childNodes;
     }
 
     get children(): NodeList<Element> {
       if (this._children === undefined) {
-        this._children = new LiveNodeList(this, isElement);
+        this._children = new ChildNodeList(this, isElement);
       }
       return this._children;
     }
@@ -220,6 +226,7 @@ export function ParentNode(constructor: new () => Node = Node) {
       }
 
       this.firstChild = this.lastChild = null;
+      this._notifyChildrenChanged();
 
       uncheckedInsertNodes(this, arguments, null);
       return this;
@@ -229,10 +236,8 @@ export function ParentNode(constructor: new () => Node = Node) {
       return super.cloneNode(deep) as ParentNode;
     }
 
-    *[Symbol.iterator](): Iterator<ChildNode> {
-      for (let child = this.firstChild; child !== null; child = child.nextSibling) {
-        yield child;
-      }
+    *[Symbol.iterator](): IterableIterator<ChildNode> {
+      yield* this.childNodes;
     }
   };
 

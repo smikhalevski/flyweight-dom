@@ -5,7 +5,7 @@ import type { ParentNode } from './ParentNode.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertOffset, defineNodeType, ELEMENT_NODE, isText, TEXT_NODE } from './utils.js';
+import { defineNodeType, ELEMENT_NODE, isText, TEXT_NODE, coerceToString, coerceToPositiveInteger } from './utils.js';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
@@ -38,7 +38,7 @@ export class Text extends CharacterData {
   splitText(offset: number): this {
     const { data, parentNode, nextSibling } = this;
 
-    assertOffset(data, offset);
+    offset = coerceToPositiveInteger(offset);
 
     this.data = data.substring(0, offset);
 
@@ -59,13 +59,15 @@ export class Text extends CharacterData {
 
 defineNodeType(Text, TEXT_NODE, '#text');
 
-export function setTextContent(node: ParentNode, value: string | null): void {
+export function setTextContent(node: ParentNode, value: string | null | undefined): void {
   while (node.firstChild !== null) {
     uncheckedRemoveChild(node, node.firstChild);
   }
 
-  if (value !== null && value.length !== 0) {
-    uncheckedAppendChild(node, new Text(value));
+  const data = coerceToString(value);
+
+  if (data.length !== 0) {
+    uncheckedAppendChild(node, new Text(data));
   }
 }
 

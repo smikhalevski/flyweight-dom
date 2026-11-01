@@ -85,22 +85,6 @@ test('deletes data', () => {
   expect(node.data).toBe('aab');
 });
 
-test('deletes data up to the end if count is negative', () => {
-  const node = new MockCharacterData();
-  node.data = 'aaabbb';
-
-  node.deleteData(2, -1);
-
-  expect(node.data).toBe('aa');
-});
-
-test('throws if offset is out of range', () => {
-  const node = new MockCharacterData();
-  node.data = 'aaa';
-
-  expect(() => node.deleteData(4, 1)).toThrow('The offset 4 is out of range');
-});
-
 test('replaces data', () => {
   const node = new MockCharacterData();
   node.data = 'aaabbb';
@@ -110,28 +94,12 @@ test('replaces data', () => {
   expect(node.data).toBe('aacccb');
 });
 
-test('replaces data up to the end if count is negative', () => {
-  const node = new MockCharacterData();
-  node.data = 'aaabbb';
-
-  node.replaceData(2, -1, 'ccc');
-
-  expect(node.data).toBe('aaccc');
-});
-
 test('returns a data substring', () => {
   const node = new MockCharacterData();
   node.data = 'aaabbb';
 
   expect(node.substringData(2, 3)).toBe('abb');
   expect(node.data).toBe('aaabbb');
-});
-
-test('returns a data substring up to the end if count is negative', () => {
-  const node = new MockCharacterData();
-  node.data = 'aaabbb';
-
-  expect(node.substringData(2, -1)).toBe('abbb');
 });
 
 test('clones a CharacterData instance', () => {

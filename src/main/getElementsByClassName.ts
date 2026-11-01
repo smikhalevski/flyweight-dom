@@ -3,7 +3,7 @@ import { Element } from './Element.js';
 import { Node } from './Node.js';
 import { NodeFilter } from './NodeFilter.js';
 import { TreeWalker } from './TreeWalker.js';
-import { isSpaceChar } from './utils.js';
+import { coerceToString, isSpaceChar } from './utils.js';
 
 /**
  * Returns an array elements which have all of the given class name(s).
@@ -14,6 +14,8 @@ import { isSpaceChar } from './utils.js';
  * @group Other
  */
 export function getElementsByClassName(root: Node, className: string): Element[] {
+  className = coerceToString(className);
+
   const classNames = splitTokens(className);
 
   if (classNames.length === 0) {

@@ -29,7 +29,7 @@ export { DocumentType } from './DocumentType.js';
 export { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
 export { Element, type InsertPosition } from './Element.js';
 export { NodeFilter } from './NodeFilter.js';
-export { NodeList, EmptyNodeList, LiveNodeList } from './NodeList.js';
+export { NodeList, EmptyNodeList, ChildNodeList } from './NodeList.js';
 export { ParentNode } from './ParentNode.js';
 export { ProcessingInstruction } from './ProcessingInstruction.js';
 export { Text } from './Text.js';

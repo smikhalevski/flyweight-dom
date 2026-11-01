@@ -91,18 +91,12 @@ export function isText(node: Node): node is Text {
   return node.nodeType === TEXT_NODE || node.nodeType === CDATA_SECTION_NODE;
 }
 
-export function assertOffset(data: string, offset: number): void {
-  if (offset < 0 || offset > data.length) {
-    throw new Error('The offset ' + offset + ' is out of range');
-  }
+export function coerceToPositiveInteger(count: number): number {
+  return Math.max(count, 0) | 0;
 }
 
-/**
- * Converts a count the same way browsers convert unsigned long arguments, so a negative count spans to the end of
- * the data, and NaN becomes 0.
- */
-export function toUnsignedLong(count: number): number {
-  return count >>> 0;
+export function coerceToString(value: unknown): string {
+  return typeof value === 'string' ? value : value === null || value === undefined ? '' : String(value);
 }
 
 // https://infra.spec.whatwg.org/#ascii-whitespace

@@ -1,6 +1,6 @@
 import type { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
-import { EmptyNodeList, type NodeList } from './NodeList.js';
+import { EmptyNodeList, type ChildNodeList, type NodeList } from './NodeList.js';
 import type { ParentNode } from './ParentNode.js';
 import { uncheckedContains } from './uncheckedContains.js';
 import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.js';
@@ -74,13 +74,22 @@ export class Node {
   protected _childNodes: NodeList | undefined = undefined;
 
   /**
+   * Changes each time children of the node change, so a {@link ChildNodeList} knows when its cached state is stale.
+   * Only declared here, so edit helpers and lists can reach it. Initialized by {@link ParentNode}, so leaf nodes don't
+   * spend memory on it.
+   *
+   * @hidden
+   */
+  declare protected _childrenVersion: number;
+
+  /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
    */
   get nodeValue(): string | null {
     return null;
   }
 
-  set nodeValue(value: string | null) {}
+  set nodeValue(value: string | null | undefined) {}
 
   /**
    * @see [Node.textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) on MDN
@@ -89,7 +98,7 @@ export class Node {
     return null;
   }
 
-  set textContent(value: string | null) {}
+  set textContent(value: string | null | undefined) {}
 
   /**
    * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
@@ -164,5 +173,14 @@ export class Node {
    */
   cloneNode(deep?: boolean): Node {
     throw new Error('This node type does not support this method');
+  }
+
+  /**
+   * Notifies live lists of the node that its children changed.
+   *
+   * @hidden
+   */
+  protected _notifyChildrenChanged(): void {
+    this._childrenVersion = (this._childrenVersion + 1) | 0;
   }
 }

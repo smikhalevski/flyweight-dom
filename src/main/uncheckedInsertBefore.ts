@@ -4,6 +4,8 @@ import type { ParentNode } from './ParentNode.js';
 export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, child: ChildNode): void {
   const { previousSibling } = child;
 
+  parent['_notifyChildrenChanged']();
+
   node.parentNode = parent;
 
   node.nextSibling = child;

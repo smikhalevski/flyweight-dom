@@ -8,6 +8,8 @@ export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: P
     return;
   }
 
+  targetParent['_notifyChildrenChanged']();
+
   let { lastChild } = targetParent;
 
   for (let child: ChildNode | null = firstChild; child !== null; child = child.nextSibling) {

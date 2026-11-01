@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { DOMTokenList, ValueAccessor } from '../main/index.js';
 
 let valueMock: string | null = '';
@@ -14,7 +14,7 @@ beforeEach(() => {
   valueMock = '';
 });
 
-test('creates a new DOMTokenList instance', () => {
+test('creates an empty token list', () => {
   const node = new DOMTokenList(valueAccessorMock);
 
   expect(node.length).toBe(0);
@@ -44,7 +44,15 @@ test('returns the underlying value as is', () => {
   expect(tokenList.value).toBe('aaa   bbb');
 });
 
-test('adds a new token', () => {
+test('sets the underlying value as is', () => {
+  const tokenList = new DOMTokenList(valueAccessorMock);
+
+  tokenList.value = 'aaa   bbb';
+
+  expect(valueMock).toBe('aaa   bbb');
+});
+
+test('adds tokens', () => {
   const tokenList = new DOMTokenList(valueAccessorMock);
 
   tokenList.add('aaa', 'bbb');
@@ -54,18 +62,31 @@ test('adds a new token', () => {
   expect(tokenList.length).toBe(3);
 });
 
-test('throws if an added token contains space chars', () => {
+test('does not add a token that is already present', () => {
+  const tokenList = new DOMTokenList(valueAccessorMock);
+
+  valueMock = 'aaa';
+  tokenList.add('aaa');
+
+  expect(tokenList.value).toBe('aaa');
+});
+
+test('throws if an added token is empty', () => {
+  expect(() => new DOMTokenList(valueAccessorMock).add('')).toThrow('The token provided must not be empty');
+});
+
+test('throws if an added token contains whitespace, and adds nothing', () => {
   const tokenList = new DOMTokenList(valueAccessorMock);
 
   tokenList.add('ccc');
   expect(() => tokenList.add('aaa', 'b\tbb')).toThrow(
-    new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens")
+    "The token provided ('b	bb') contains HTML space characters, which are not valid in tokens"
   );
 
   expect(tokenList.value).toBe('ccc');
 });
 
-test('removes a token', () => {
+test('removes tokens', () => {
   const tokenList = new DOMTokenList(valueAccessorMock);
 
   tokenList.add('aaa', 'bbb', 'ccc');
@@ -94,18 +115,18 @@ test('splits tokens by ASCII whitespace only', () => {
   expect(tokenList.item(0)).toBe('aaa\u00A0bbb');
 });
 
-test('throws if a removed token contains space chars', () => {
+test('throws if a removed token contains whitespace, and removes nothing', () => {
   const tokenList = new DOMTokenList(valueAccessorMock);
 
   tokenList.add('aaa', 'bbb');
   expect(() => tokenList.remove('aaa', 'b\tbb')).toThrow(
-    new Error("The token provided ('b	bb') contains HTML space characters, which are not valid in tokens")
+    "The token provided ('b	bb') contains HTML space characters, which are not valid in tokens"
   );
 
   expect(tokenList.value).toBe('aaa bbb');
 });
 
-test('tokens become unique after list is modified', () => {
+test('removes duplicate tokens when the list is modified, but not when it is read', () => {
   const tokenList = new DOMTokenList(valueAccessorMock);
 
   valueMock = 'aaa aaa bbb aaa';
@@ -128,7 +149,7 @@ describe('replace', () => {
     expect(tokenList.length).toBe(2);
   });
 
-  test('returns false if a token cannot be replaced', () => {
+  test('returns false, and changes nothing, if the token is absent', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
@@ -152,68 +173,79 @@ describe('replace', () => {
     expect(tokenList.value).toBe('ccc bbb');
   });
 
-  test('throws if a replaced token contains space chars', () => {
+  test('throws if the replaced token contains whitespace', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
 
     expect(() => tokenList.replace('a\taa', 'ccc')).toThrow(
-      new Error("The token provided ('a\taa') contains HTML space characters, which are not valid in tokens")
+      "The token provided ('a\taa') contains HTML space characters, which are not valid in tokens"
     );
   });
 
-  test('throws if a replacement token contains space chars', () => {
+  test('throws if the replacement token contains whitespace, and replaces nothing', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
 
     expect(() => tokenList.replace('aaa', 'c\tcc')).toThrow(
-      new Error("The token provided ('c\tcc') contains HTML space characters, which are not valid in tokens")
+      "The token provided ('c\tcc') contains HTML space characters, which are not valid in tokens"
     );
+    expect(tokenList.value).toBe('aaa bbb');
+  });
+
+  test('replaces a token with itself', () => {
+    const tokenList = new DOMTokenList(valueAccessorMock);
+
+    valueMock = 'aaa bbb';
+
+    expect(tokenList.replace('aaa', 'aaa')).toBe(true);
     expect(tokenList.value).toBe('aaa bbb');
   });
 });
 
-describe('add', () => {
-  test('adds a token if it is not contained', () => {
+describe('toggle', () => {
+  test('adds a token if it is absent', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
-    tokenList.toggle('ccc');
 
+    expect(tokenList.toggle('ccc')).toBe(true);
     expect(tokenList.value).toBe('aaa bbb ccc');
   });
 
-  test('removes a token if it is contained', () => {
+  test('removes a token if it is present', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
-    tokenList.toggle('aaa');
 
+    expect(tokenList.toggle('aaa')).toBe(false);
     expect(tokenList.value).toBe('bbb');
   });
 
-  test('adds a token or does nothing', () => {
+  test('adds a token, or keeps it, if forced on', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
-    tokenList.toggle('aaa', true);
-    tokenList.toggle('ccc', true);
 
+    expect(tokenList.toggle('aaa', true)).toBe(true);
+    expect(tokenList.toggle('ccc', true)).toBe(true);
     expect(tokenList.value).toBe('aaa bbb ccc');
   });
 
-  test('removes a token or does nothing', () => {
+  test('removes a token, or keeps it absent, if forced off', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
-    tokenList.toggle('aaa', false);
-    tokenList.toggle('ccc', false);
 
+    expect(tokenList.toggle('aaa', false)).toBe(false);
+    expect(tokenList.toggle('ccc', false)).toBe(false);
     expect(tokenList.value).toBe('bbb');
   });
+});
 
-  test('returns true if a token is in the list', () => {
+describe('contains', () => {
+  test('returns whether a token is in the list', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     tokenList.add('aaa', 'bbb');
@@ -224,7 +256,7 @@ describe('add', () => {
 });
 
 describe('item', () => {
-  test('returns a token by its index', () => {
+  test('returns a token by index, or null if the index is out of range or not an integer', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     valueMock = 'aaa   bbb\t\tccc';
@@ -234,6 +266,22 @@ describe('item', () => {
     expect(tokenList.item(2)).toBe('ccc');
     expect(tokenList.item(3)).toBeNull();
     expect(tokenList.item(0.5)).toBeNull();
+  });
+});
+
+describe('forEach', () => {
+  test('calls the callback with each token, its index and the list', () => {
+    const tokenList = new DOMTokenList(valueAccessorMock);
+    const callbackMock = vi.fn();
+    const thisArg = {};
+
+    valueMock = 'aaa bbb';
+    tokenList.forEach(callbackMock, thisArg);
+
+    expect(callbackMock).toHaveBeenCalledTimes(2);
+    expect(callbackMock).toHaveBeenNthCalledWith(1, 'aaa', 0, tokenList);
+    expect(callbackMock).toHaveBeenNthCalledWith(2, 'bbb', 1, tokenList);
+    expect(callbackMock.mock.contexts[0]).toBe(thisArg);
   });
 });
 
@@ -248,7 +296,7 @@ describe('Symbol.iterator', () => {
 });
 
 describe('toString', () => {
-  test('stringifies as an underlying value', () => {
+  test('returns the underlying value', () => {
     const tokenList = new DOMTokenList(valueAccessorMock);
 
     valueMock = 'aaa   bbb\t\tccc';

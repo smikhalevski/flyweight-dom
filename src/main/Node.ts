@@ -1,9 +1,9 @@
 import type { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
-import { NodeList } from './NodeList.js';
+import { EmptyNodeList, type ChildNodeList, type NodeList } from './NodeList.js';
 import type { ParentNode } from './ParentNode.js';
 import { uncheckedContains } from './uncheckedContains.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.js';
 
 /**
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
@@ -66,13 +66,30 @@ export class Node {
   lastChild: ChildNode | null = null;
 
   /**
+   * Backs {@link childNodes}. Initialized on construction, so creating the list later doesn't change the hidden class of
+   * the node.
+   *
+   * @hidden
+   */
+  protected _childNodes: NodeList | undefined = undefined;
+
+  /**
+   * Changes each time children of the node change, so a {@link ChildNodeList} knows when its cached state is stale.
+   * Only declared here, so edit helpers and lists can reach it. Initialized by {@link ParentNode}, so leaf nodes don't
+   * spend memory on it.
+   *
+   * @hidden
+   */
+  declare protected _childrenVersion: number;
+
+  /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
    */
   get nodeValue(): string | null {
     return null;
   }
 
-  set nodeValue(value: string | null) {}
+  set nodeValue(value: string | null | undefined) {}
 
   /**
    * @see [Node.textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) on MDN
@@ -81,26 +98,25 @@ export class Node {
     return null;
   }
 
-  set textContent(value: string | null) {}
+  set textContent(value: string | null | undefined) {}
 
   /**
    * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
    */
   get childNodes(): NodeList {
-    return Object.defineProperty(this, 'childNodes', { value: new NodeList(this) }).childNodes;
+    if (this._childNodes === undefined) {
+      this._childNodes = new EmptyNodeList();
+    }
+    return this._childNodes;
   }
 
   /**
    * @see [Node.parentElement](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement) on MDN
    */
   get parentElement(): Element | null {
-    let parent = this.parentNode;
+    const { parentNode } = this;
 
-    while (parent !== null && parent.nodeType !== ELEMENT_NODE) {
-      parent = parent.parentNode;
-    }
-
-    return parent as Element | null;
+    return parentNode !== null && isElement(parentNode) ? parentNode : null;
   }
 
   /**
@@ -157,5 +173,14 @@ export class Node {
    */
   cloneNode(deep?: boolean): Node {
     throw new Error('This node type does not support this method');
+  }
+
+  /**
+   * Notifies live lists of the node that its children changed.
+   *
+   * @hidden
+   */
+  protected _notifyChildrenChanged(): void {
+    this._childrenVersion = (this._childrenVersion + 1) | 0;
   }
 }

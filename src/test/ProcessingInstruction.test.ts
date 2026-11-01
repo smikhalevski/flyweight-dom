@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { CharacterData, Node, ProcessingInstruction } from '../main/index.js';
 
-test('creates a new ProcessingInstruction instance', () => {
+test('creates a processing instruction without data', () => {
   const node = new ProcessingInstruction('xml');
 
   expect(node).toBeInstanceOf(Node);
@@ -13,7 +13,7 @@ test('creates a new ProcessingInstruction instance', () => {
   expect(node.data).toBe('');
 });
 
-test('clones a ProcessingInstruction instance', () => {
+test('clones a processing instruction', () => {
   const node = new ProcessingInstruction('xml', 'aaa').cloneNode() as ProcessingInstruction;
 
   expect(node).toBeInstanceOf(ProcessingInstruction);
@@ -25,4 +25,11 @@ test('clones an instance of a subclass', () => {
   class MockProcessingInstruction extends ProcessingInstruction {}
 
   expect(new MockProcessingInstruction('aaa').cloneNode()).toBeInstanceOf(MockProcessingInstruction);
+});
+
+test('processing instructions are equal if target and data are equal', () => {
+  expect(new ProcessingInstruction('aaa', 'bbb').isEqualNode(new ProcessingInstruction('aaa', 'bbb'))).toBe(true);
+
+  expect(new ProcessingInstruction('aaa', 'bbb').isEqualNode(new ProcessingInstruction('xxx', 'bbb'))).toBe(false);
+  expect(new ProcessingInstruction('aaa', 'bbb').isEqualNode(new ProcessingInstruction('aaa', 'xxx'))).toBe(false);
 });

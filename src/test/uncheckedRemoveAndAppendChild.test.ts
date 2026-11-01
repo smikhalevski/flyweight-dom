@@ -3,7 +3,7 @@ import { DocumentFragment, Element, Text } from '../main/index.js';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
 import { uncheckedRemoveAndAppendChild } from '../main/uncheckedRemoveAndAppendChild.js';
 
-test('appends the first child node to an element', () => {
+test('appends a node to an empty parent', () => {
   const parent = new Element('parent');
   const node = new Text();
 
@@ -17,7 +17,7 @@ test('appends the first child node to an element', () => {
   expect(node.nextSibling).toBeNull();
 });
 
-test('appends multiple child nodes to an element', () => {
+test('appends nodes in order', () => {
   const parent = new Element('parent');
   const node1 = new Text();
   const node2 = new Text();
@@ -43,7 +43,7 @@ test('appends multiple child nodes to an element', () => {
   expect(node3.nextSibling).toBeNull();
 });
 
-test('removes a node from its parent', () => {
+test('moves a node from its previous parent', () => {
   const parent1 = new Element('parent1');
   const parent2 = new Element('parent2');
   const node = new Text();

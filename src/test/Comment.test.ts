@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { CharacterData, Comment, Node } from '../main/index.js';
 
-test('creates a new Comment instance', () => {
+test('creates an empty comment', () => {
   const node = new Comment();
 
   expect(node).toBeInstanceOf(Node);
@@ -13,14 +13,14 @@ test('creates a new Comment instance', () => {
   expect(node.data).toBe('');
 });
 
-test('creates a new Comment instance with data', () => {
+test('creates a comment with data', () => {
   const node = new Comment('aaa');
 
   expect(node.length).toBe(3);
   expect(node.data).toBe('aaa');
 });
 
-test('clones a Comment instance', () => {
+test('clones a comment', () => {
   const node = new Comment('aaa').cloneNode() as Comment;
 
   expect(node).toBeInstanceOf(Comment);

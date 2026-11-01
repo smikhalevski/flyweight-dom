@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
-import { DocumentFragment, Element, Node, Text } from '../main/index.js';
+import { Document, DocumentFragment, Element, Node, Text } from '../main/index.js';
 
-test('creates a new DocumentFragment instance', () => {
+test('creates an empty fragment', () => {
   const node = new DocumentFragment();
 
   expect(node).toBeInstanceOf(Node);
@@ -16,7 +16,7 @@ test('creates a new DocumentFragment instance', () => {
   expect(node.replaceChildren).toBeInstanceOf(Function);
 });
 
-test('shallow clones a DocumentFragment instance', () => {
+test('shallow clones a fragment without its children', () => {
   const fragment = new DocumentFragment();
   const element = new Element('aaa');
 
@@ -28,7 +28,7 @@ test('shallow clones a DocumentFragment instance', () => {
   expect(node.firstChild).toBeNull();
 });
 
-test('deeply clones a DocumentFragment instance', () => {
+test('deeply clones a fragment with its children', () => {
   const fragment = new DocumentFragment();
   const element = new Element('aaa');
 
@@ -41,7 +41,7 @@ test('deeply clones a DocumentFragment instance', () => {
   expect(node.firstChild!.nodeType).toBe(Node.ELEMENT_NODE);
 });
 
-test('returns concatenated textContent', () => {
+test('textContent joins the text of descendants', () => {
   const fragment = new DocumentFragment().append(new Element('aaa').append(new Text('bbb'), new Text('ccc')));
 
   expect(fragment.textContent).toBe('bbbccc');
@@ -60,4 +60,11 @@ test('clones an instance of a subclass', () => {
   class MockDocumentFragment extends DocumentFragment {}
 
   expect(new MockDocumentFragment().cloneNode()).toBeInstanceOf(MockDocumentFragment);
+});
+
+test('fragments are equal if children are equal', () => {
+  expect(new DocumentFragment().append('aaa').isEqualNode(new DocumentFragment().append('aaa'))).toBe(true);
+
+  expect(new DocumentFragment().append('aaa').isEqualNode(new DocumentFragment().append('bbb'))).toBe(false);
+  expect(new DocumentFragment().isEqualNode(new Document())).toBe(false);
 });

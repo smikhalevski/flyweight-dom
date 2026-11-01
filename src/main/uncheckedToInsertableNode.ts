@@ -1,10 +1,10 @@
 import type { ChildNode } from './ChildNode.js';
 import type { DocumentFragment } from './DocumentFragment.js';
-import type { Node } from './Node.js';
+import { Node } from './Node.js';
 import type { ParentNode } from './ParentNode.js';
 import { Text } from './Text.js';
 import { uncheckedContains } from './uncheckedContains.js';
-import { ATTRIBUTE_NODE, DOCUMENT_NODE } from './utils.js';
+import { ATTRIBUTE_NODE, coerceToString, DOCUMENT_NODE } from './utils.js';
 
 export type InsertableNode = DocumentFragment | ChildNode;
 
@@ -20,12 +20,24 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   }
 }
 
-export function assertInsertable(parent: ParentNode, node: Node | string): asserts node is InsertableNode | string {
-  if (typeof node !== 'string') {
-    assertInsertableNode(parent, node);
+export function assertInsertable(parent: ParentNode, value: unknown): void {
+  if (value instanceof Node) {
+    assertInsertableNode(parent, value);
+    return;
+  }
+
+  if ((typeof value === 'object' && value !== null) || typeof value === 'function') {
+    throw new Error('The value must be a Node or a primitive');
   }
 }
 
-export function uncheckedToInsertableNode(node: Node | string): InsertableNode {
-  return typeof node === 'string' ? new Text(node) : (node as InsertableNode);
+/**
+ * Returns the node, or a text node with the stringified value, or `null` if the value is `null` or `undefined`, so it
+ * is skipped.
+ */
+export function uncheckedToInsertableNode(value: unknown): InsertableNode | null {
+  if (value instanceof Node) {
+    return value as InsertableNode;
+  }
+  return value === null || value === undefined ? null : new Text(coerceToString(value));
 }

@@ -2,13 +2,13 @@ import { expect, test } from 'vitest';
 import { f } from '../main/dsl.js';
 import { getElementsByTagName } from '../main/index.js';
 
-test('returns elements with the given ID', () => {
+test('returns elements with the given tag name', () => {
   const root = f.doc(f.xxx(f.yyy(), f.zzz()), f.zzz());
 
   expect(getElementsByTagName(root, 'zzz')).toStrictEqual([root.childNodes[0].childNodes[1], root.childNodes[1]]);
 });
 
-test('returns all elements', () => {
+test('returns all elements if the tag name is *', () => {
   const root = f.doc(f.xxx(f.yyy(), f.zzz()), f.zzz());
 
   expect(getElementsByTagName(root, '*')).toStrictEqual([

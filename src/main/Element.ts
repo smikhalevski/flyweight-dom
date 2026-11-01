@@ -1,10 +1,10 @@
 import { ChildNode } from './ChildNode.js';
-import { DOMTokenList } from './DOMTokenList.js';
+import { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
 import type { Node } from './Node.js';
 import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import { coerceToString, defineNodeType, ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
 
 /**
  * The position is case-insensitive.
@@ -28,83 +28,87 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * @group Nodes
  */
 export class Element extends ParentNode(ChildNode()) {
-  readonly nodeType: number = ELEMENT_NODE;
-  readonly nodeName: string;
+  /**
+   * Backs {@link classList}. Initialized on construction, so creating the list later doesn't change the hidden class of
+   * the element.
+   */
+  private _classList: DOMTokenList | undefined = undefined;
 
   /**
    * @see [Element.id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) on MDN
    */
   get id(): string {
-    return this.attributes.id || '';
+    return this.attributes.id ?? '';
   }
 
   set id(value: string) {
-    this.attributes.id = value;
+    this.attributes.id = coerceToString(value);
   }
 
   /**
    * @see [Element.className](https://developer.mozilla.org/en-US/docs/Web/API/Element/className) on MDN
    */
   get className(): string {
-    return this.attributes.class || '';
+    return this.attributes.class ?? '';
   }
 
   set className(value: string) {
-    this.attributes.class = value;
+    this.attributes.class = coerceToString(value);
   }
 
   /**
    * @see [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) on MDN
    */
   get classList(): DOMTokenList {
-    const tokenList = new DOMTokenList({
-      get: () => {
-        return this.getAttribute('class');
-      },
-      set: value => {
-        this.attributes.class = value;
-      },
-    });
-
-    return Object.defineProperty(this, 'classList', { value: tokenList }).classList;
+    if (this._classList === undefined) {
+      this._classList = new DOMTokenList(new ClassAttributeAccessor(this));
+    }
+    return this._classList;
   }
 
   get textContent(): string | null {
     return getTextContent(this);
   }
 
-  set textContent(value: string | null) {
+  set textContent(value: string | null | undefined) {
     setTextContent(this, value);
   }
-
-  /**
-   * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
-   */
-  readonly attributes: Record<string, string>;
 
   /**
    * Creates a new instance of {@link Element}.
    *
    * @param tagName The tag name of the element.
-   * @param attributes Attributes to copy, so the element never shares state with the caller or other elements.
+   * @param attributes The attributes of the element. The object isn't copied, to avoid an allocation per element, so
+   * the element owns it, and it must not be passed to other elements.
    */
   constructor(
     /**
      * @see [Element.tagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) on MDN
      */
     readonly tagName: string,
-    attributes?: Record<string, string>
+    /**
+     * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
+     */
+    readonly attributes: Record<string, string> = {}
   ) {
     super();
-    this.nodeName = tagName;
-    this.attributes = attributes !== undefined ? { ...attributes } : {};
   }
 
   /**
+   * @param name The name of the attribute.
+   * @param value The value of the attribute. `null` and `undefined` become an empty string, and other values are
+   * stringified.
    * @see [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) on MDN
    */
-  setAttribute(name: string, value: string): this {
-    this.attributes[name] = value;
+  setAttribute(name: string, value: string | null | undefined): this {
+    value = coerceToString(value);
+
+    if (name === '__proto__') {
+      // Assignment would call the inherited __proto__ setter, which ignores strings, so define an own property instead
+      Object.defineProperty(this.attributes, name, { value, writable: true, enumerable: true, configurable: true });
+    } else {
+      this.attributes[name] = value;
+    }
     return this;
   }
 
@@ -182,7 +186,8 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   cloneNode(deep?: boolean): Element {
-    const node = new (this.constructor as typeof Element)(this.tagName, this.attributes);
+    // The constructor doesn't copy attributes, so the clone would share them otherwise
+    const node = new (this.constructor as typeof Element)(this.tagName, { ...this.attributes });
 
     if (deep) {
       uncheckedCloneChildren(this, node);
@@ -191,18 +196,43 @@ export class Element extends ParentNode(ChildNode()) {
   }
 }
 
-function isEqualAttributes(attrs: Record<string, string>, otherAttrs: Record<string, string>): boolean {
-  let attrsCount = 0;
+defineNodeType(Element, ELEMENT_NODE, element => element.tagName);
 
-  for (const key in attrs) {
-    ++attrsCount;
+/**
+ * Reads and writes the class attribute for {@link Element.classList}. A class takes less memory than an object with
+ * two closures that capture the element.
+ */
+class ClassAttributeAccessor implements ValueAccessor {
+  constructor(private readonly element: Element) {}
 
-    if (attrs[key] !== otherAttrs[key]) {
-      return false;
-    }
+  get(): string | null {
+    return this.element.getAttribute('class');
   }
 
-  return attrsCount === Object.keys(otherAttrs).length;
+  set(value: string): void {
+    this.element.attributes.class = value;
+  }
+}
+
+/**
+ * Returns `true` if both objects have the same attributes. Both objects are enumerated the same way, so the result
+ * doesn't depend on the order of arguments. Doesn't allocate.
+ */
+function isEqualAttributes(attributes: Record<string, string>, otherAttributes: Record<string, string>): boolean {
+  let count = 0;
+
+  for (const name in attributes) {
+    if (attributes[name] !== otherAttributes[name]) {
+      return false;
+    }
+    ++count;
+  }
+
+  for (const _name in otherAttributes) {
+    --count;
+  }
+
+  return count === 0;
 }
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {

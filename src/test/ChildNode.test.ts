@@ -1,13 +1,17 @@
 import { describe, expect, test } from 'vitest';
-import { ChildNode, Element, Node, Text } from '../main/index.js';
+import { ChildNode, DocumentFragment, Element, Node, Text } from '../main/index.js';
 import { getChildNodes } from './utils.js';
 
-test('returns the cached constructor', () => {
+test('returns the same class for the same base class', () => {
   expect(ChildNode()).toBe(ChildNode());
   expect(ChildNode(Node)).toBe(ChildNode());
 });
 
-test('extends a class constructor', () => {
+test('cloneNode throws if the base class does not support it', () => {
+  expect(() => new (ChildNode())().cloneNode()).toThrow('This node type does not support this method');
+});
+
+test('creates a class that can be extended', () => {
   class MockNode extends ChildNode() {
     readonly nodeName = '';
     readonly nodeType = -1;
@@ -33,7 +37,7 @@ describe('after', () => {
     expect(text2.parentNode).toBeNull();
   });
 
-  test('does not append a parent node to its child', () => {
+  test('throws if a node contains the parent', () => {
     const element1 = new Element('element1');
     const element2 = new Element('element2');
     const element3 = new Element('element3');
@@ -41,10 +45,10 @@ describe('after', () => {
     element1.append(element2);
     element2.append(element3);
 
-    expect(() => element3.after(element1)).toThrow(new Error('The new child element contains the parent'));
+    expect(() => element3.after(element1)).toThrow('The new child element contains the parent');
   });
 
-  test('appends a node as the last child', () => {
+  test('inserts a node after the last child', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -57,7 +61,7 @@ describe('after', () => {
     expect(text2.parentNode).toBe(parent);
   });
 
-  test('appends a node as an interim child', () => {
+  test('inserts a node between children', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -72,7 +76,7 @@ describe('after', () => {
     expect(text2.parentNode).toBe(parent);
   });
 
-  test('inserts the next sibling after the node', () => {
+  test('does not move the next sibling inserted after the node', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -96,6 +100,17 @@ describe('after', () => {
 
     expect(getChildNodes(parent)).toEqual([text1, text2, text4, text3]);
   });
+
+  test('keeps the insertion point after an empty fragment', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const text3 = new Text('ccc');
+    const parent = new Element('aaa').append(text1, text2);
+
+    text1.after(new DocumentFragment(), text3);
+
+    expect(getChildNodes(parent)).toStrictEqual([text1, text3, text2]);
+  });
 });
 
 describe('before', () => {
@@ -107,7 +122,7 @@ describe('before', () => {
     expect(text2.parentNode).toBeNull();
   });
 
-  test('does not append a parent node to its child', () => {
+  test('throws if a node contains the parent', () => {
     const element1 = new Element('element1');
     const element2 = new Element('element2');
     const element3 = new Element('element3');
@@ -115,10 +130,10 @@ describe('before', () => {
     element1.append(element2);
     element2.append(element3);
 
-    expect(() => element3.before(element1)).toThrow(new Error('The new child element contains the parent'));
+    expect(() => element3.before(element1)).toThrow('The new child element contains the parent');
   });
 
-  test('inserts a node as the first child', () => {
+  test('inserts a node before the first child', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -131,7 +146,7 @@ describe('before', () => {
     expect(text2.parentNode).toBe(parent);
   });
 
-  test('inserts a node as an interim child', () => {
+  test('inserts a node between children', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -146,7 +161,7 @@ describe('before', () => {
     expect(text2.parentNode).toBe(parent);
   });
 
-  test('inserts a node before itself', () => {
+  test('does not move a node inserted before itself', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -156,6 +171,18 @@ describe('before', () => {
     text2.before(text2);
 
     expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
+  });
+
+  test('inserts nodes after the first preceding sibling that is not inserted', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const text3 = new Text('ccc');
+    const text4 = new Text('ddd');
+    const parent = new Element('aaa').append(text1, text2, text3);
+
+    text3.before(text4, text2);
+
+    expect(getChildNodes(parent)).toStrictEqual([text1, text4, text2, text3]);
   });
 });
 
@@ -167,7 +194,7 @@ describe('remove', () => {
     expect(text.parentNode).toBeNull();
   });
 
-  test('removes a child from parent', () => {
+  test('removes a node from its parent', () => {
     const parent = new Element('parent');
     const text = new Text('text');
 
@@ -175,6 +202,7 @@ describe('remove', () => {
 
     expect(text.remove()).toBe(text);
     expect(text.parentNode).toBeNull();
+    expect(parent.firstChild).toBeNull();
   });
 });
 
@@ -187,7 +215,7 @@ describe('replaceWith', () => {
     expect(text2.parentNode).toBeNull();
   });
 
-  test('replaces a child with another child', () => {
+  test('replaces a node with another node', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -201,7 +229,7 @@ describe('replaceWith', () => {
     expect(parent.lastChild).toBe(text2);
   });
 
-  test('replaces a node with itself', () => {
+  test('does not move a node replaced with itself', () => {
     const parent = new Element('parent');
     const text1 = new Text('text1');
     const text2 = new Text('text2');

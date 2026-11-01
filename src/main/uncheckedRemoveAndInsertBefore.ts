@@ -7,6 +7,8 @@ import { isDocumentFragment } from './utils.js';
 
 export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {
   if (isDocumentFragment(node)) {
+    node['_notifyChildrenChanged']();
+
     let nodeChild = node.firstChild;
 
     while (nodeChild !== null) {

@@ -1,9 +1,9 @@
 import { splitTokens } from './DOMTokenList.js';
 import { Element } from './Element.js';
 import { Node } from './Node.js';
-import { NodeFilter } from './NodeFilter.js';
+import { SHOW_ELEMENT } from './NodeFilter.js';
 import { TreeWalker } from './TreeWalker.js';
-import { isSpaceChar } from './utils.js';
+import { coerceToString, isSpaceChar } from './utils.js';
 
 /**
  * Returns an array elements which have all of the given class name(s).
@@ -14,13 +14,15 @@ import { isSpaceChar } from './utils.js';
  * @group Other
  */
 export function getElementsByClassName(root: Node, className: string): Element[] {
+  className = coerceToString(className);
+
   const classNames = splitTokens(className);
 
   if (classNames.length === 0) {
     return [];
   }
 
-  const treeWalker = new TreeWalker(root, NodeFilter.SHOW_ELEMENT);
+  const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
   const elements = [];
 
   nextNode: for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {

@@ -6,6 +6,8 @@ import { isDocumentFragment } from './utils.js';
 
 export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {
   if (isDocumentFragment(node)) {
+    node['_notifyChildrenChanged']();
+
     let nodeChild = node.firstChild;
 
     while (nodeChild !== null) {

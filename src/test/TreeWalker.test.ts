@@ -35,11 +35,11 @@ describe('TreeWalker', () => {
       expect(treeWalker.parentNode()).toBe(element2);
     });
 
-    test('returns null if current node is root', () => {
+    test('returns null if the current node is the root', () => {
       expect(new TreeWalker(text1).parentNode()).toBeNull();
     });
 
-    test('ignores skipped nodes', () => {
+    test('returns the closest ancestor if the parent is skipped', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName !== 'element2' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
       );
@@ -49,7 +49,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.parentNode()).toBe(element1);
     });
 
-    test('ignores rejected nodes', () => {
+    test('returns the closest ancestor if the parent is rejected', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName !== 'element2' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
       );
@@ -69,7 +69,7 @@ describe('TreeWalker', () => {
       expect(new TreeWalker(text1).firstChild()).toBeNull();
     });
 
-    test('ignores skipped nodes', () => {
+    test('descends into a skipped child', () => {
       expect(
         new TreeWalker(document, undefined, node =>
           node.nodeName === 'element1' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
@@ -77,7 +77,7 @@ describe('TreeWalker', () => {
       ).toBe(element2);
     });
 
-    test('steps over skipped nodes', () => {
+    test('returns the first accepted node after skipped subtrees', () => {
       expect(
         new TreeWalker(document, undefined, node =>
           node.nodeName !== 'element3' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
@@ -85,12 +85,16 @@ describe('TreeWalker', () => {
       ).toBe(element3);
     });
 
-    test('steps over rejected nodes', () => {
+    test('does not descend into a rejected child', () => {
       expect(
         new TreeWalker(document, undefined, node =>
           node.nodeName === 'element1' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
         ).firstChild()
       ).toBe(element3);
+    });
+
+    test('returns null if no descendant is accepted', () => {
+      expect(new TreeWalker(document, undefined, () => NodeFilter.FILTER_SKIP).firstChild()).toBeNull();
     });
   });
 
@@ -103,7 +107,7 @@ describe('TreeWalker', () => {
       expect(new TreeWalker(text1).lastChild()).toBeNull();
     });
 
-    test('ignores skipped nodes', () => {
+    test('descends into a skipped child', () => {
       expect(
         new TreeWalker(document, undefined, node =>
           node.nodeName === 'element3' || node.nodeName === 'element4'
@@ -113,7 +117,7 @@ describe('TreeWalker', () => {
       ).toBe(text2);
     });
 
-    test('steps over skipped nodes', () => {
+    test('returns the last accepted node before skipped subtrees', () => {
       expect(
         new TreeWalker(document, undefined, node =>
           node.nodeName !== 'element2' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
@@ -121,12 +125,16 @@ describe('TreeWalker', () => {
       ).toBe(element2);
     });
 
-    test('steps over rejected nodes', () => {
+    test('does not descend into a rejected child', () => {
       expect(
         new TreeWalker(document, undefined, node =>
           node.nodeName === 'element4' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
         ).lastChild()
       ).toBe(element3);
+    });
+
+    test('returns null if no descendant is accepted', () => {
+      expect(new TreeWalker(document, undefined, () => NodeFilter.FILTER_SKIP).lastChild()).toBeNull();
     });
   });
 
@@ -145,11 +153,11 @@ describe('TreeWalker', () => {
       expect(treeWalker.nextSibling()).toBeNull();
     });
 
-    test('returns null the current element is the root', () => {
+    test('returns null if the current node is the root', () => {
       expect(new TreeWalker(element1).nextSibling()).toBeNull();
     });
 
-    test('ignores skipped ancestor', () => {
+    test('continues after a skipped parent', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element1' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -158,7 +166,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.nextSibling()).toBe(element3);
     });
 
-    test('ignores skipped sibling', () => {
+    test('descends into a skipped sibling', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element3' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -167,7 +175,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.nextSibling()).toBe(text2);
     });
 
-    test('ignores skipped subtree', () => {
+    test('steps over a subtree without accepted nodes', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName !== 'element4' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -176,7 +184,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.nextSibling()).toBe(element4);
     });
 
-    test('ignores rejected nodes', () => {
+    test('does not descend into a rejected sibling', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element3' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
       );
@@ -201,11 +209,11 @@ describe('TreeWalker', () => {
       expect(treeWalker.previousSibling()).toBeNull();
     });
 
-    test('returns null the current element is the root', () => {
+    test('returns null if the current node is the root', () => {
       expect(new TreeWalker(element3).previousSibling()).toBeNull();
     });
 
-    test('ignores skipped ancestor', () => {
+    test('continues before a skipped parent', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element3' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -214,7 +222,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.previousSibling()).toBe(element1);
     });
 
-    test('ignores skipped sibling', () => {
+    test('descends into a skipped sibling', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element3' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -223,7 +231,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.previousSibling()).toBe(text2);
     });
 
-    test('ignores skipped subtree', () => {
+    test('steps over a subtree without accepted nodes', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName !== 'element1' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -232,7 +240,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.previousSibling()).toBe(element1);
     });
 
-    test('ignores rejected nodes', () => {
+    test('does not descend into a rejected sibling', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element3' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
       );
@@ -243,18 +251,18 @@ describe('TreeWalker', () => {
   });
 
   describe('nextNode', () => {
-    test('returns the child node', () => {
+    test('returns the first child', () => {
       expect(new TreeWalker(document).nextNode()).toBe(element1);
     });
 
-    test('returns null is there is no next node', () => {
+    test('returns null if there is no next node', () => {
       const treeWalker = new TreeWalker(document);
       treeWalker.currentNode = element4;
 
       expect(treeWalker.nextNode()).toBeNull();
     });
 
-    test('ignores skipped child nodes', () => {
+    test('descends into a skipped child', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element1' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -262,7 +270,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.nextNode()).toBe(element2);
     });
 
-    test('exits parent', () => {
+    test('continues after the last descendant of a parent', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element1' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -271,14 +279,24 @@ describe('TreeWalker', () => {
       expect(treeWalker.nextNode()).toBe(element3);
     });
 
-    test('does not leave the root node', () => {
+    test('does not leave the root', () => {
       const treeWalker = new TreeWalker(element1);
       treeWalker.currentNode = text1;
 
       expect(treeWalker.nextNode()).toBeNull();
     });
 
-    test('ignores rejected nodes', () => {
+    test('returns null if the current node was removed from the tree', () => {
+      const element = new Element('aaa');
+      const treeWalker = new TreeWalker(new Element('bbb').append(element));
+      treeWalker.currentNode = element;
+
+      element.remove();
+
+      expect(treeWalker.nextNode()).toBeNull();
+    });
+
+    test('does not descend into rejected nodes', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName !== 'element4' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
       );
@@ -289,18 +307,18 @@ describe('TreeWalker', () => {
   });
 
   describe('previousNode', () => {
-    test('returns the child of the previous sibling', () => {
+    test('returns the last descendant of the previous sibling', () => {
       const treeWalker = new TreeWalker(document);
       treeWalker.currentNode = element4;
 
       expect(treeWalker.previousNode()).toBe(text2);
     });
 
-    test('returns null if current node is root', () => {
+    test('returns null if the current node is the root', () => {
       expect(new TreeWalker(element3).previousNode()).toBeNull();
     });
 
-    test('ignores skipped nodes', () => {
+    test('returns the previous sibling if its descendants are skipped', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeValue === 'text2' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
       );
@@ -309,7 +327,7 @@ describe('TreeWalker', () => {
       expect(treeWalker.previousNode()).toBe(element3);
     });
 
-    test('ignores rejected nodes', () => {
+    test('does not descend into a rejected previous sibling', () => {
       const treeWalker = new TreeWalker(document, undefined, node =>
         node.nodeName === 'element3' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
       );
@@ -317,11 +335,27 @@ describe('TreeWalker', () => {
 
       expect(treeWalker.previousNode()).toBe(text1);
     });
+
+    test('returns an ancestor of a skipped parent', () => {
+      const treeWalker = new TreeWalker(document, undefined, node =>
+        node.nodeName === 'element2' ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT
+      );
+      treeWalker.currentNode = text1;
+
+      expect(treeWalker.previousNode()).toBe(element1);
+    });
+
+    test('returns null if the current node is not inside the root', () => {
+      const treeWalker = new TreeWalker(document);
+      treeWalker.currentNode = new Text();
+
+      expect(treeWalker.previousNode()).toBeNull();
+    });
   });
 });
 
 describe('filterNode', () => {
-  test('returns skip if not shown', () => {
+  test('returns FILTER_SKIP for node types that are not shown', () => {
     const treeWalker = new TreeWalker(document, NodeFilter.SHOW_DOCUMENT | NodeFilter.SHOW_TEXT);
 
     expect(filterNode(treeWalker, element4)).toBe(NodeFilter.FILTER_SKIP);
@@ -330,7 +364,7 @@ describe('filterNode', () => {
     expect(filterNode(treeWalker, text1)).toBe(NodeFilter.FILTER_ACCEPT);
   });
 
-  test('calls filter function', () => {
+  test('calls a filter function with the node', () => {
     const filterMock = vi.fn();
 
     filterNode(new TreeWalker(document, undefined, filterMock), element4);
@@ -339,7 +373,7 @@ describe('filterNode', () => {
     expect(filterMock).toHaveBeenNthCalledWith(1, element4);
   });
 
-  test('calls acceptNode method', () => {
+  test('calls acceptNode of a filter object with the node', () => {
     const acceptNodeMock = vi.fn();
 
     filterNode(new TreeWalker(document, undefined, { acceptNode: acceptNodeMock }), element4);
@@ -348,7 +382,13 @@ describe('filterNode', () => {
     expect(acceptNodeMock).toHaveBeenNthCalledWith(1, element4);
   });
 
-  test('return FILTER_ACCEPT is invalid value is returned from filter', () => {
-    expect(filterNode(new TreeWalker(document, undefined, () => 111), element4)).toBe(NodeFilter.FILTER_ACCEPT);
+  test('returns FILTER_ACCEPT if filter returns true', () => {
+    // @ts-expect-error Filters written in JavaScript can return booleans
+    expect(filterNode(new TreeWalker(document, undefined, () => true), element4)).toBe(NodeFilter.FILTER_ACCEPT);
+  });
+
+  test('does not accept a node if filter returns false', () => {
+    // @ts-expect-error Filters written in JavaScript can return booleans
+    expect(filterNode(new TreeWalker(document, undefined, () => false), element4)).toBe(0);
   });
 });

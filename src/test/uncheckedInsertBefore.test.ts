@@ -31,7 +31,7 @@ test('inserts an element before another element', () => {
   expect(node2.nextElementSibling).toBeNull();
 });
 
-test('inserts an element before a node followed by an element', () => {
+test('inserts an element before a text node', () => {
   const parent = new Element('parent');
   const node1 = new Element('node1');
   const text2 = new Text('node2');
@@ -61,7 +61,7 @@ test('inserts an element before a node followed by an element', () => {
   expect(text2.nextElementSibling).toBe(node3);
 });
 
-test('updates childNodes and children', () => {
+test('updates childNodes and children that were read before', () => {
   const parent = new Element('parent');
   const node1 = new Element('node1');
   const node2 = new Element('node2');

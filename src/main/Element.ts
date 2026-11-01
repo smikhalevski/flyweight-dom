@@ -38,7 +38,7 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) on MDN
    */
   get id(): string {
-    return this.attributes.id || '';
+    return this.attributes.id ?? '';
   }
 
   set id(value: string) {
@@ -49,7 +49,7 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.className](https://developer.mozilla.org/en-US/docs/Web/API/Element/className) on MDN
    */
   get className(): string {
-    return this.attributes.class || '';
+    return this.attributes.class ?? '';
   }
 
   set className(value: string) {
@@ -95,9 +95,12 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   /**
+   * @param name The name of the attribute.
+   * @param value The value of the attribute. `null` and `undefined` become an empty string, and other values are
+   * stringified.
    * @see [Element.setAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute) on MDN
    */
-  setAttribute(name: string, value: string): this {
+  setAttribute(name: string, value: string | null | undefined): this {
     value = coerceToString(value);
 
     if (name === '__proto__') {

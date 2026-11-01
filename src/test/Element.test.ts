@@ -89,6 +89,14 @@ test('sets/gets an attribute', () => {
   expect(element.getAttribute('bbb')).toBe('ccc');
 });
 
+test('sets an empty attribute if value is null', () => {
+  const element = new Element('aaa');
+
+  element.setAttribute('bbb', null);
+
+  expect(element.getAttribute('bbb')).toBe('');
+});
+
 test('sets an attribute named __proto__', () => {
   const element = new Element('aaa');
 

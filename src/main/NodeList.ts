@@ -101,7 +101,7 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
   }
 
   get length(): number {
-    this._dropStaleCache();
+    this._resetCacheIfChildrenChanged();
 
     const { _target } = this;
     const { _filter } = _target;
@@ -126,9 +126,9 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
   item(index: number): T | null {
     const { _target } = this;
 
-    _target._dropStaleCache();
+    _target._resetCacheIfChildrenChanged();
 
-    if (!Number.isSafeInteger(index) || index < 0 || (_target._length !== -1 && index >= _target._length)) {
+    if (!Number.isInteger(index) || index < 0 || (_target._length !== -1 && index >= _target._length)) {
       return null;
     }
 
@@ -163,18 +163,16 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
     return node;
   }
 
-  *values(): IterableIterator<T> {
+  values(): IterableIterator<T> {
     const { _target } = this;
 
-    for (let index = 0, node; (node = _target.item(index)) !== null; ++index) {
-      yield node;
-    }
+    return iterateChildNodes(_target._root, _target._filter);
   }
 
   /**
    * Drops the cache if children of the root changed since it was filled.
    */
-  private _dropStaleCache(): void {
+  private _resetCacheIfChildrenChanged(): void {
     const { _target } = this;
 
     const rootChildrenVersion = _target._root['_childrenVersion'];
@@ -187,6 +185,44 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
     _target._length = -1;
     _target._index = -1;
     _target._node = null;
+  }
+}
+
+/**
+ * Yields children of the parent that pass the filter.
+ *
+ * Children are yielded by index, the same as live lists in browsers, so if children change during iteration, the next
+ * yielded node is the one at the next index, and not a sibling of a node that may have been moved to another parent.
+ * Doesn't create a {@link ChildNodeList}, so iterating doesn't attach one to every visited parent.
+ *
+ * @param parent The node whose children are yielded.
+ * @param filter The callback that returns `true` for children that are yielded, or `undefined` to yield all children.
+ */
+export function* iterateChildNodes<T extends ChildNode>(
+  parent: Node,
+  filter: ((node: Node) => boolean) | undefined
+): Generator<T, void, undefined> {
+  let childrenVersion = parent['_childrenVersion'];
+  let index = 0;
+  let node = getFilteredSibling(parent.firstChild, filter, true);
+
+  while (node !== null) {
+    yield node as T;
+
+    ++index;
+
+    if (parent['_childrenVersion'] === childrenVersion) {
+      node = getFilteredSibling(node.nextSibling, filter, true);
+      continue;
+    }
+
+    // Children changed, so the node may be detached or moved, and the next node is looked up by its index
+    childrenVersion = parent['_childrenVersion'];
+    node = getFilteredSibling(parent.firstChild, filter, true);
+
+    for (let i = 0; i < index && node !== null; ++i) {
+      node = getFilteredSibling(node.nextSibling, filter, true);
+    }
   }
 }
 

@@ -139,6 +139,21 @@ describe('ChildNodeList', () => {
     expect(Array.from(nodeList)).toStrictEqual([element]);
   });
 
+  test('iterates by index if nodes are removed during iteration', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+    const nodeList = new ChildNodeList(new Element('ddd').append(element1, new Text(), element2, element3), isElement);
+    const nodes = [];
+
+    for (const node of nodeList) {
+      nodes.push(node);
+      node.remove();
+    }
+
+    expect(nodes).toStrictEqual([element1, element3]);
+  });
+
   describe('length', () => {
     test('returns the number of nodes that pass the filter', () => {
       const nodeList = new ChildNodeList(new Element('aaa').append(new Text(), new Element('bbb')), isElement);

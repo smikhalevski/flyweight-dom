@@ -21,6 +21,17 @@ test('creates an element', () => {
   expect(element.childNodes[0]).toBeInstanceOf(Text);
 });
 
+test('does not share attributes with the caller', () => {
+  const attributes = { class: 'aaa' };
+  const element1 = f.span(attributes);
+  const element2 = f.span(attributes);
+
+  element1.setAttribute('class', 'bbb');
+
+  expect(attributes).toStrictEqual({ class: 'aaa' });
+  expect(element2.getAttribute('class')).toBe('aaa');
+});
+
 test('creates element factories after hasOwnProperty is read', () => {
   f.hasOwnProperty;
 

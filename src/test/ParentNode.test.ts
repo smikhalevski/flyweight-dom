@@ -399,4 +399,20 @@ describe('Symbol.iterator', () => {
 
     expect(Array.from(node)).toEqual([node.childNodes[0], node.childNodes[1]]);
   });
+
+  test('does not yield children of another parent if a child is moved during iteration', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const text3 = new Text('ccc');
+    const parent = new Element('aaa').append(text1, text2);
+    const otherParent = new Element('bbb').append(text3);
+    const nodes = [];
+
+    for (const child of parent) {
+      nodes.push(child);
+      otherParent.insertBefore(child, text3);
+    }
+
+    expect(nodes).toStrictEqual([text1]);
+  });
 });

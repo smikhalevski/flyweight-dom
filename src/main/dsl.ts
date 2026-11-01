@@ -130,7 +130,8 @@ function createElementFactory(tagName: string): ElementFactory {
       element = new Element(tagName);
       appendChild(element, arg);
     } else {
-      element = new Element(tagName, arg);
+      // Element owns its attributes object, so copy the caller's object, which may be reused or frozen
+      element = new Element(tagName, { ...arg });
     }
 
     for (let i = 1; i < arguments.length; ++i) {

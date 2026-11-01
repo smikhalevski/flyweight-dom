@@ -1,7 +1,7 @@
 import { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
 import { Node } from './Node.js';
-import { ChildNodeList, type NodeList } from './NodeList.js';
+import { ChildNodeList, iterateChildNodes, type NodeList } from './NodeList.js';
 import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
@@ -236,8 +236,8 @@ export function ParentNode(constructor: new () => Node = Node) {
       return super.cloneNode(deep) as ParentNode;
     }
 
-    *[Symbol.iterator](): IterableIterator<ChildNode> {
-      yield* this.childNodes;
+    [Symbol.iterator](): IterableIterator<ChildNode> {
+      return iterateChildNodes(this, undefined);
     }
   };
 

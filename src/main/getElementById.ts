@@ -1,6 +1,6 @@
 import { Element } from './Element.js';
 import { Node } from './Node.js';
-import { NodeFilter } from './NodeFilter.js';
+import { SHOW_ELEMENT } from './NodeFilter.js';
 import { TreeWalker } from './TreeWalker.js';
 import { coerceToString } from './utils.js';
 
@@ -20,7 +20,7 @@ export function getElementById(root: Node, id: string): Element | null {
     return null;
   }
 
-  const treeWalker = new TreeWalker(root, NodeFilter.SHOW_ELEMENT);
+  const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
 
   for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
     if (element.id === id) {

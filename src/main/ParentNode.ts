@@ -89,8 +89,7 @@ export function ParentNode(constructor: new () => Node = Node) {
     private _children: NodeList<Element> | undefined = undefined;
 
     /**
-     * See {@link Node._childrenVersion}.
-     *
+     * @see {@link Node._childrenVersion}.
      * @hidden
      */
     protected _childrenVersion = 0;

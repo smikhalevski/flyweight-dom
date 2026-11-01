@@ -3,15 +3,15 @@ import type { Element } from './Element.js';
 import type { Node } from './Node.js';
 import type { Text } from './Text.js';
 
-export const ELEMENT_NODE: number = 1;
-export const ATTRIBUTE_NODE: number = 2;
-export const TEXT_NODE: number = 3;
-export const CDATA_SECTION_NODE: number = 4;
-export const PROCESSING_INSTRUCTION_NODE: number = 7;
-export const COMMENT_NODE: number = 8;
-export const DOCUMENT_NODE: number = 9;
-export const DOCUMENT_TYPE_NODE: number = 10;
-export const DOCUMENT_FRAGMENT_NODE: number = 11;
+export const ELEMENT_NODE = 1;
+export const ATTRIBUTE_NODE = 2;
+export const TEXT_NODE = 3;
+export const CDATA_SECTION_NODE = 4;
+export const PROCESSING_INSTRUCTION_NODE = 7;
+export const COMMENT_NODE = 8;
+export const DOCUMENT_NODE = 9;
+export const DOCUMENT_TYPE_NODE = 10;
+export const DOCUMENT_FRAGMENT_NODE = 11;
 
 /**
  * Defines {@link Node.nodeType} and {@link Node.nodeName} on the prototype of a node class, so nodes don't spend memory

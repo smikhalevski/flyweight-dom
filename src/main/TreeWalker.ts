@@ -1,10 +1,5 @@
 import { Node } from './Node.js';
-import type { NodeFilter } from './NodeFilter.js';
-
-const FILTER_ACCEPT = 1;
-const FILTER_REJECT = 2;
-const FILTER_SKIP = 3;
-const SHOW_ALL = 0xffffffff;
+import { FILTER_ACCEPT, FILTER_REJECT, FILTER_SKIP, type NodeFilter, SHOW_ALL } from './NodeFilter.js';
 
 /**
  * Implemented according to https://dom.spec.whatwg.org/#treewalker

@@ -173,9 +173,7 @@ export class Element extends ParentNode(ChildNode()) {
    * @see [Element.insertAdjacentText](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentText) on MDN
    */
   insertAdjacentText(position: InsertPosition, data: string): void {
-    if (data !== null && data !== undefined) {
-      insertAdjacentNode(this, position, new Text(data));
-    }
+    insertAdjacentNode(this, position, new Text(data));
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {
@@ -216,18 +214,25 @@ class ClassAttributeAccessor implements ValueAccessor {
   }
 }
 
-function isEqualAttributes(attrs: Record<string, string>, otherAttrs: Record<string, string>): boolean {
-  let attrsCount = 0;
+/**
+ * Returns `true` if both objects have the same attributes. Both objects are enumerated the same way, so the result
+ * doesn't depend on the order of arguments. Doesn't allocate.
+ */
+function isEqualAttributes(attributes: Record<string, string>, otherAttributes: Record<string, string>): boolean {
+  let count = 0;
 
-  for (const key in attrs) {
-    ++attrsCount;
-
-    if (attrs[key] !== otherAttrs[key]) {
+  for (const name in attributes) {
+    if (attributes[name] !== otherAttributes[name]) {
       return false;
     }
+    ++count;
   }
 
-  return attrsCount === Object.keys(otherAttrs).length;
+  for (const _name in otherAttributes) {
+    --count;
+  }
+
+  return count === 0;
 }
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {

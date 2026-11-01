@@ -161,7 +161,7 @@ export class DOMTokenList {
    */
   item(index: number): string | null {
     const tokens = getTokens(this);
-    return index < 0 || index >= tokens.length ? null : tokens[index] ?? null;
+    return index < 0 || index >= tokens.length ? null : (tokens[index] ?? null);
   }
 
   /**

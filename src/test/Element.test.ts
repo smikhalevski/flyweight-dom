@@ -269,6 +269,13 @@ test('inserts adjacent text that consists of spaces', () => {
   expect(element1.firstChild).toEqual(new Text(' \t'));
 });
 
+test('throws if adjacent text position is invalid and data is null', () => {
+  // @ts-expect-error Data must be a string
+  expect(() => new Element('aaa').insertAdjacentText('xxx' as InsertPosition, null)).toThrow(
+    "The value provided ('xxx') is not one of 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'"
+  );
+});
+
 test('shallow clones an Element instance', () => {
   const element1 = new Element('aaa');
   const element2 = new Element('bbb');
@@ -328,6 +335,13 @@ test('elements are equal when attributes are equal', () => {
   expect(new Element('aaa').setAttribute('qqq', 'ppp').isEqualNode(new Element('aaa').setAttribute('xxx', 'yyy'))).toBe(
     false
   );
+});
+
+test('compares attributes the same way regardless of the order of elements', () => {
+  const element1 = new Element('aaa', Object.create({ xxx: 'yyy' }));
+  const element2 = new Element('aaa', { xxx: 'yyy' });
+
+  expect(element1.isEqualNode(element2)).toBe(element2.isEqualNode(element1));
 });
 
 test('elements are equal when children are equal', () => {

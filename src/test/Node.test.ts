@@ -12,11 +12,12 @@ class MockParentNode extends ParentNode(ChildNode()) {
   readonly nodeType = -1;
 }
 
-test('inherits statics from Node', () => {
-  expect(Node.ELEMENT_NODE).toBe(1);
+test('node classes inherit node type constants', () => {
+  // @ts-expect-error Mixins drop statics from the class type, but classes still inherit them at runtime
+  expect(Element.ELEMENT_NODE).toBe(1);
 });
 
-test('creates a new MockNode instance', () => {
+test('creates a node without a parent and children', () => {
   const node = new MockNode();
 
   expect(node).toBeInstanceOf(Node);
@@ -35,13 +36,13 @@ test('childNodes of a parent node is a ChildNodeList', () => {
   expect(new Element('aaa').childNodes).toBeInstanceOf(ChildNodeList);
 });
 
-test('returns the same childNodes instance', () => {
+test('returns the same childNodes of a node that cannot have children', () => {
   const node = new MockNode();
 
   expect(node.childNodes).toBe(node.childNodes);
 });
 
-test('creating childNodes, children and classList does not add properties to nodes', () => {
+test('reading childNodes, children, classList and attributes does not add properties to nodes', () => {
   const element = new Element('aaa');
   const document = new Document();
   const fragment = new DocumentFragment();
@@ -62,13 +63,13 @@ test('creating childNodes, children and classList does not add properties to nod
   expect(nodes.map(node => Object.getOwnPropertyNames(node))).toStrictEqual(propertyNames);
 });
 
-test('hasChildNodes return false', () => {
+test('hasChildNodes returns false for a node without children', () => {
   const node = new MockNode();
 
   expect(node.hasChildNodes()).toBe(false);
 });
 
-test('child mutation methods throw', () => {
+test('child mutation methods of a base node throw', () => {
   const node = new MockNode();
 
   const text = new Text();
@@ -79,11 +80,11 @@ test('child mutation methods throw', () => {
   expect(() => node.replaceChild(text, text)).toThrow('This node type does not support this method');
 });
 
-test('cloneNode throws', () => {
+test('cloneNode of a base node throws', () => {
   expect(() => new MockNode().cloneNode()).toThrow('This node type does not support this method');
 });
 
-test('can be appended to an element', () => {
+test('a base node can be appended to an element', () => {
   const node = new MockNode();
   const element = new Element('aaa');
 

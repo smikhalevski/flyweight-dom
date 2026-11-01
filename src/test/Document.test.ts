@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { Document, DocumentType, Element, Node, Text } from '../main/index.js';
 
-test('creates a new Document instance', () => {
+test('creates an empty document', () => {
   const node = new Document();
 
   expect(node).toBeInstanceOf(Node);
@@ -18,7 +18,7 @@ test('creates a new Document instance', () => {
   expect(node.replaceChildren).toBeInstanceOf(Function);
 });
 
-test('returns a doctype', () => {
+test('returns the doctype', () => {
   const document = new Document();
   const doctype = new DocumentType('aaa');
 
@@ -27,7 +27,7 @@ test('returns a doctype', () => {
   expect(document.doctype).toBe(doctype);
 });
 
-test('returns a document element', () => {
+test('returns the document element', () => {
   const document = new Document();
   const element = new Element('aaa');
 
@@ -36,7 +36,7 @@ test('returns a document element', () => {
   expect(document.documentElement).toBe(element);
 });
 
-test('shallow clones a Document instance', () => {
+test('shallow clones a document without its children', () => {
   const document = new Document();
   const element = new Element('aaa');
 
@@ -48,7 +48,7 @@ test('shallow clones a Document instance', () => {
   expect(node.firstChild).toBeNull();
 });
 
-test('deeply clones a Document instance', () => {
+test('deeply clones a document with its children', () => {
   const document = new Document();
   const element = new Element('aaa');
 
@@ -61,7 +61,7 @@ test('deeply clones a Document instance', () => {
   expect(node.firstChild!.nodeType).toBe(Node.ELEMENT_NODE);
 });
 
-test('returns null textContent', () => {
+test('textContent is null', () => {
   const document = new Document().append(new Element('aaa').append(new Text('bbb')));
 
   expect(document.textContent).toBeNull();

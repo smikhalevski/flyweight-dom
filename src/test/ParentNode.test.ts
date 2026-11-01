@@ -6,12 +6,12 @@ test('cloneNode throws if the base class does not support it', () => {
   expect(() => new (ParentNode())().cloneNode()).toThrow('This node type does not support this method');
 });
 
-test('returns the cached constructor', () => {
+test('returns the same class for the same base class', () => {
   expect(ParentNode()).toBe(ParentNode());
   expect(ParentNode(Node)).toBe(ParentNode());
 });
 
-test('extends a class constructor', () => {
+test('creates a class that can be extended', () => {
   class MockNode extends ParentNode() {
     readonly nodeName = '';
     readonly nodeType = -1;
@@ -28,7 +28,7 @@ test('extends a class constructor', () => {
   expect(new MockNode() instanceof ParentNode()).toBe(true);
 });
 
-test('extends composite constructor', () => {
+test('creates a class from a ChildNode mixin over a ParentNode mixin', () => {
   class MockNode extends ChildNode(ParentNode()) {
     readonly nodeName = '#my-node';
     readonly nodeType = 100;
@@ -40,7 +40,7 @@ test('extends composite constructor', () => {
 });
 
 describe('hasChildNodes', () => {
-  test('returns true if has children', () => {
+  test('returns whether the node has children', () => {
     const parent = new Element('aaa');
     const text = new Text('text');
 
@@ -53,7 +53,7 @@ describe('hasChildNodes', () => {
 });
 
 describe('appendChild', () => {
-  test('appends a child to parent', () => {
+  test('appends a child', () => {
     const parent = new Element('aaa');
     const text = new Text('text');
 
@@ -62,7 +62,7 @@ describe('appendChild', () => {
     expect(text.parentNode).toBe(parent);
   });
 
-  test('removes a child from its previous parent', () => {
+  test('moves a child from its previous parent', () => {
     const parent1 = new Element('parent1');
     const parent2 = new Element('parent2');
     const text = new Text('text');
@@ -100,7 +100,7 @@ describe('insertBefore', () => {
     expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
   });
 
-  test('throws if parent does not contain a child', () => {
+  test('throws if the reference node is not a child', () => {
     const parent = new Element('aaa');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -123,7 +123,7 @@ describe('insertBefore', () => {
     expect(parent.lastChild).toBe(text1);
   });
 
-  test('inserts a node as an interim child', () => {
+  test('inserts a node between children', () => {
     const parent = new Element('aaa');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -164,7 +164,7 @@ describe('removeChild', () => {
     expect(parent.firstChild).toBeNull();
   });
 
-  test('throws if parent does not contain a child', () => {
+  test('throws if the node is not a child', () => {
     const parent = new Element('aaa');
     const text = new Text('text');
 
@@ -185,7 +185,7 @@ describe('replaceChild', () => {
     expect(text2.parentNode).toBe(parent);
   });
 
-  test('throws if parent does not contain a child', () => {
+  test('throws if the replaced node is not a child', () => {
     const parent = new Element('aaa');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -220,7 +220,7 @@ describe('replaceChild', () => {
 });
 
 describe('children', () => {
-  test('returns the array of child elements', () => {
+  test('returns the list of child elements', () => {
     const parent = new Element('aaa');
     const child1 = new Text('child1');
     const child2 = new Element('child2');
@@ -233,13 +233,13 @@ describe('children', () => {
     expect(parent.children[1]).toBe(child3);
   });
 
-  test('returns the same array', () => {
+  test('returns the same list', () => {
     const element = new Element('aaa');
 
     expect(element.children).toBe(element.children);
   });
 
-  test('returns the same array for a class that does not initialize it', () => {
+  test('returns the same list for a class that extends the mixin directly', () => {
     class MockNode extends ParentNode() {
       readonly nodeName = '';
       readonly nodeType = -1;
@@ -295,7 +295,7 @@ describe('append', () => {
     expect(parent.firstChild).toBeNull();
   });
 
-  test('appends the child', () => {
+  test('appends nodes and returns the parent', () => {
     const parent = new Element('aaa');
     const child1 = new Text('child1');
     const child2 = new Text('child2');
@@ -307,7 +307,7 @@ describe('append', () => {
     expect(parent.firstChild!.nextSibling).toBe(child2);
   });
 
-  test('does not append nodes if any of them is not appendable', () => {
+  test('does not append anything if a node cannot be a child', () => {
     const parent = new Element('aaa');
     const child1 = new Text('child1');
     const child2 = new Document();
@@ -327,7 +327,7 @@ describe('append', () => {
 });
 
 describe('prepend', () => {
-  test('inserts a node as the first child', () => {
+  test('inserts a node into an empty parent', () => {
     const parent = new Element('aaa');
     const text = new Text('text');
 
@@ -351,7 +351,7 @@ describe('prepend', () => {
     expect(parent.lastChild).toBe(text1);
   });
 
-  test('prepends the first child', () => {
+  test('prepends existing children in the given order', () => {
     const parent = new Element('aaa');
     const text1 = new Text('text1');
     const text2 = new Text('text2');
@@ -382,7 +382,7 @@ describe('replaceChildren', () => {
     expect(parent.childNodes.length).toBe(0);
   });
 
-  test('appends new child nodes', () => {
+  test('replaces children with new nodes', () => {
     const parent = new Element('aaa');
     const child1 = new Element('bbb');
     const child2 = new Element('ccc');
@@ -410,7 +410,7 @@ describe('replaceChildren', () => {
     expect(child2.previousSibling).toBeNull();
   });
 
-  test('inserts previous children in the given order', () => {
+  test('reinserts previous children in the given order', () => {
     const parent = new Element('aaa');
     const child1 = new Element('bbb');
     const child2 = new Element('ccc');

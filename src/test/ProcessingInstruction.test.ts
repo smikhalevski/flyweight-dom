@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { CharacterData, Node, ProcessingInstruction } from '../main/index.js';
 
-test('creates a new ProcessingInstruction instance', () => {
+test('creates a processing instruction without data', () => {
   const node = new ProcessingInstruction('xml');
 
   expect(node).toBeInstanceOf(Node);
@@ -13,7 +13,7 @@ test('creates a new ProcessingInstruction instance', () => {
   expect(node.data).toBe('');
 });
 
-test('clones a ProcessingInstruction instance', () => {
+test('clones a processing instruction', () => {
   const node = new ProcessingInstruction('xml', 'aaa').cloneNode() as ProcessingInstruction;
 
   expect(node).toBeInstanceOf(ProcessingInstruction);

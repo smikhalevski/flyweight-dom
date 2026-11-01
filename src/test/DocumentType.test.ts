@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { DocumentType, Node } from '../main/index.js';
 
-test('creates a new DocumentType instance', () => {
+test('creates a doctype with empty IDs', () => {
   const node = new DocumentType('aaa');
 
   expect(node).toBeInstanceOf(Node);
@@ -19,14 +19,14 @@ test('creates a new DocumentType instance', () => {
   expect(node.replaceWith).toBeInstanceOf(Function);
 });
 
-test('creates a new DocumentType instance with IDs', () => {
+test('creates a doctype with public and system IDs', () => {
   const node = new DocumentType('aaa', 'bbb', 'ccc');
 
   expect(node.publicId).toBe('bbb');
   expect(node.systemId).toBe('ccc');
 });
 
-test('clones a DocumentType instance', () => {
+test('clones a doctype', () => {
   const node = new DocumentType('aaa', 'bbb', 'ccc').cloneNode() as DocumentType;
 
   expect(node.nodeName).toBe('aaa');

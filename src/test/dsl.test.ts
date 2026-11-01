@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { f } from '../main/dsl.js';
 import { CDATASection, Comment, Document, Element, ProcessingInstruction, Text } from '../main/index.js';
 
-test('creates a document', () => {
+test('creates a document with a doctype and the children of a fragment', () => {
   const doctype = f.doctype('html');
   const element = f.html();
   const document = f.doc(doctype, f.f(element));
@@ -11,7 +11,7 @@ test('creates a document', () => {
   expect(Array.from(document)).toStrictEqual([doctype, element]);
 });
 
-test('creates an element', () => {
+test('creates an element with attributes and text', () => {
   const element = f.span({ className: 'xxx' }, 'yyy');
 
   expect(element).toBeInstanceOf(Element);
@@ -32,7 +32,7 @@ test('does not share attributes with the caller', () => {
   expect(element2.getAttribute('class')).toBe('aaa');
 });
 
-test('creates element factories after hasOwnProperty is read', () => {
+test('creates element factories after a factory named hasOwnProperty was created', () => {
   f.hasOwnProperty;
 
   expect(f.aaa()).toBeInstanceOf(Element);

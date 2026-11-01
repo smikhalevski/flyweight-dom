@@ -14,19 +14,19 @@ describe('assertInsertableNode', () => {
     }
   }
 
-  test('throws on DOCUMENT_NODE nodes', () => {
+  test('throws if the node is a document', () => {
     const node = new MockNode(Node.DOCUMENT_NODE);
 
     expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow('Node cannot be a child');
   });
 
-  test('throws on ATTRIBUTE_NODE nodes', () => {
+  test('throws if the node is an attribute', () => {
     const node = new MockNode(Node.ATTRIBUTE_NODE);
 
     expect(() => assertInsertableNode(new Element('aaa'), node)).toThrow('Node cannot be a child');
   });
 
-  test('throws if a child contains a parent', () => {
+  test('throws if the node contains the parent', () => {
     const element1 = new Element('element1');
     const element2 = new Element('element2');
     const element3 = new Element('element3');
@@ -41,11 +41,11 @@ describe('assertInsertableNode', () => {
 });
 
 describe('uncheckedToInsertableNode', () => {
-  test('converts string to Text instance', () => {
+  test('converts a string to a text node', () => {
     expect(uncheckedToInsertableNode('aaa')).toEqual(new Text('aaa'));
   });
 
-  test('preserves node instances as is', () => {
+  test('returns a node as is', () => {
     const node = new Element('aaa');
 
     expect(uncheckedToInsertableNode(node)).toBe(node);

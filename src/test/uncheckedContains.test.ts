@@ -3,13 +3,13 @@ import { Element, Text } from '../main/index.js';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
 import { uncheckedContains } from '../main/uncheckedContains.js';
 
-test('an elements contains itself', () => {
+test('a node contains itself', () => {
   const node = new Element('node');
 
   expect(uncheckedContains(node, node)).toBe(true);
 });
 
-test('returns true if element contains text', () => {
+test('an element contains its child', () => {
   const parent = new Element('parent');
   const node = new Text('node');
 
@@ -18,7 +18,7 @@ test('returns true if element contains text', () => {
   expect(uncheckedContains(parent, node)).toBe(true);
 });
 
-test('returns false if element does not contain text', () => {
+test('an element does not contain a child of another parent', () => {
   const parent1 = new Element('parent1');
   const parent2 = new Element('parent2');
   const node1 = new Text('node1');
@@ -30,7 +30,7 @@ test('returns false if element does not contain text', () => {
   expect(uncheckedContains(parent1, node2)).toBe(false);
 });
 
-test('returns true if an element contains a deeply nested text', () => {
+test('an element contains a nested descendant', () => {
   const parent1 = new Element('parent1');
   const parent2 = new Element('parent2');
   const node = new Text('node');
@@ -41,7 +41,7 @@ test('returns true if an element contains a deeply nested text', () => {
   expect(uncheckedContains(parent1, node)).toBe(true);
 });
 
-test('returns false if child contains parent', () => {
+test('a child does not contain its parent', () => {
   const parent = new Element('parent');
   const node = new Text('node');
 

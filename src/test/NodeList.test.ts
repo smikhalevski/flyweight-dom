@@ -26,7 +26,7 @@ describe('ChildNodeList', () => {
     expect(nodeList['01']).toBeUndefined();
   });
 
-  test('reflects changes of the root', () => {
+  test('reflects a child appended before the first read', () => {
     const element = new Element('aaa');
     const text = new Text();
     const nodeList = new ChildNodeList(element);
@@ -36,7 +36,7 @@ describe('ChildNodeList', () => {
     expect(nodeList[0]).toBe(text);
   });
 
-  test('returns nodes that pass the filter by decreasing index', () => {
+  test('returns filtered nodes when indices are read in decreasing order', () => {
     const element1 = new Element('bbb');
     const element2 = new Element('ccc');
     const element3 = new Element('ddd');
@@ -128,7 +128,7 @@ describe('ChildNodeList', () => {
     expect(1 in nodeList).toBe(false);
   });
 
-  test('reports keys of the list as present', () => {
+  test('reports members of the list as present', () => {
     expect('item' in new ChildNodeList(new Element('aaa'))).toBe(true);
   });
 

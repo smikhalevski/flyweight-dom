@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { Element, Text } from '../main/index.js';
 import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
 
-test('appends the first child node to an element', () => {
+test('appends a text node to an empty parent', () => {
   const parent = new Element('parent');
   const node = new Text();
 
@@ -21,7 +21,7 @@ test('appends the first child node to an element', () => {
   expect(node.nextElementSibling).toBeNull();
 });
 
-test('appends multiple child nodes to an element', () => {
+test('appends text nodes in order', () => {
   const parent = new Element('parent');
   const node1 = new Text();
   const node2 = new Text();
@@ -58,7 +58,7 @@ test('appends multiple child nodes to an element', () => {
   expect(node3.nextElementSibling).toBeNull();
 });
 
-test('updates childNodes', () => {
+test('updates childNodes that were read before', () => {
   const parent = new Element('parent');
   const node = new Text();
 
@@ -72,7 +72,7 @@ test('updates childNodes', () => {
   expect(parent.children.length).toBe(0);
 });
 
-test('appends the first element to an element', () => {
+test('appends an element to an empty parent', () => {
   const parent = new Element('parent');
   const node = new Element('node');
 
@@ -91,7 +91,7 @@ test('appends the first element to an element', () => {
   expect(node.nextElementSibling).toBeNull();
 });
 
-test('appends multiple elements to an element', () => {
+test('appends elements in order', () => {
   const parent = new Element('parent');
   const node1 = new Element('node1');
   const node2 = new Element('node2');
@@ -128,7 +128,7 @@ test('appends multiple elements to an element', () => {
   expect(node3.nextElementSibling).toBeNull();
 });
 
-test('updates children when an element is appended', () => {
+test('updates children that were read before', () => {
   const parent = new Element('parent');
   const node = new Element('node');
 
@@ -143,7 +143,7 @@ test('updates children when an element is appended', () => {
   expect(parent.children[0]).toBe(node);
 });
 
-test('appends mixed nodes to an element', () => {
+test('appends elements and text nodes in order', () => {
   const parent = new Element('parent');
   const node1 = new Element('node1');
   const node2 = new Text('node2');

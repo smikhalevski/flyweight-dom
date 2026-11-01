@@ -6,7 +6,7 @@ class MockCharacterData extends CharacterData {
   readonly nodeName = '';
 }
 
-test('creates a CharacterData instance', () => {
+test('creates character data that is a child node', () => {
   const node = new MockCharacterData();
 
   expect(node).toBeInstanceOf(Node);
@@ -18,7 +18,7 @@ test('creates a CharacterData instance', () => {
   expect(node.replaceWith).toBeInstanceOf(Function);
 });
 
-test('data and length are synchronized', () => {
+test('length is the length of data', () => {
   const node = new MockCharacterData();
   node.data = 'aaa';
 
@@ -34,7 +34,7 @@ test('appends data', () => {
   expect(node.data).toBe('aaabbb');
 });
 
-test('data, nodeValue, and textContent are synchronized', () => {
+test('data, nodeValue and textContent reflect each other, and null clears them', () => {
   const node = new MockCharacterData();
 
   node.data = 'aaa';
@@ -65,15 +65,6 @@ test('data, nodeValue, and textContent are synchronized', () => {
   expect(node.data).toBe('');
   expect(node.nodeValue).toBe('');
   expect(node.textContent).toBe('');
-});
-
-test('clears the data', () => {
-  const node = new MockCharacterData();
-  node.data = 'aaa';
-
-  node.nodeValue = null;
-
-  expect(node.data).toBe('');
 });
 
 test('deletes data', () => {
@@ -112,7 +103,7 @@ test('replaces data', () => {
   expect(node.data).toBe('aacccb');
 });
 
-test('returns a data substring', () => {
+test('returns a substring of data', () => {
   const node = new MockCharacterData();
   node.data = 'aaabbb';
 
@@ -120,10 +111,11 @@ test('returns a data substring', () => {
   expect(node.data).toBe('aaabbb');
 });
 
-test('clones a CharacterData instance', () => {
-  const node = new MockCharacterData().cloneNode() as MockCharacterData;
-  node.data = 'aaa';
+test('clones character data', () => {
+  const node = new MockCharacterData('aaa');
+  const clone = node.cloneNode();
 
-  expect(node).toBeInstanceOf(MockCharacterData);
-  expect(node.data).toBe('aaa');
+  expect(clone).not.toBe(node);
+  expect(clone).toBeInstanceOf(MockCharacterData);
+  expect(clone.data).toBe('aaa');
 });

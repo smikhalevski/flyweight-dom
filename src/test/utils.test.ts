@@ -22,10 +22,12 @@ describe('defineNodeType', () => {
 
     expect(node.nodeType).toBe(111);
     expect(node.nodeName).toBe('aaa');
-    expect(Object.keys(node)).not.toContain('nodeName');
+    expect(Object.getOwnPropertyNames(MockNode.prototype)).toEqual(expect.arrayContaining(['nodeType', 'nodeName']));
+    expect(Object.getOwnPropertyNames(node)).not.toContain('nodeType');
+    expect(Object.getOwnPropertyNames(node)).not.toContain('nodeName');
   });
 
-  test('defines a nodeName getter', () => {
+  test('derives nodeName from the node on each read', () => {
     class MockNode extends Node {
       name = 'aaa';
     }
@@ -38,7 +40,7 @@ describe('defineNodeType', () => {
     expect(node.nodeName).toBe('bbb');
   });
 
-  test('allows assigning nodeName if it is derived', () => {
+  test('allows assigning a derived nodeName to a single node', () => {
     class MockNode extends Node {}
 
     defineNodeType(MockNode, 111, () => 'aaa');
@@ -52,7 +54,7 @@ describe('defineNodeType', () => {
     expect(new MockNode().nodeName).toBe('aaa');
   });
 
-  test('is used by all node classes', () => {
+  test('all node classes keep nodeType and nodeName off instances', () => {
     const nodes = [
       new CDATASection(),
       new Comment(),
@@ -65,8 +67,8 @@ describe('defineNodeType', () => {
     ];
 
     for (const node of nodes) {
-      expect(Object.keys(node)).not.toContain('nodeType');
-      expect(Object.keys(node)).not.toContain('nodeName');
+      expect(Object.getOwnPropertyNames(node)).not.toContain('nodeType');
+      expect(Object.getOwnPropertyNames(node)).not.toContain('nodeName');
     }
   });
 });

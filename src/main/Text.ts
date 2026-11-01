@@ -5,7 +5,14 @@ import type { ParentNode } from './ParentNode.js';
 import { uncheckedAppendChild } from './uncheckedAppendChild.js';
 import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { defineNodeType, ELEMENT_NODE, isText, TEXT_NODE, coerceToString, coerceToPositiveInteger } from './utils.js';
+import {
+  defineNodeType,
+  ELEMENT_NODE,
+  isText,
+  TEXT_NODE,
+  coerceToString,
+  coerceToNonNegativeInteger,
+} from './utils.js';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
@@ -38,7 +45,7 @@ export class Text extends CharacterData {
   splitText(offset: number): this {
     const { data, parentNode, nextSibling } = this;
 
-    offset = coerceToPositiveInteger(offset);
+    offset = coerceToNonNegativeInteger(offset);
 
     this.data = data.substring(0, offset);
 

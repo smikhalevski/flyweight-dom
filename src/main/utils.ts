@@ -91,8 +91,11 @@ export function isText(node: Node): node is Text {
   return node.nodeType === TEXT_NODE || node.nodeType === CDATA_SECTION_NODE;
 }
 
-export function coerceToPositiveInteger(count: number): number {
-  return Math.max(count, 0) | 0;
+/**
+ * Truncates the value to an integer, or returns 0 if the value is negative or NaN.
+ */
+export function coerceToNonNegativeInteger(value: number): number {
+  return value > 0 ? Math.trunc(value) : 0;
 }
 
 export function coerceToString(value: unknown): string {

@@ -1,6 +1,6 @@
 import { ChildNode } from './ChildNode.js';
 import type { Node } from './Node.js';
-import { coerceToPositiveInteger, coerceToString, isEqualConstructor } from './utils.js';
+import { coerceToNonNegativeInteger, coerceToString, isEqualConstructor } from './utils.js';
 
 /**
  * @see [CharacterData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData) on MDN
@@ -57,9 +57,9 @@ export abstract class CharacterData extends ChildNode() {
    * @see [CharacterData.deleteData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/deleteData) on MDN
    */
   deleteData(offset: number, count: number): this {
-    offset = coerceToPositiveInteger(offset);
+    offset = coerceToNonNegativeInteger(offset);
 
-    this.data = this.data.substring(0, offset) + this.data.substring(offset + coerceToPositiveInteger(count));
+    this.data = this.data.substring(0, offset) + this.data.substring(offset + coerceToNonNegativeInteger(count));
     return this;
   }
 
@@ -67,7 +67,7 @@ export abstract class CharacterData extends ChildNode() {
    * @see [CharacterData.insertData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/insertData) on MDN
    */
   insertData(offset: number, data: string): this {
-    offset = coerceToPositiveInteger(offset);
+    offset = coerceToNonNegativeInteger(offset);
 
     this.data = this.data.substring(0, offset) + coerceToString(data) + this.data.substring(offset);
     return this;
@@ -77,12 +77,12 @@ export abstract class CharacterData extends ChildNode() {
    * @see [CharacterData.replaceData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/replaceData) on MDN
    */
   replaceData(offset: number, count: number, data: string): this {
-    offset = coerceToPositiveInteger(offset);
+    offset = coerceToNonNegativeInteger(offset);
 
     this.data =
       this.data.substring(0, offset) +
       coerceToString(data) +
-      this.data.substring(offset + coerceToPositiveInteger(count));
+      this.data.substring(offset + coerceToNonNegativeInteger(count));
 
     return this;
   }
@@ -91,9 +91,9 @@ export abstract class CharacterData extends ChildNode() {
    * @see [CharacterData.substringData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData/substringData) on MDN
    */
   substringData(offset: number, count: number): string {
-    offset = coerceToPositiveInteger(offset);
+    offset = coerceToNonNegativeInteger(offset);
 
-    return this.data.substring(offset, offset + coerceToPositiveInteger(count));
+    return this.data.substring(offset, offset + coerceToNonNegativeInteger(count));
   }
 
   isEqualNode(otherNode: Node | null | undefined): boolean {

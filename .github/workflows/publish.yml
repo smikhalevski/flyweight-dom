@@ -51,7 +51,7 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npm lint
+      - run: npm run lint
       - run: npm test
 
       - name: Publish package

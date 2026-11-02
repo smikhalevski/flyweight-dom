@@ -50,5 +50,15 @@ test('skips null, undefined and boolean children', () => {
 
 test('throws if a child is an object that is not a node', () => {
   // @ts-expect-error Objects aren't children
-  expect(() => f.div('aaa', {})).toThrow('Cannot append a child');
+  expect(() => f.div('aaa', {})).toThrow('The value must be a Node or a primitive');
+});
+
+test('does not move children out of their parents if a child cannot be appended', () => {
+  const text = new Text();
+  const parent = new Element('aaa').append(text);
+
+  expect(() => f.bbb(text, new Document())).toThrow('Node cannot be a child');
+  expect(() => f.f(text, new Document())).toThrow('Node cannot be a child');
+  expect(() => f.doc(text, new Document())).toThrow('Node cannot be a child');
+  expect(text.parentNode).toBe(parent);
 });

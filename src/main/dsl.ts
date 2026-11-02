@@ -23,11 +23,15 @@ import { DocumentFragment } from './DocumentFragment.js';
 import { DocumentType } from './DocumentType.js';
 import { Element } from './Element.js';
 import { Node } from './Node.js';
-import { ParentNode } from './ParentNode.js';
+import type { ParentNode } from './ParentNode.js';
 import { ProcessingInstruction } from './ProcessingInstruction.js';
 import { Text } from './Text.js';
+import { assertInsertable } from './uncheckedToInsertableNode.js';
 
 /**
+ * A child of a node created by the DSL. Strings, numbers and bigints become text nodes, while `null`, `undefined` and
+ * booleans are skipped, so a child can be conditional: `f.ul(isEmpty && f.li('Empty'))`.
+ *
  * @group DSL
  */
 export type Child = Node | string | number | boolean | bigint | null | undefined;
@@ -66,28 +70,16 @@ export interface ElementFactories {
 }
 
 const nodeFactories: NodeFactories = {
-  doc() {
-    const node = new Document();
-
-    for (let i = 0; i < arguments.length; ++i) {
-      appendChild(node, arguments[i]);
-    }
-
-    return node;
+  doc(...children) {
+    return appendChildren(new Document(), children);
   },
 
   doctype(name, publicId, systemId) {
     return new DocumentType(name, publicId, systemId);
   },
 
-  f() {
-    const node = new DocumentFragment();
-
-    for (let i = 0; i < arguments.length; ++i) {
-      appendChild(node, arguments[i]);
-    }
-
-    return node;
+  f(...children) {
+    return appendChildren(new DocumentFragment(), children);
   },
 
   pi(target, data) {
@@ -105,62 +97,71 @@ const nodeFactories: NodeFactories = {
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-const proxyHandler: ProxyHandler<any> = {
-  get(target, key, _receiver) {
-    // Not target.hasOwnProperty, since it can be replaced by an element factory
-    if (typeof key === 'string' && !hasOwnProperty.call(target, key)) {
-      target[key] = createElementFactory(key);
-    }
+const elementFactoryMap = new Map<string, ElementFactory>();
 
-    return target[key];
+/**
+ * Node factories, and element factories for all other tag names.
+ *
+ * @group DSL
+ */
+export const f = new Proxy(nodeFactories, {
+  get(nodeFactories, key) {
+    if (typeof key === 'string' && !hasOwnProperty.call(nodeFactories, key)) {
+      return getElementFactory(key);
+    }
+    return Reflect.get(nodeFactories, key);
   },
-};
+}) as NodeFactories & ElementFactories;
+
+function getElementFactory(tagName: string): ElementFactory {
+  let elementFactory = elementFactoryMap.get(tagName);
+
+  if (elementFactory === undefined) {
+    elementFactory = createElementFactory(tagName);
+    elementFactoryMap.set(tagName, elementFactory);
+  }
+  return elementFactory;
+}
 
 function createElementFactory(tagName: string): ElementFactory {
-  return function () {
-    if (arguments.length === 0) {
-      return new Element(tagName);
+  return (...args: unknown[]) => {
+    const attributes = args[0];
+
+    // The first argument holds attributes if it's an object that isn't a node, otherwise it's a child
+    if (typeof attributes !== 'object' || attributes === null || attributes instanceof Node) {
+      return appendChildren(new Element(tagName), args);
     }
 
-    const arg = arguments[0];
-
-    let element;
-
-    if (arg === null || typeof arg !== 'object' || arg instanceof Node) {
-      element = new Element(tagName);
-      appendChild(element, arg);
-    } else {
-      // Element owns its attributes object, so copy the caller's object, which may be reused or frozen
-      element = new Element(tagName, { ...arg });
-    }
-
-    for (let i = 1; i < arguments.length; ++i) {
-      appendChild(element, arguments[i]);
-    }
-
-    return element;
+    // Element owns its attributes object, so copy the caller's object, which may be reused or frozen
+    return appendChildren(new Element(tagName, { ...attributes }), args, 1);
   };
 }
 
-function appendChild(parent: ParentNode, child: Child): void {
-  if (child === null || child === undefined || typeof child === 'boolean') {
-    return;
-  }
-
-  if (typeof child === 'string' || typeof child === 'number' || typeof child === 'bigint') {
-    parent.appendChild(new Text(child.toString()));
-    return;
-  }
-
-  if (child instanceof Node) {
-    parent.appendChild(child);
-    return;
-  }
-
-  throw new Error('Cannot append a child');
-}
-
 /**
- * @group DSL
+ * Appends children to the parent and returns the parent.
+ *
+ * **Note:** All children are checked before any is appended, so a child that can't be appended doesn't leave other
+ * children moved out of their parents.
+ *
+ * @param parent The parent to append children to.
+ * @param children The children to append.
+ * @param startIndex The index of the first child in children, so attributes that precede children are skipped
+ * without copying the array.
  */
-export const f: NodeFactories & ElementFactories = new Proxy(nodeFactories, proxyHandler);
+function appendChildren<T extends ParentNode>(parent: T, children: unknown[], startIndex = 0): T {
+  for (let i = startIndex; i < children.length; ++i) {
+    assertInsertable(parent, children[i]);
+  }
+
+  for (let i = startIndex; i < children.length; ++i) {
+    // Checked by assertInsertable, so an object is a node
+    const child = children[i] as Child;
+
+    if (child === null || child === undefined || typeof child === 'boolean') {
+      continue;
+    }
+
+    parent.appendChild(typeof child === 'object' ? child : new Text(String(child)));
+  }
+  return parent;
+}

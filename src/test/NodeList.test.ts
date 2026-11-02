@@ -1,7 +1,24 @@
+/// <reference lib="es2021.weakref" />
 import { describe, expect, test } from 'vitest';
 import { DocumentFragment, Element, Text } from '../main/index.js';
 import { EmptyNodeList, ChildNodeList } from '../main/NodeList.js';
-import { isElement } from '../main/utils.js';
+import { isElement, isText } from '../main/utils.js';
+import { collectGarbage } from './utils.js';
+
+/**
+ * Appends a child to the element, reads it from lists of the element, removes it, and returns a weak reference to it.
+ * Runs in its own function, so no variable of the test keeps the child alive.
+ */
+function makeTestRemovedChildRef(element: Element): WeakRef<Element> {
+  const child = new Element('bbb');
+
+  element.append(child);
+  element.childNodes.item(0);
+  element.children.item(0);
+  child.remove();
+
+  return new WeakRef(child);
+}
 
 describe('ChildNodeList', () => {
   test('returns a node by index', () => {
@@ -152,6 +169,49 @@ describe('ChildNodeList', () => {
     }
 
     expect(nodes).toStrictEqual([element1, element3]);
+  });
+
+  test('iterates by index if nodes are removed before a nested iteration', () => {
+    const element1 = new Element('aaa');
+    const element2 = new Element('bbb');
+    const element3 = new Element('ccc');
+    const nodeList = new ChildNodeList(new Element('ddd').append(element1, element2, element3));
+    const nodes = [];
+
+    for (const node of nodeList) {
+      nodes.push(node);
+      node.remove();
+      Array.from(nodeList);
+    }
+
+    expect(nodes).toStrictEqual([element1, element3]);
+  });
+
+  test('returns nodes if lists with different filters are read in turns', () => {
+    const text = new Text();
+    const element = new Element('bbb');
+    const root = new Element('aaa').append(text, element);
+    const elementList = new ChildNodeList(root, isElement);
+    const textList = new ChildNodeList(root, isText);
+
+    expect(elementList[0]).toBe(element);
+    expect(textList[0]).toBe(text);
+  });
+
+  test('has no nodes if the root is a leaf node', () => {
+    expect(new ChildNodeList(new Text()).length).toBe(0);
+  });
+
+  test('does not keep a removed child in memory', async () => {
+    const element = new Element('aaa');
+    const childRef = makeTestRemovedChildRef(element);
+
+    await collectGarbage();
+
+    expect(childRef.deref()).toBeUndefined();
+
+    // Keeps the element alive until here, so its lists could retain the child
+    expect(element.childNodes.length).toBe(0);
   });
 
   describe('length', () => {

@@ -1,6 +1,6 @@
 import type { ChildNode } from './ChildNode.js';
 import type { Element } from './Element.js';
-import { EmptyNodeList, type ChildNodeList, type NodeList } from './NodeList.js';
+import { EmptyNodeList, type ChildrenCache, type NodeList } from './NodeList.js';
 import type { ParentNode } from './ParentNode.js';
 import { uncheckedContains } from './uncheckedContains.js';
 import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.js';
@@ -91,13 +91,18 @@ export class Node {
   declare protected _children: NodeList<Element> | undefined;
 
   /**
-   * Changes each time children of the node change, so a {@link ChildNodeList} knows when its cached state is stale.
+   * Tells live lists and iterators of children whether children changed since they last read them. Set to `null` when
+   * children change. Lists then replace it with a {@link ChildrenCache}, and iterators with a unique number if there's
+   * no cache.
+   *
+   * The cache lives on the node rather than on lists, so dropping it when children change also releases the cached
+   * node. Otherwise, a removed child would stay in memory until the list is read again.
    *
    * **Note:** Initialized for parent nodes only, see the constructor.
    *
    * @hidden
    */
-  declare protected _childrenVersion: number;
+  declare protected _childrenCache: ChildrenCache | number | null;
 
   /**
    * Creates a new instance of {@link Node}.
@@ -110,7 +115,7 @@ export class Node {
     if (this._isParentNode) {
       this._childNodes = undefined;
       this._children = undefined;
-      this._childrenVersion = 0;
+      this._childrenCache = null;
     }
   }
 
@@ -205,12 +210,13 @@ export class Node {
   }
 
   /**
-   * Notifies live lists of the node that its children changed.
+   * Notifies live lists and iterators of the node that its children changed.
    *
    * @hidden
    */
   protected _notifyChildrenChanged(): void {
-    this._childrenVersion = (this._childrenVersion + 1) | 0;
+    // Dropping the cache rather than updating it keeps this a single store, and releases the node that the cache holds
+    this._childrenCache = null;
   }
 }
 

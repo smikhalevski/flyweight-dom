@@ -50,34 +50,14 @@ export class EmptyNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
  * The live {@link NodeList} of children of a node. Index access goes through a Proxy, since the list doesn't store
  * nodes, and reads them from the root on each access.
  *
- * The list caches its length and the last accessed node, so iterating by index takes constant time per access until
- * children of the root change.
+ * The length and the last accessed node are cached on the root, so iterating by index takes constant time per access
+ * until children of the root change.
  *
  * @group Other
  */
 export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> {
   private _root;
   private _filter;
-
-  /**
-   * The children version of the root when the cache was filled, or -1 if the cache was never filled.
-   */
-  private _rootChildrenVersion = -1;
-
-  /**
-   * The cached length, or -1 if it isn't known.
-   */
-  private _length = -1;
-
-  /**
-   * The index of {@link _node}, or -1 if no node is cached.
-   */
-  private _index = -1;
-
-  /**
-   * The last node returned by {@link item}.
-   */
-  private _node: T | null = null;
 
   /**
    * The list itself rather than its {@link Proxy}.
@@ -101,13 +81,12 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
   }
 
   get length(): number {
-    this._resetCacheIfChildrenChanged();
-
     const { _target } = this;
     const { _filter } = _target;
+    const cache = getChildrenCache(_target._root, _filter);
 
-    if (_target._length !== -1) {
-      return _target._length;
+    if (cache.length !== -1) {
+      return cache.length;
     }
 
     let length = 0;
@@ -118,24 +97,22 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
       }
     }
 
-    _target._length = length;
+    cache.length = length;
 
     return length;
   }
 
   item(index: number): T | null {
     const { _target } = this;
+    const { _filter } = _target;
+    const cache = getChildrenCache(_target._root, _filter);
 
-    _target._resetCacheIfChildrenChanged();
-
-    if (!Number.isInteger(index) || index < 0 || (_target._length !== -1 && index >= _target._length)) {
+    if (!Number.isInteger(index) || index < 0 || (cache.length !== -1 && index >= cache.length)) {
       return null;
     }
 
-    const { _filter } = _target;
-
-    let i = _target._index;
-    let node = _target._node;
+    let i = cache.index;
+    let node = cache.node as T | null;
 
     // Starts from the first child if it's closer than the cached node
     if (i === -1 || index < i - index) {
@@ -157,8 +134,8 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
       --i;
     }
 
-    _target._index = i;
-    _target._node = node;
+    cache.index = i;
+    cache.node = node;
 
     return node;
   }
@@ -168,24 +145,64 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
 
     return iterateChildNodes(_target._root, _target._filter);
   }
+}
+
+/**
+ * The cached length and the last accessed node of a {@link ChildNodeList}. Stored on the root rather than on the list,
+ * so the root drops it when its children change, and the cached node isn't kept in memory after it is removed.
+ */
+export class ChildrenCache {
+  /**
+   * The number of children that pass the filter, or -1 if it isn't known.
+   */
+  length = -1;
 
   /**
-   * Drops the cache if children of the root changed since it was filled.
+   * The index of {@link node}, or -1 if no node is cached.
    */
-  private _resetCacheIfChildrenChanged(): void {
-    const { _target } = this;
+  index = -1;
 
-    const rootChildrenVersion = _target._root['_childrenVersion'];
+  /**
+   * The last node returned by {@link ChildNodeList.item}.
+   */
+  node: ChildNode | null = null;
 
-    if (_target._rootChildrenVersion === rootChildrenVersion) {
-      return;
-    }
+  /**
+   * The cache of lists of filtered children. Set on the cache of lists of all children only.
+   */
+  filteredCache: ChildrenCache | null = null;
 
-    _target._rootChildrenVersion = rootChildrenVersion;
-    _target._length = -1;
-    _target._index = -1;
-    _target._node = null;
+  /**
+   * Creates a new instance of {@link ChildrenCache}.
+   *
+   * @param filter The filter of lists that use the cache, or `undefined` for lists of all children.
+   */
+  constructor(readonly filter: ((node: Node) => boolean) | undefined) {}
+}
+
+/**
+ * Returns the cache of lists of children of the parent that pass the filter.
+ */
+function getChildrenCache(parent: Node, filter: ((node: Node) => boolean) | undefined): ChildrenCache {
+  let cache = parent['_childrenCache'];
+
+  // Not an object if children changed, if only iterators read them since then, or if the parent is a leaf node
+  if (typeof cache !== 'object' || cache === null) {
+    cache = parent['_childrenCache'] = new ChildrenCache(undefined);
   }
+
+  if (filter === undefined) {
+    return cache;
+  }
+
+  let filteredCache = cache.filteredCache;
+
+  // Lists with different filters take over the cache from each other, so a list with a new filter on each read doesn't
+  // grow the cache
+  if (filteredCache === null || filteredCache.filter !== filter) {
+    filteredCache = cache.filteredCache = new ChildrenCache(filter);
+  }
+  return filteredCache;
 }
 
 /**
@@ -202,7 +219,7 @@ export function* iterateChildNodes<T extends ChildNode>(
   parent: Node,
   filter: ((node: Node) => boolean) | undefined
 ): Generator<T, void, undefined> {
-  let childrenVersion = parent['_childrenVersion'];
+  let childrenToken = getChildrenToken(parent);
   let index = 0;
   let node = getFilteredSibling(parent.firstChild, filter, true);
 
@@ -211,19 +228,38 @@ export function* iterateChildNodes<T extends ChildNode>(
 
     ++index;
 
-    if (parent['_childrenVersion'] === childrenVersion) {
+    if (parent['_childrenCache'] === childrenToken) {
       node = getFilteredSibling(node.nextSibling, filter, true);
       continue;
     }
 
     // Children changed, so the node may be detached or moved, and the next node is looked up by its index
-    childrenVersion = parent['_childrenVersion'];
+    childrenToken = getChildrenToken(parent);
     node = getFilteredSibling(parent.firstChild, filter, true);
 
     for (let i = 0; i < index && node !== null; ++i) {
       node = getFilteredSibling(node.nextSibling, filter, true);
     }
   }
+}
+
+let lastChildrenToken = 0;
+
+/**
+ * Returns a value that stays the same until children of the parent change: the children cache of the parent, or if
+ * there's no cache, a unique number, so iterating doesn't attach a cache to every visited parent.
+ */
+function getChildrenToken(parent: Node): ChildrenCache | number {
+  const childrenCache = parent['_childrenCache'];
+
+  if (childrenCache !== null) {
+    return childrenCache;
+  }
+
+  // Masked to stay a small integer, which V8 stores without allocating
+  lastChildrenToken = (lastChildrenToken + 1) & 0x3fffffff;
+
+  return (parent['_childrenCache'] = lastChildrenToken);
 }
 
 /**

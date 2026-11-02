@@ -47,9 +47,10 @@ export class Text extends CharacterData {
 
     offset = coerceToNonNegativeInteger(offset);
 
-    this.data = data.substring(0, offset);
-
+    // Created before the data is cut, so a subclass constructor that throws doesn't leave the data cut
     const node = new (this.constructor as typeof Text)(data.substring(offset)) as this;
+
+    this.data = data.substring(0, offset);
 
     if (parentNode === null) {
       return node;
@@ -67,11 +68,12 @@ export class Text extends CharacterData {
 defineNodeType(Text, TEXT_NODE, '#text');
 
 export function setTextContent(node: ParentNode, value: string | null | undefined): void {
+  // Converted before children are removed, so a value that can't be converted doesn't leave the node without children
+  const data = coerceToString(value);
+
   while (node.firstChild !== null) {
     uncheckedRemoveChild(node, node.firstChild);
   }
-
-  const data = coerceToString(value);
 
   if (data.length !== 0) {
     uncheckedAppendChild(node, new Text(data));

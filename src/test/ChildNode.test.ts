@@ -240,4 +240,13 @@ describe('replaceWith', () => {
 
     expect(getChildNodes(parent)).toEqual([text1, text2, text3]);
   });
+
+  test('throws and keeps the node if a value is an object that is not a node', () => {
+    const text = new Text();
+    const parent = new Element('aaa').append(text);
+
+    // @ts-expect-error The value isn't a node
+    expect(() => text.replaceWith(new Text(), {})).toThrow('The value must be a Node or a primitive');
+    expect(getChildNodes(parent)).toEqual([text]);
+  });
 });

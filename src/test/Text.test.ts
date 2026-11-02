@@ -57,6 +57,22 @@ test('appends the split part if the text is the last child', () => {
   expect(getChildNodes(parent)).toStrictEqual([text, node]);
 });
 
+test('keeps data if the split part cannot be created', () => {
+  class MockText extends Text {
+    constructor(data?: string) {
+      if (data === 'bbb') {
+        throw new Error('expected');
+      }
+      super(data);
+    }
+  }
+
+  const node = new MockText('aaabbb');
+
+  expect(() => node.splitText(3)).toThrow('expected');
+  expect(node.data).toBe('aaabbb');
+});
+
 test('wholeText joins adjacent text nodes and CDATA sections up to the nearest other node', () => {
   const text = new Text('bbb');
 

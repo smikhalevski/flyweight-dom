@@ -161,19 +161,14 @@ export function ParentNode(constructor: new () => Node = Node) {
         throw new Error('The node to be replaced is not a child of this node');
       }
 
-      let { nextSibling } = child;
-
-      if (nextSibling === node) {
-        nextSibling = node.nextSibling;
+      // Replacing a child with itself doesn't move it, and inserting a node before itself would break sibling links
+      if (node === (child as Node)) {
+        return child;
       }
 
+      // The node is inserted before the child is removed, so a failed insertion leaves the child in place
+      uncheckedRemoveAndInsertBefore(this, node, child as Node as ChildNode);
       uncheckedRemoveChild(this, child as Node as ChildNode);
-
-      if (nextSibling !== null) {
-        uncheckedRemoveAndInsertBefore(this, node, nextSibling);
-      } else {
-        uncheckedRemoveAndAppendChild(this, node);
-      }
       return child;
     }
 

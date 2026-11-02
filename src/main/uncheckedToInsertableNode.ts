@@ -22,9 +22,6 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
 
 /**
  * Throws if the value can't be inserted into the parent. Primitives can be inserted, since they are converted to text.
- *
- * Objects are told apart from nodes by `nodeType` rather than by `instanceof`, which makes `append` and similar methods
- * up to 40% slower.
  */
 export function assertInsertable(parent: ParentNode, value: unknown): void {
   if (typeof value === 'function') {

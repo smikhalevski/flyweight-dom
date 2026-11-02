@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import { Element, Node, Text } from '../main/index.js';
-import { assertInsertableNode, uncheckedToInsertableNode } from '../main/uncheckedToInsertableNode.js';
+import {
+  assertInsertable,
+  assertInsertableNode,
+  uncheckedToInsertableNode,
+} from '../main/uncheckedToInsertableNode.js';
 
 describe('assertInsertableNode', () => {
   class MockNode extends Node {
@@ -37,6 +41,12 @@ describe('assertInsertableNode', () => {
     assertInsertableNode(element1, element3);
 
     expect(() => assertInsertableNode(element3, element1)).toThrow('The new child element contains the parent');
+  });
+});
+
+describe('assertInsertable', () => {
+  test('throws if an object is not a node', () => {
+    expect(() => assertInsertable(new Element('aaa'), {})).toThrow('The value must be a Node or a primitive');
   });
 });
 

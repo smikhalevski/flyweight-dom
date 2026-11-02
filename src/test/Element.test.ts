@@ -425,6 +425,21 @@ test('setting textContent replaces children', () => {
   expect(element.textContent).toBe('ddd');
 });
 
+test('setting textContent keeps children if the value cannot be converted to a string', () => {
+  const text = new Text();
+  const element = new Element('aaa').append(text);
+
+  expect(() => {
+    // @ts-expect-error The value isn't a string
+    element.textContent = {
+      toString() {
+        throw new Error('expected');
+      },
+    };
+  }).toThrow('expected');
+  expect(element.firstChild).toBe(text);
+});
+
 test('setting an empty textContent removes children', () => {
   const element = new Element('aaa').append('bbb');
 

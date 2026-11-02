@@ -6,7 +6,7 @@ import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.js';
 import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
 import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
 import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertInsertable, assertInsertableNode } from './uncheckedToInsertableNode.js';
+import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
 import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.js';
 
 /**
@@ -82,17 +82,6 @@ export function ParentNode(constructor: new () => Node = Node) {
   parentConstructor = class extends constructor implements ParentNode {
     declare readonly nodeType: number;
     declare readonly nodeName: string;
-
-    /**
-     * Backs {@link children}.
-     */
-    private _children: NodeList<Element> | undefined = undefined;
-
-    /**
-     * @see {@link Node._childrenVersion}.
-     * @hidden
-     */
-    protected _childrenVersion = 0;
 
     get childNodes(): NodeList {
       if (this._childNodes === undefined) {
@@ -193,8 +182,14 @@ export function ParentNode(constructor: new () => Node = Node) {
         assertInsertable(this, arguments[i]);
       }
 
-      for (let i = 0, anchor = this.lastChild; i < arguments.length; ++i) {
-        anchor = uncheckedInsertNodeAfter(this, arguments[i], anchor);
+      // Appending each value in turn moves a value that occurs several times to the end, so the result is the same as
+      // appending a fragment of all values, see https://dom.spec.whatwg.org/#converting-nodes-into-a-node
+      for (let i = 0; i < arguments.length; ++i) {
+        const node = uncheckedToInsertableNode(arguments[i]);
+
+        if (node !== null) {
+          uncheckedRemoveAndAppendChild(this, node);
+        }
       }
       return this;
     }
@@ -225,8 +220,13 @@ export function ParentNode(constructor: new () => Node = Node) {
       this.firstChild = this.lastChild = null;
       this._notifyChildrenChanged();
 
-      for (let i = 0, anchor: ChildNode | null = null; i < arguments.length; ++i) {
-        anchor = uncheckedInsertNodeAfter(this, arguments[i], anchor);
+      // Same as append
+      for (let i = 0; i < arguments.length; ++i) {
+        const node = uncheckedToInsertableNode(arguments[i]);
+
+        if (node !== null) {
+          uncheckedRemoveAndAppendChild(this, node);
+        }
       }
       return this;
     }
@@ -239,6 +239,9 @@ export function ParentNode(constructor: new () => Node = Node) {
       return iterateChildNodes(this, undefined);
     }
   };
+
+  // Tells the Node constructor to initialize parent node fields
+  Object.defineProperty(parentConstructor.prototype, '_isParentNode', { value: true });
 
   parentConstructorCache.set(constructor, parentConstructor);
 

@@ -66,21 +66,53 @@ export class Node {
   lastChild: ChildNode | null = null;
 
   /**
-   * Backs {@link childNodes}. Initialized on construction, so creating the list later doesn't change the hidden class of
-   * the node.
+   * `true` if the node can have children. Defined on prototypes, so the constructor knows which fields to initialize.
    *
    * @hidden
    */
-  protected _childNodes: NodeList | undefined = undefined;
+  declare protected readonly _isParentNode: boolean;
+
+  /**
+   * Backs {@link ParentNode.childNodes}.
+   *
+   * **Note:** Initialized for parent nodes only, see the constructor.
+   *
+   * @hidden
+   */
+  declare protected _childNodes: NodeList | undefined;
+
+  /**
+   * Backs {@link ParentNode.children}.
+   *
+   * **Note:** Initialized for parent nodes only, see the constructor.
+   *
+   * @hidden
+   */
+  declare protected _children: NodeList<Element> | undefined;
 
   /**
    * Changes each time children of the node change, so a {@link ChildNodeList} knows when its cached state is stale.
-   * Only declared here, so edit helpers and lists can reach it. Initialized by {@link ParentNode}, so leaf nodes don't
-   * spend memory on it.
+   *
+   * **Note:** Initialized for parent nodes only, see the constructor.
    *
    * @hidden
    */
   declare protected _childrenVersion: number;
+
+  /**
+   * Creates a new instance of {@link Node}.
+   */
+  constructor() {
+    // Parent node fields are initialized here rather than in ParentNode, since a mixin with field initializers gets a
+    // constructor that V8 can't skip, which makes every parent node slower to create. Leaf nodes don't get these
+    // fields, so they don't spend memory on them. Fields are initialized on construction rather than on first access,
+    // so creating a list doesn't change the hidden class of the node.
+    if (this._isParentNode) {
+      this._childNodes = undefined;
+      this._children = undefined;
+      this._childrenVersion = 0;
+    }
+  }
 
   /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
@@ -104,10 +136,7 @@ export class Node {
    * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
    */
   get childNodes(): NodeList {
-    if (this._childNodes === undefined) {
-      this._childNodes = new EmptyNodeList();
-    }
-    return this._childNodes;
+    return emptyNodeList;
   }
 
   /**
@@ -184,3 +213,11 @@ export class Node {
     this._childrenVersion = (this._childrenVersion + 1) | 0;
   }
 }
+
+Object.defineProperty(Node.prototype, '_isParentNode', { value: false });
+
+/**
+ * {@link Node.childNodes} of all nodes that can't have children. The list has no state, so all nodes share it, and it
+ * is frozen, so a property added to it doesn't show up on other nodes.
+ */
+const emptyNodeList: NodeList = Object.freeze(new EmptyNodeList());

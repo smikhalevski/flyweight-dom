@@ -42,12 +42,29 @@ test('returns the same childNodes of a node that cannot have children', () => {
   expect(node.childNodes).toBe(node.childNodes);
 });
 
+test('nodes that cannot have children share one frozen childNodes', () => {
+  expect(new MockNode().childNodes).toBe(new Text().childNodes);
+  expect(Object.isFrozen(new Text().childNodes)).toBe(true);
+});
+
+test('nodes that cannot have children have no fields for child lists', () => {
+  expect(Object.getOwnPropertyNames(new Text('aaa'))).toStrictEqual([
+    'parentNode',
+    'previousSibling',
+    'nextSibling',
+    'firstChild',
+    'lastChild',
+    'data',
+  ]);
+});
+
 test('reading childNodes, children, classList and attributes does not add properties to nodes', () => {
   const element = new Element('aaa');
   const document = new Document();
   const fragment = new DocumentFragment();
+  const parentNode = new MockParentNode();
   const text = new Text();
-  const nodes = [element, document, fragment, text];
+  const nodes = [element, document, fragment, parentNode, text];
   const propertyNames = nodes.map(node => Object.getOwnPropertyNames(node));
 
   element.childNodes;
@@ -58,6 +75,8 @@ test('reading childNodes, children, classList and attributes does not add proper
   document.children;
   fragment.childNodes;
   fragment.children;
+  parentNode.childNodes;
+  parentNode.children;
   text.childNodes;
 
   expect(nodes.map(node => Object.getOwnPropertyNames(node))).toStrictEqual(propertyNames);

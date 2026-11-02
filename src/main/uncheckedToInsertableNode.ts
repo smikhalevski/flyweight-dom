@@ -1,6 +1,6 @@
 import type { ChildNode } from './ChildNode.js';
 import type { DocumentFragment } from './DocumentFragment.js';
-import { Node } from './Node.js';
+import type { Node } from './Node.js';
 import type { ParentNode } from './ParentNode.js';
 import { Text } from './Text.js';
 import { uncheckedContains } from './uncheckedContains.js';
@@ -20,23 +20,36 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   }
 }
 
+/**
+ * Throws if the value can't be inserted into the parent. Primitives can be inserted, since they are converted to text.
+ *
+ * Objects are told apart from nodes by `nodeType` rather than by `instanceof`, which makes `append` and similar methods
+ * up to 40% slower.
+ */
 export function assertInsertable(parent: ParentNode, value: unknown): void {
-  if (value instanceof Node) {
-    assertInsertableNode(parent, value);
+  if (typeof value === 'function') {
+    throw new Error('The value must be a Node or a primitive');
+  }
+
+  if (typeof value !== 'object' || value === null) {
     return;
   }
 
-  if ((typeof value === 'object' && value !== null) || typeof value === 'function') {
+  if (typeof (value as Node).nodeType !== 'number') {
     throw new Error('The value must be a Node or a primitive');
   }
+
+  assertInsertableNode(parent, value as Node);
 }
 
 /**
  * Returns the node, or a text node with the stringified value, or `null` if the value is `null` or `undefined`, so it
  * is skipped.
+ *
+ * **Note:** The value must be checked by {@link assertInsertable}, so an object is always a node.
  */
 export function uncheckedToInsertableNode(value: unknown): InsertableNode | null {
-  if (value instanceof Node) {
+  if (typeof value === 'object' && value !== null) {
     return value as InsertableNode;
   }
   return value === null || value === undefined ? null : new Text(coerceToString(value));

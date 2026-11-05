@@ -4,6 +4,7 @@
     "isolatedModules": true,
     "strict": true,
     "noUnusedLocals": true,
+    "rewriteRelativeImportExtensions": true,
     "skipLibCheck": true,
     "target": "ES2020",
     "module": "NodeNext",

@@ -34,7 +34,10 @@
   },
   "homepage": "https://github.com/smikhalevski/flyweight-dom#readme",
   "devDependencies": {
+    "@types/jsdom": "^30.0.0",
     "domhandler": "^6.0.1",
+    "domutils": "^4.0.2",
+    "jsdom": "^31.0.0",
     "oxfmt": "^0.75.0",
     "oxlint": "^1.90.0",
     "rimraf": "^6.1.3",

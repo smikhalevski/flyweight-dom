@@ -37,8 +37,16 @@ export class DOMTokenList {
     this._valueAccessor.set(value);
   }
 
-  private _tokens: string[] | undefined = undefined;
-  private _tokenizedValue: string | undefined = undefined;
+  /**
+   * @hidden
+   */
+  protected _tokens: string[] | undefined = undefined;
+
+  /**
+   * @hidden
+   */
+  protected _tokenizedValue: string | undefined = undefined;
+
   private _valueAccessor: ValueAccessor;
 
   /**

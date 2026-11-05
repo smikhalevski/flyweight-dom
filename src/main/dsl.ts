@@ -27,6 +27,7 @@ import type { ParentNode } from './ParentNode.js';
 import { ProcessingInstruction } from './ProcessingInstruction.js';
 import { Text } from './Text.js';
 import { assertInsertable } from './uncheckedToInsertableNode.js';
+import { hasOwnProperty } from './utils.js';
 
 /**
  * A child of a node created by the DSL. Strings, numbers and bigints become text nodes, while `null`, `undefined` and
@@ -95,23 +96,7 @@ const nodeFactories: NodeFactories = {
   },
 };
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
-
 const elementFactoryMap = new Map<string, ElementFactory>();
-
-/**
- * Node factories, and element factories for all other tag names.
- *
- * @group DSL
- */
-export const f = new Proxy(nodeFactories, {
-  get(nodeFactories, key) {
-    if (typeof key === 'string' && !hasOwnProperty.call(nodeFactories, key)) {
-      return getElementFactory(key);
-    }
-    return Reflect.get(nodeFactories, key);
-  },
-}) as NodeFactories & ElementFactories;
 
 function getElementFactory(tagName: string): ElementFactory {
   let elementFactory = elementFactoryMap.get(tagName);
@@ -165,3 +150,17 @@ function appendChildren<T extends ParentNode>(parent: T, children: unknown[], st
   }
   return parent;
 }
+
+/**
+ * Node factories, and element factories for all other tag names.
+ *
+ * @group DSL
+ */
+export const f = new Proxy(nodeFactories, {
+  get(nodeFactories, key) {
+    if (typeof key === 'string' && !hasOwnProperty(nodeFactories, key)) {
+      return getElementFactory(key);
+    }
+    return Reflect.get(nodeFactories, key);
+  },
+}) as NodeFactories & ElementFactories;

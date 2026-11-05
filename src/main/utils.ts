@@ -13,6 +13,12 @@ export const DOCUMENT_NODE = 9;
 export const DOCUMENT_TYPE_NODE = 10;
 export const DOCUMENT_FRAGMENT_NODE = 11;
 
+export const _hasOwnProperty = Object.prototype.hasOwnProperty;
+
+export function hasOwnProperty(object: object, key: PropertyKey): boolean {
+  return _hasOwnProperty.call(object, key);
+}
+
 /**
  * Defines {@link Node.nodeType} and {@link Node.nodeName} on the prototype of a node class, so nodes don't spend memory
  * on values that are the same for all instances of a class, or that duplicate another property.

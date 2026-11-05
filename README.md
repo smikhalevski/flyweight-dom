@@ -6,18 +6,20 @@
   </picture></a>
 </p>
 
+The extremely fast DOM implementation.
+
+- DOM can be extended with custom nodes.
+- Low memory consumption, minimal amount of allocations.
+- Zero dependencies.
+- [4 kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
+
 <br>
 
 ```sh
 npm install --save-prod flyweight-dom
 ```
 
-The extremely fast DOM implementation.
-
-- DOM can be extended with custom nodes;
-- Low memory consumption, minimal amount of allocations;
-- Zero dependencies;
-- [4 kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
+<br>
 
 # Usage
 

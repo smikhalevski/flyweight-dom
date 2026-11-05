@@ -1,7 +1,7 @@
 /// <reference lib="es2021.weakref" />
 import { describe, expect, test } from 'vitest';
 import { DocumentFragment, Element, Text } from '../main/index.js';
-import { EmptyNodeList, ChildNodeList } from '../main/NodeList.js';
+import { EmptyNodeList, ChildNodeIterator, ChildNodeList } from '../main/NodeList.js';
 import { isElement, isText } from '../main/utils.js';
 import { collectGarbage } from './utils.js';
 
@@ -248,5 +248,25 @@ describe('EmptyNodeList', () => {
     expect(nodeList.item(0)).toBeNull();
     expect(nodeList[0]).toBeUndefined();
     expect(Array.from(nodeList)).toStrictEqual([]);
+  });
+});
+
+describe('ChildNodeIterator', () => {
+  test('stays done if children are added after the last node', () => {
+    const element = new Element('aaa');
+    const iterator = new ChildNodeIterator(element, undefined);
+
+    iterator.next();
+    element.append(new Text());
+
+    expect(iterator.next()).toStrictEqual({ value: undefined, done: true });
+  });
+
+  test('supports iterator helpers', () => {
+    const text = new Text();
+    const iterator = new ChildNodeIterator(new Element('aaa').append(text), undefined);
+
+    // @ts-expect-error Iterator helpers aren't in the ES2020 lib
+    expect(iterator.toArray()).toStrictEqual([text]);
   });
 });

@@ -4,7 +4,14 @@ import type { Node } from './Node.js';
 import { ParentNode } from './ParentNode.js';
 import { getTextContent, setTextContent, Text } from './Text.js';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { coerceToString, defineNodeType, ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import {
+  coerceToString,
+  defineNodeType,
+  ELEMENT_NODE,
+  hasOwnProperty,
+  isEqualChildNodes,
+  isEqualConstructor,
+} from './utils.js';
 
 /**
  * The position is case-insensitive.
@@ -20,8 +27,6 @@ export type InsertPosition =
   | 'afterBegin'
   | 'beforeEnd'
   | 'afterEnd';
-
-const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
  * @see [Element](https://developer.mozilla.org/en-US/docs/Web/API/Element) on MDN
@@ -117,14 +122,14 @@ export class Element extends ParentNode(ChildNode()) {
    */
   getAttribute(name: string): string | null {
     // Own property check, so inherited Object.prototype members aren't reported as attributes
-    return hasOwnProperty.call(this.attributes, name) ? this.attributes[name] : null;
+    return hasOwnProperty(this.attributes, name) ? this.attributes[name] : null;
   }
 
   /**
    * @see [Element.hasAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute) on MDN
    */
   hasAttribute(name: string): boolean {
-    return hasOwnProperty.call(this.attributes, name);
+    return hasOwnProperty(this.attributes, name);
   }
 
   /**

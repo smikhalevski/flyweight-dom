@@ -1,5 +1,6 @@
 import * as domhandler from 'domhandler';
 import { describe, measure, test, beforeIteration } from 'toofast';
+// @ts-ignore
 import * as lib from '../../lib/index.js';
 
 describe('Element.appendChild', () => {
@@ -51,14 +52,14 @@ describe('Element.childNodes', () => {
     root.append(new lib.Element('div'), new lib.Element('div'), new lib.Element('div'));
 
     measure(() => {
-      root.childNodes.length;
+      void root.childNodes.length;
     });
   });
 });
 
 describe('Element.classList', () => {
   test('add', () => {
-    let element;
+    let element: lib.Element;
 
     beforeIteration(() => {
       element = new lib.Element('div');

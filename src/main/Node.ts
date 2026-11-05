@@ -91,9 +91,8 @@ export class Node {
   declare protected _children: NodeList<Element> | undefined;
 
   /**
-   * Tells live lists and iterators of children whether children changed since they last read them. Set to `null` when
-   * children change. Lists then replace it with a {@link ChildrenCache}, and iterators with a unique number if there's
-   * no cache.
+   * The cache of live lists of children, or the version of children if there's no cache, or `null` if children changed
+   * since either was set. Live lists and iterators compare versions to tell whether children changed.
    *
    * The cache lives on the node rather than on lists, so dropping it when children change also releases the cached
    * node. Otherwise, a removed child would stay in memory until the list is read again.

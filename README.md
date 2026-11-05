@@ -19,8 +19,6 @@ The extremely fast DOM implementation.
 npm install --save-prod flyweight-dom
 ```
 
-<br>
-
 # Usage
 
 🔰 [API documentation is available here.](https://smikhalevski.github.io/flyweight-dom/)
@@ -114,6 +112,25 @@ Or use the iterator:
 ```ts
 for (const child of parent) {
   // Process the child
+}
+```
+
+The iterator, `childNodes` and `children` are live and read children by index, the same as
+[`NodeList`](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) in browsers. If children change during
+iteration, it continues from the next index: removing the current child skips the one after it, and inserting a node
+before the current child returns the current child again, so this loop never ends:
+
+```ts
+for (const child of parent) {
+  child.before(new Text(' '));
+}
+```
+
+Iterate over a copy if the loop changes children:
+
+```ts
+for (const child of Array.from(parent)) {
+  child.before(new Text(' '));
 }
 ```
 

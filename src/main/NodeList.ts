@@ -63,6 +63,9 @@ const noNodes: never[] = [];
  * The length and the last accessed node are cached on the root, so reading nodes one after another takes constant time
  * per access until children of the root change.
  *
+ * **Note:** Iteration reads children by index, the same as in browsers. If children change during iteration, it
+ * continues from the next index, see {@link ParentNode} for details.
+ *
  * @group Other
  */
 export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> {

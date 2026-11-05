@@ -1,9 +1,5 @@
 import { Node } from './Node.js';
 
-export const FILTER_ACCEPT = 1;
-export const FILTER_REJECT = 2;
-export const FILTER_SKIP = 3;
-export const SHOW_ALL = 0xffffffff;
 export const SHOW_ELEMENT = 1;
 
 /**

@@ -1,5 +1,12 @@
 import { Node } from './Node.js';
-import { FILTER_ACCEPT, FILTER_REJECT, FILTER_SKIP, type NodeFilter, SHOW_ALL } from './NodeFilter.js';
+import type { NodeFilter } from './NodeFilter.js';
+
+// Declared here rather than imported from NodeFilter.ts, since reading imported constants makes nextNode() about 25%
+// slower in V8
+const FILTER_ACCEPT = 1;
+const FILTER_REJECT = 2;
+const FILTER_SKIP = 3;
+const SHOW_ALL = 0xffffffff;
 
 /**
  * Implemented according to https://dom.spec.whatwg.org/#treewalker

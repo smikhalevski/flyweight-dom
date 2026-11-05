@@ -52,6 +52,17 @@ export interface ParentNode extends Node, Iterable<ChildNode> {
   replaceChildren(...nodes: Array<Node | string>): this;
 
   cloneNode(deep?: boolean): ParentNode;
+
+  /**
+   * Returns a live iterator over children.
+   *
+   * **Note:** Children are read by index, the same as when iterating over a
+   * [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) in browsers. If children change during
+   * iteration, it continues from the next index: removing the current child skips the one after it, and inserting a
+   * node before the current child returns the current child again. Iterate over a copy, like `Array.from(parent)`, if
+   * the loop changes children.
+   */
+  [Symbol.iterator](): IterableIterator<ChildNode>;
 }
 
 const parentConstructorCache = new WeakMap();

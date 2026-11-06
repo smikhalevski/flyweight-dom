@@ -1,9 +1,9 @@
-import type { Element } from './Element.js';
-import { Node } from './Node.js';
-import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertInsertable } from './uncheckedToInsertableNode.js';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, getViableNextSibling } from './utils.js';
+import type { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { assertInsertable } from './uncheckedToInsertableNode.ts';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.ts';
 
 /**
  * The node that can be a child of another node.
@@ -45,7 +45,7 @@ export interface ChildNode extends Node {
   cloneNode(deep?: boolean): ChildNode;
 }
 
-const childConstructorCache = new WeakMap();
+const childConstructorMap = new WeakMap();
 
 /**
  * The mixin that can extend the constructor prototype with properties and methods of the {@link ChildNode}.
@@ -64,7 +64,7 @@ export function ChildNode(): new () => ChildNode;
 export function ChildNode<T extends Node>(constructor: new () => T): new () => T & ChildNode;
 
 export function ChildNode(constructor: new () => Node = Node) {
-  let childConstructor = childConstructorCache.get(constructor);
+  let childConstructor = childConstructorMap.get(constructor);
 
   if (childConstructor !== undefined) {
     return childConstructor;
@@ -93,7 +93,9 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      uncheckedInsertNodes(parentNode, arguments, getViableNextSibling(this.nextSibling, arguments));
+      for (let i = 0, anchor: ChildNode | null = this; i < arguments.length; ++i) {
+        anchor = uncheckedInsertNodeAfter(parentNode, arguments[i], anchor);
+      }
       return this;
     }
 
@@ -108,8 +110,9 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      // This node may be among inserted nodes, so insert before the first node that stays in place
-      uncheckedInsertNodes(parentNode, arguments, getViableNextSibling(this, arguments));
+      for (let i = 0, anchor = this.previousSibling; i < arguments.length; ++i) {
+        anchor = uncheckedInsertNodeAfter(parentNode, arguments[i], anchor);
+      }
       return this;
     }
 
@@ -133,10 +136,14 @@ export function ChildNode(constructor: new () => Node = Node) {
         assertInsertable(parentNode, arguments[i]);
       }
 
-      const nextSibling = getViableNextSibling(this.nextSibling, arguments);
+      let anchor = this.previousSibling;
 
+      // This node may be among inserted values, so it is removed first, and inserted again when its turn comes
       uncheckedRemoveChild(parentNode, this);
-      uncheckedInsertNodes(parentNode, arguments, nextSibling);
+
+      for (let i = 0; i < arguments.length; ++i) {
+        anchor = uncheckedInsertNodeAfter(parentNode, arguments[i], anchor);
+      }
       return this;
     }
 
@@ -145,7 +152,7 @@ export function ChildNode(constructor: new () => Node = Node) {
     }
   };
 
-  childConstructorCache.set(constructor, childConstructor);
+  childConstructorMap.set(constructor, childConstructor);
 
   return childConstructor;
 }

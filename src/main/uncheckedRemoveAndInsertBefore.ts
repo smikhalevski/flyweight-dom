@@ -1,19 +1,25 @@
-import type { ChildNode } from './ChildNode.js';
-import type { ParentNode } from './ParentNode.js';
-import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import type { InsertableNode } from './uncheckedToInsertableNode.js';
-import { isDocumentFragment } from './utils.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { uncheckedInsertBefore } from './uncheckedInsertBefore.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import type { InsertableNode } from './uncheckedToInsertableNode.ts';
+import { isDocumentFragment } from './utils.ts';
 
-export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {
+export function uncheckedRemoveAndInsertBefore(
+  parent: ParentNode,
+  node: InsertableNode,
+  referenceChild: ChildNode
+): void {
   if (isDocumentFragment(node)) {
-    let nodeChild = node.firstChild;
+    node['_notifyChildrenChanged']();
 
-    while (nodeChild !== null) {
-      const { nextSibling } = nodeChild;
+    let fragmentChild = node.firstChild;
 
-      uncheckedInsertBefore(parent, nodeChild, child);
-      nodeChild = nextSibling;
+    while (fragmentChild !== null) {
+      const { nextSibling } = fragmentChild;
+
+      uncheckedInsertBefore(parent, fragmentChild, referenceChild);
+      fragmentChild = nextSibling;
     }
 
     node.firstChild = node.lastChild = null;
@@ -26,5 +32,5 @@ export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: Inserta
     uncheckedRemoveChild(parentNode, node);
   }
 
-  uncheckedInsertBefore(parent, node, child);
+  uncheckedInsertBefore(parent, node, referenceChild);
 }

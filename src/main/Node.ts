@@ -1,9 +1,9 @@
-import type { ChildNode } from './ChildNode.js';
-import type { Element } from './Element.js';
-import { NodeList } from './NodeList.js';
-import type { ParentNode } from './ParentNode.js';
-import { uncheckedContains } from './uncheckedContains.js';
-import { ELEMENT_NODE, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { Element } from './Element.ts';
+import { EmptyNodeList, type ChildrenCache, type NodeList } from './NodeList.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { uncheckedContains } from './uncheckedContains.ts';
+import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.ts';
 
 /**
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
@@ -66,13 +66,66 @@ export class Node {
   lastChild: ChildNode | null = null;
 
   /**
+   * `true` if the node can have children. Defined on prototypes, so the constructor knows which fields to initialize.
+   *
+   * @hidden
+   */
+  declare protected readonly _isParentNode: boolean;
+
+  /**
+   * Backs {@link ParentNode.childNodes}.
+   *
+   * **Note:** Initialized for parent nodes only, see the constructor.
+   *
+   * @hidden
+   */
+  declare protected _childNodes: NodeList | undefined;
+
+  /**
+   * Backs {@link ParentNode.children}.
+   *
+   * **Note:** Initialized for parent nodes only, see the constructor.
+   *
+   * @hidden
+   */
+  declare protected _children: NodeList<Element> | undefined;
+
+  /**
+   * The cache of live lists of children, or the version of children if there's no cache, or `null` if children changed
+   * since either was set. Live lists and iterators compare versions to tell whether children changed.
+   *
+   * The cache lives on the node rather than on lists, so dropping it when children change also releases the cached
+   * node. Otherwise, a removed child would stay in memory until the list is read again.
+   *
+   * **Note:** Initialized for parent nodes only, see the constructor.
+   *
+   * @hidden
+   */
+  declare protected _childrenCache: ChildrenCache | number | null;
+
+  /**
+   * Creates a new instance of {@link Node}.
+   */
+  constructor() {
+    // Parent node fields are initialized here rather than in ParentNode, since a mixin with field initializers gets a
+    // constructor that V8 can't skip, which makes every parent node slower to create. Leaf nodes don't get these
+    // fields, so they don't spend memory on them. Fields are initialized on construction rather than on first access,
+    // so creating a list doesn't change the hidden class of the node.
+    if (this._isParentNode) {
+      this._childNodes = undefined;
+      this._children = undefined;
+      this._childrenCache = null;
+    }
+  }
+
+  /**
    * @see [Node.nodeValue](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue) on MDN
    */
   get nodeValue(): string | null {
     return null;
   }
 
-  set nodeValue(value: string | null) {}
+  set nodeValue(value: string | null | undefined) {}
 
   /**
    * @see [Node.textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) on MDN
@@ -81,26 +134,22 @@ export class Node {
     return null;
   }
 
-  set textContent(value: string | null) {}
+  set textContent(value: string | null | undefined) {}
 
   /**
    * @see [Node.childNodes](https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes) on MDN
    */
   get childNodes(): NodeList {
-    return Object.defineProperty(this, 'childNodes', { value: new NodeList(this) }).childNodes;
+    return emptyNodeList;
   }
 
   /**
    * @see [Node.parentElement](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement) on MDN
    */
   get parentElement(): Element | null {
-    let parent = this.parentNode;
+    const { parentNode } = this;
 
-    while (parent !== null && parent.nodeType !== ELEMENT_NODE) {
-      parent = parent.parentNode;
-    }
-
-    return parent as Element | null;
+    return parentNode !== null && isElement(parentNode) ? parentNode : null;
   }
 
   /**
@@ -127,8 +176,8 @@ export class Node {
   /**
    * @see [Node.contains](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains) on MDN
    */
-  contains(node: Node | null | undefined): boolean {
-    return node !== null && node !== undefined && uncheckedContains(this, node);
+  contains(otherNode: Node | null | undefined): boolean {
+    return otherNode !== null && otherNode !== undefined && uncheckedContains(this, otherNode);
   }
 
   /**
@@ -158,4 +207,22 @@ export class Node {
   cloneNode(deep?: boolean): Node {
     throw new Error('This node type does not support this method');
   }
+
+  /**
+   * Notifies live lists and iterators of the node that its children changed.
+   *
+   * @hidden
+   */
+  protected _notifyChildrenChanged(): void {
+    // Dropping the cache rather than updating it keeps this a single store, and releases the node that the cache holds
+    this._childrenCache = null;
+  }
 }
+
+Object.defineProperty(Node.prototype, '_isParentNode', { value: false });
+
+/**
+ * {@link Node.childNodes} of all nodes that can't have children. The list has no state, so all nodes share it, and it
+ * is frozen, so a property added to it doesn't show up on other nodes.
+ */
+const emptyNodeList: NodeList = Object.freeze(new EmptyNodeList());

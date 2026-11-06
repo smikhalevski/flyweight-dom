@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
-import { Element, Text } from '../main/index.js';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
-import { uncheckedRemoveChild } from '../main/uncheckedRemoveChild.js';
+import { Element, Text } from '../main/index.ts';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.ts';
+import { uncheckedRemoveChild } from '../main/uncheckedRemoveChild.ts';
 
 test('removes the only child', () => {
   const parent = new Element('parent');
@@ -61,7 +61,7 @@ test('removes the middle child', () => {
   expect(node3.nextElementSibling).toBeNull();
 });
 
-test('updates childNodes', () => {
+test('updates childNodes that were read before', () => {
   const parent = new Element('parent');
   const node1 = new Text('node1');
   const node2 = new Text('node2');
@@ -140,7 +140,7 @@ test('removes the middle element', () => {
   expect(node3.nextElementSibling).toBeNull();
 });
 
-test('updates children', () => {
+test('updates children that were read before', () => {
   const parent = new Element('parent');
   const node1 = new Element('node1');
   const node2 = new Element('node2');

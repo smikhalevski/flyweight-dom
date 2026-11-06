@@ -1,19 +1,13 @@
-import { ChildNode } from './ChildNode.js';
-import type { Element } from './Element.js';
-import { Node } from './Node.js';
-import { NodeList } from './NodeList.js';
-import { uncheckedInsertNodes } from './uncheckedInsertNodes.js';
-import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
-import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertInsertable, assertInsertableNode } from './uncheckedToInsertableNode.js';
-import {
-  ELEMENT_NODE,
-  getNextSiblingOrSelf,
-  getPreviousSiblingOrSelf,
-  getViableNextSibling,
-  isElement,
-} from './utils.js';
+import { ChildNode } from './ChildNode.ts';
+import type { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import { ChildNodeIterator, ChildNodeList, type NodeList } from './NodeList.ts';
+import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
+import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.ts';
+import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.ts';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.ts';
 
 /**
  * The node that can be a parent of another node.
@@ -58,9 +52,20 @@ export interface ParentNode extends Node, Iterable<ChildNode> {
   replaceChildren(...nodes: Array<Node | string>): this;
 
   cloneNode(deep?: boolean): ParentNode;
+
+  /**
+   * Returns a live iterator over children.
+   *
+   * **Note:** Children are read by index, the same as when iterating over a
+   * [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) in browsers. If children change during
+   * iteration, it continues from the next index: removing the current child skips the one after it, and inserting a
+   * node before the current child returns the current child again. Iterate over a copy, like `Array.from(parent)`, if
+   * the loop changes children.
+   */
+  [Symbol.iterator](): IterableIterator<ChildNode>;
 }
 
-const parentConstructorCache = new WeakMap();
+const parentConstructorMap = new WeakMap();
 
 /**
  * The mixin that can extend the constructor prototype with properties and methods of the {@link ParentNode}.
@@ -79,7 +84,7 @@ export function ParentNode(): new () => ParentNode;
 export function ParentNode<T extends Node>(constructor: new () => T): new () => T & ParentNode;
 
 export function ParentNode(constructor: new () => Node = Node) {
-  let parentConstructor = parentConstructorCache.get(constructor);
+  let parentConstructor = parentConstructorMap.get(constructor);
 
   if (parentConstructor !== undefined) {
     return parentConstructor;
@@ -89,8 +94,18 @@ export function ParentNode(constructor: new () => Node = Node) {
     declare readonly nodeType: number;
     declare readonly nodeName: string;
 
+    get childNodes(): NodeList {
+      if (this._childNodes === undefined) {
+        this._childNodes = new ChildNodeList(this);
+      }
+      return this._childNodes;
+    }
+
     get children(): NodeList<Element> {
-      return Object.defineProperty(this, 'children', { value: new NodeList(this, isElement) }).children;
+      if (this._children === undefined) {
+        this._children = new ChildNodeList(this, isElement);
+      }
+      return this._children;
     }
 
     get childElementCount(): number {
@@ -157,19 +172,14 @@ export function ParentNode(constructor: new () => Node = Node) {
         throw new Error('The node to be replaced is not a child of this node');
       }
 
-      let { nextSibling } = child;
-
-      if (nextSibling === node) {
-        nextSibling = node.nextSibling;
+      // Replacing a child with itself doesn't move it, and inserting a node before itself would break sibling links
+      if (node === (child as Node)) {
+        return child;
       }
 
+      // The node is inserted before the child is removed, so a failed insertion leaves the child in place
+      uncheckedRemoveAndInsertBefore(this, node, child as Node as ChildNode);
       uncheckedRemoveChild(this, child as Node as ChildNode);
-
-      if (nextSibling !== null) {
-        uncheckedRemoveAndInsertBefore(this, node, nextSibling);
-      } else {
-        uncheckedRemoveAndAppendChild(this, node);
-      }
       return child;
     }
 
@@ -178,7 +188,15 @@ export function ParentNode(constructor: new () => Node = Node) {
         assertInsertable(this, arguments[i]);
       }
 
-      uncheckedInsertNodes(this, arguments, null);
+      // Appending each value in turn moves a value that occurs several times to the end, so the result is the same as
+      // appending a fragment of all values, see https://dom.spec.whatwg.org/#converting-nodes-into-a-node
+      for (let i = 0; i < arguments.length; ++i) {
+        const node = uncheckedToInsertableNode(arguments[i]);
+
+        if (node !== null) {
+          uncheckedRemoveAndAppendChild(this, node);
+        }
+      }
       return this;
     }
 
@@ -187,7 +205,9 @@ export function ParentNode(constructor: new () => Node = Node) {
         assertInsertable(this, arguments[i]);
       }
 
-      uncheckedInsertNodes(this, arguments, getViableNextSibling(this.firstChild, arguments));
+      for (let i = 0, anchor: ChildNode | null = null; i < arguments.length; ++i) {
+        anchor = uncheckedInsertNodeAfter(this, arguments[i], anchor);
+      }
       return this;
     }
 
@@ -204,8 +224,16 @@ export function ParentNode(constructor: new () => Node = Node) {
       }
 
       this.firstChild = this.lastChild = null;
+      this._notifyChildrenChanged();
 
-      uncheckedInsertNodes(this, arguments, null);
+      // Same as append
+      for (let i = 0; i < arguments.length; ++i) {
+        const node = uncheckedToInsertableNode(arguments[i]);
+
+        if (node !== null) {
+          uncheckedRemoveAndAppendChild(this, node);
+        }
+      }
       return this;
     }
 
@@ -213,14 +241,15 @@ export function ParentNode(constructor: new () => Node = Node) {
       return super.cloneNode(deep) as ParentNode;
     }
 
-    *[Symbol.iterator](): Iterator<ChildNode> {
-      for (let child = this.firstChild; child !== null; child = child.nextSibling) {
-        yield child;
-      }
+    [Symbol.iterator](): IterableIterator<ChildNode> {
+      return new ChildNodeIterator(this, undefined);
     }
   };
 
-  parentConstructorCache.set(constructor, parentConstructor);
+  // Tells the Node constructor to initialize parent node fields
+  Object.defineProperty(parentConstructor.prototype, '_isParentNode', { value: true });
+
+  parentConstructorMap.set(constructor, parentConstructor);
 
   return parentConstructor;
 }

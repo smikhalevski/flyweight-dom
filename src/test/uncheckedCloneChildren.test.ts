@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest';
-import { Element, Text } from '../main/index.js';
-import { uncheckedCloneChildren } from '../main/uncheckedCloneChildren.js';
+import { Element, Text } from '../main/index.ts';
+import { uncheckedCloneChildren } from '../main/uncheckedCloneChildren.ts';
 
-test('clones a single children of source to target', () => {
+test('clones a single child into the target', () => {
   const sourceParent = new Element('sourceParent');
   const node = new Text('text');
 
@@ -25,7 +25,7 @@ test('clones a single children of source to target', () => {
   expect(targetParent.firstChild!.nextSibling).toBeNull();
 });
 
-test('clones nested children of source to target', () => {
+test('clones nested children into the target', () => {
   const sourceParent = new Element('sourceParent');
   const node1 = new Element('node1');
   const node2 = new Element('node2');

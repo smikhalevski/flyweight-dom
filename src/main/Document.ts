@@ -1,17 +1,14 @@
-import type { DocumentType } from './DocumentType.js';
-import type { Element } from './Element.js';
-import { ParentNode } from './ParentNode.js';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ELEMENT_NODE, getNextSiblingOrSelf } from './utils.js';
+import type { DocumentType } from './DocumentType.ts';
+import type { Element } from './Element.ts';
+import { ParentNode } from './ParentNode.ts';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.ts';
+import { defineNodeType, DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ELEMENT_NODE, getNextSiblingOrSelf } from './utils.ts';
 
 /**
  * @see [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document) on MDN
  * @group Nodes
  */
 export class Document extends ParentNode() {
-  readonly nodeType: number = DOCUMENT_NODE;
-  readonly nodeName: string = '#document';
-
   /**
    * @see [Document.doctype](https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype) on MDN
    */
@@ -35,3 +32,5 @@ export class Document extends ParentNode() {
     return node;
   }
 }
+
+defineNodeType(Document, DOCUMENT_NODE, '#document');

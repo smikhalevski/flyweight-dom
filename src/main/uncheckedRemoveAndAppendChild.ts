@@ -1,18 +1,20 @@
-import type { ParentNode } from './ParentNode.js';
-import { uncheckedAppendChild } from './uncheckedAppendChild.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import type { InsertableNode } from './uncheckedToInsertableNode.js';
-import { isDocumentFragment } from './utils.js';
+import type { ParentNode } from './ParentNode.ts';
+import { uncheckedAppendChild } from './uncheckedAppendChild.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import type { InsertableNode } from './uncheckedToInsertableNode.ts';
+import { isDocumentFragment } from './utils.ts';
 
 export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {
   if (isDocumentFragment(node)) {
-    let nodeChild = node.firstChild;
+    node['_notifyChildrenChanged']();
 
-    while (nodeChild !== null) {
-      const { nextSibling } = nodeChild;
+    let fragmentChild = node.firstChild;
 
-      uncheckedAppendChild(parent, nodeChild);
-      nodeChild = nextSibling;
+    while (fragmentChild !== null) {
+      const { nextSibling } = fragmentChild;
+
+      uncheckedAppendChild(parent, fragmentChild);
+      fragmentChild = nextSibling;
     }
 
     node.firstChild = node.lastChild = null;

@@ -1,7 +1,8 @@
-import { Element } from './Element.js';
-import { Node } from './Node.js';
-import { NodeFilter } from './NodeFilter.js';
-import { TreeWalker } from './TreeWalker.js';
+import { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import { SHOW_ELEMENT } from './NodeFilter.ts';
+import { TreeWalker } from './TreeWalker.ts';
+import { coerceToString } from './utils.ts';
 
 /**
  * Returns an array of elements with the given tag name.
@@ -12,7 +13,9 @@ import { TreeWalker } from './TreeWalker.js';
  * @group Other
  */
 export function getElementsByTagName(root: Node, tagName: string): Element[] {
-  const treeWalker = new TreeWalker(root, NodeFilter.SHOW_ELEMENT);
+  tagName = coerceToString(tagName);
+
+  const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
 
   const elements = [];
 

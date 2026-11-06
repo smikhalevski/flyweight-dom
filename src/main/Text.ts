@@ -1,20 +1,24 @@
-import { CharacterData } from './CharacterData.js';
-import type { ChildNode } from './ChildNode.js';
-import type { Node } from './Node.js';
-import type { ParentNode } from './ParentNode.js';
-import { uncheckedAppendChild } from './uncheckedAppendChild.js';
-import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertOffset, ELEMENT_NODE, isText, TEXT_NODE } from './utils.js';
+import { CharacterData } from './CharacterData.ts';
+import type { ChildNode } from './ChildNode.ts';
+import type { Node } from './Node.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { uncheckedAppendChild } from './uncheckedAppendChild.ts';
+import { uncheckedInsertBefore } from './uncheckedInsertBefore.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import {
+  defineNodeType,
+  ELEMENT_NODE,
+  isText,
+  TEXT_NODE,
+  coerceToString,
+  coerceToNonNegativeInteger,
+} from './utils.ts';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
  * @group Nodes
  */
 export class Text extends CharacterData {
-  readonly nodeType: number = TEXT_NODE;
-  readonly nodeName: string = '#text';
-
   /**
    * @see [Text.wholeText](https://developer.mozilla.org/en-US/docs/Web/API/Text/wholeText) on MDN
    */
@@ -41,11 +45,12 @@ export class Text extends CharacterData {
   splitText(offset: number): this {
     const { data, parentNode, nextSibling } = this;
 
-    assertOffset(data, offset);
+    offset = coerceToNonNegativeInteger(offset);
+
+    // Created before the data is cut, so a subclass constructor that throws doesn't leave the data cut
+    const node = new (this.constructor as typeof Text)(data.substring(offset)) as this;
 
     this.data = data.substring(0, offset);
-
-    const node = new (this.constructor as typeof Text)(data.substring(offset)) as this;
 
     if (parentNode === null) {
       return node;
@@ -60,13 +65,18 @@ export class Text extends CharacterData {
   }
 }
 
-export function setTextContent(node: ParentNode, value: string | null): void {
+defineNodeType(Text, TEXT_NODE, '#text');
+
+export function setTextContent(node: ParentNode, value: string | null | undefined): void {
+  // Converted before children are removed, so a value that can't be converted doesn't leave the node without children
+  const data = coerceToString(value);
+
   while (node.firstChild !== null) {
     uncheckedRemoveChild(node, node.firstChild);
   }
 
-  if (value !== null && value.length !== 0) {
-    uncheckedAppendChild(node, new Text(value));
+  if (data.length !== 0) {
+    uncheckedAppendChild(node, new Text(data));
   }
 }
 
@@ -74,15 +84,15 @@ export function setTextContent(node: ParentNode, value: string | null): void {
  * Returns the concatenated data of all text descendants, ignoring comments, processing instructions and doctypes.
  */
 export function getTextContent(node: Node): string {
-  let value = '';
+  let textContent = '';
 
   for (let child = node.firstChild; child !== null; child = child.nextSibling) {
     if (isText(child)) {
-      value += child.data;
+      textContent += child.data;
     } else if (child.nodeType === ELEMENT_NODE) {
-      value += getTextContent(child);
+      textContent += getTextContent(child);
     }
   }
 
-  return value;
+  return textContent;
 }

@@ -1,5 +1,12 @@
-import { Node } from './Node.js';
-import { NodeFilter } from './NodeFilter.js';
+import { Node } from './Node.ts';
+import type { NodeFilter } from './NodeFilter.ts';
+
+// Declared here rather than imported from NodeFilter.ts, since reading imported constants makes nextNode() about 25%
+// slower in V8
+const FILTER_ACCEPT = 1;
+const FILTER_REJECT = 2;
+const FILTER_SKIP = 3;
+const SHOW_ALL = 0xffffffff;
 
 /**
  * Implemented according to https://dom.spec.whatwg.org/#treewalker
@@ -31,7 +38,7 @@ export class TreeWalker {
     /**
      * @see [TreeWalker.whatToShow](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/whatToShow) on MDN
      */
-    readonly whatToShow: number = NodeFilter.SHOW_ALL,
+    readonly whatToShow: number = SHOW_ALL,
 
     /**
      * @see [TreeWalker.filter](https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker/filter) on MDN
@@ -52,7 +59,7 @@ export class TreeWalker {
     while (node !== null && node !== root) {
       node = node.parentNode;
 
-      if (node !== null && filterNode(this, node) === NodeFilter.FILTER_ACCEPT) {
+      if (node !== null && filterNode(this, node) === FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
     }
@@ -73,11 +80,11 @@ export class TreeWalker {
     while (node !== null) {
       result = filterNode(this, node);
 
-      if (result === NodeFilter.FILTER_ACCEPT) {
+      if (result === FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
 
-      if (result === NodeFilter.FILTER_SKIP && (candidate = node.firstChild) !== null) {
+      if (result === FILTER_SKIP && (candidate = node.firstChild) !== null) {
         node = candidate;
         continue;
       }
@@ -113,11 +120,11 @@ export class TreeWalker {
     while (node !== null) {
       result = filterNode(this, node);
 
-      if (result === NodeFilter.FILTER_ACCEPT) {
+      if (result === FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
 
-      if (result === NodeFilter.FILTER_SKIP && (candidate = node.lastChild) !== null) {
+      if (result === FILTER_SKIP && (candidate = node.lastChild) !== null) {
         node = candidate;
         continue;
       }
@@ -161,18 +168,18 @@ export class TreeWalker {
         node = candidate;
         result = filterNode(this, node);
 
-        if (result === NodeFilter.FILTER_ACCEPT) {
+        if (result === FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
 
-        if (result === NodeFilter.FILTER_REJECT || (candidate = node.firstChild) === null) {
+        if (result === FILTER_REJECT || (candidate = node.firstChild) === null) {
           candidate = node.nextSibling;
         }
       }
 
       candidate = node.parentNode;
 
-      if (candidate === null || candidate === root || filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
+      if (candidate === null || candidate === root || filterNode(this, candidate) === FILTER_ACCEPT) {
         return null;
       }
 
@@ -201,18 +208,18 @@ export class TreeWalker {
         node = candidate;
         result = filterNode(this, node);
 
-        if (result === NodeFilter.FILTER_ACCEPT) {
+        if (result === FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
 
-        if (result === NodeFilter.FILTER_REJECT || (candidate = node.lastChild) === null) {
+        if (result === FILTER_REJECT || (candidate = node.lastChild) === null) {
           candidate = node.previousSibling;
         }
       }
 
       candidate = node.parentNode;
 
-      if (candidate === null || candidate === root || filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
+      if (candidate === null || candidate === root || filterNode(this, candidate) === FILTER_ACCEPT) {
         return null;
       }
 
@@ -231,29 +238,38 @@ export class TreeWalker {
     let candidate;
 
     while (true) {
-      while (result !== NodeFilter.FILTER_REJECT && (candidate = node.firstChild) !== null) {
+      while (result !== FILTER_REJECT && (candidate = node.firstChild) !== null) {
         node = candidate;
         result = filterNode(this, candidate);
 
-        if (result === NodeFilter.FILTER_ACCEPT) {
+        if (result === FILTER_ACCEPT) {
           return (this.currentNode = candidate);
         }
       }
 
-      for (let parent: Node | null = node; parent !== null; parent = parent.parentNode) {
-        if (parent === root) {
+      let ancestor: Node | null = node;
+
+      while (ancestor !== null) {
+        if (ancestor === root) {
           return null;
         }
 
-        if ((candidate = parent.nextSibling) !== null) {
+        if ((candidate = ancestor.nextSibling) !== null) {
           node = candidate;
           break;
         }
+
+        ancestor = ancestor.parentNode;
+      }
+
+      if (ancestor === null) {
+        // The current node isn't inside the root, for example, it was removed from the tree
+        return null;
       }
 
       result = filterNode(this, node);
 
-      if (result === NodeFilter.FILTER_ACCEPT) {
+      if (result === FILTER_ACCEPT) {
         return (this.currentNode = node);
       }
     }
@@ -274,9 +290,9 @@ export class TreeWalker {
         do {
           node = candidate;
           result = filterNode(this, candidate);
-        } while (result !== NodeFilter.FILTER_REJECT && (candidate = node.lastChild) !== null);
+        } while (result !== FILTER_REJECT && (candidate = node.lastChild) !== null);
 
-        if (result === NodeFilter.FILTER_ACCEPT) {
+        if (result === FILTER_ACCEPT) {
           return (this.currentNode = node);
         }
       }
@@ -285,7 +301,7 @@ export class TreeWalker {
         break;
       }
 
-      if (filterNode(this, candidate) === NodeFilter.FILTER_ACCEPT) {
+      if (filterNode(this, candidate) === FILTER_ACCEPT) {
         return (this.currentNode = candidate);
       }
 
@@ -299,19 +315,17 @@ export class TreeWalker {
 export function filterNode(treeWalker: TreeWalker, node: Node): number {
   const { filter } = treeWalker;
 
-  let result;
-
   if ((((1 << node.nodeType) >> 1) & treeWalker.whatToShow) === 0) {
-    return NodeFilter.FILTER_SKIP;
+    return FILTER_SKIP;
   }
 
-  if (filter !== null) {
-    result = typeof filter === 'function' ? filter(node) : filter.acceptNode(node);
-
-    if (result === NodeFilter.FILTER_SKIP || result === NodeFilter.FILTER_REJECT) {
-      return result;
-    }
+  if (filter === null) {
+    return FILTER_ACCEPT;
   }
 
-  return NodeFilter.FILTER_ACCEPT;
+  const result = typeof filter === 'function' ? filter(node) : filter.acceptNode(node);
+
+  // Same conversion to unsigned short as in browsers: true becomes FILTER_ACCEPT, while false and undefined become 0,
+  // which traversal methods don't accept
+  return result & 0xffff;
 }

@@ -6,18 +6,18 @@
   </picture></a>
 </p>
 
+The extremely fast DOM implementation.
+
+- DOM can be extended with custom nodes.
+- Low memory consumption, minimal amount of allocations.
+- Zero dependencies.
+- [4 kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
+
 <br>
 
 ```sh
 npm install --save-prod flyweight-dom
 ```
-
-The extremely fast DOM implementation.
-
-- DOM can be extended with custom nodes;
-- Low memory consumption, minimal amount of allocations;
-- Zero dependencies;
-- [4 kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
 
 # Usage
 
@@ -112,6 +112,25 @@ Or use the iterator:
 ```ts
 for (const child of parent) {
   // Process the child
+}
+```
+
+The iterator, `childNodes` and `children` are live and read children by index, the same as
+[`NodeList`](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) in browsers. If children change during
+iteration, it continues from the next index: removing the current child skips the one after it, and inserting a node
+before the current child returns the current child again, so this loop never ends:
+
+```ts
+for (const child of parent) {
+  child.before(new Text(' '));
+}
+```
+
+Iterate over a copy if the loop changes children:
+
+```ts
+for (const child of Array.from(parent)) {
+  child.before(new Text(' '));
 }
 ```
 

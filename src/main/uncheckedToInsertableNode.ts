@@ -1,10 +1,10 @@
-import type { ChildNode } from './ChildNode.js';
-import type { DocumentFragment } from './DocumentFragment.js';
-import type { Node } from './Node.js';
-import type { ParentNode } from './ParentNode.js';
-import { Text } from './Text.js';
-import { uncheckedContains } from './uncheckedContains.js';
-import { ATTRIBUTE_NODE, DOCUMENT_NODE } from './utils.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { DocumentFragment } from './DocumentFragment.ts';
+import type { Node } from './Node.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { Text } from './Text.ts';
+import { uncheckedContains } from './uncheckedContains.ts';
+import { ATTRIBUTE_NODE, coerceToString, DOCUMENT_NODE } from './utils.ts';
 
 export type InsertableNode = DocumentFragment | ChildNode;
 
@@ -20,12 +20,34 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
   }
 }
 
-export function assertInsertable(parent: ParentNode, node: Node | string): asserts node is InsertableNode | string {
-  if (typeof node !== 'string') {
-    assertInsertableNode(parent, node);
+/**
+ * Throws if the value can't be inserted into the parent. Primitives can be inserted, since they are converted to text.
+ */
+export function assertInsertable(parent: ParentNode, value: unknown): void {
+  if (typeof value === 'function') {
+    throw new Error('The value must be a Node or a primitive');
   }
+
+  if (typeof value !== 'object' || value === null) {
+    return;
+  }
+
+  if (typeof (value as Node).nodeType !== 'number') {
+    throw new Error('The value must be a Node or a primitive');
+  }
+
+  assertInsertableNode(parent, value as Node);
 }
 
-export function uncheckedToInsertableNode(node: Node | string): InsertableNode {
-  return typeof node === 'string' ? new Text(node) : (node as InsertableNode);
+/**
+ * Returns the node, or a text node with the stringified value, or `null` if the value is `null` or `undefined`, so it
+ * is skipped.
+ *
+ * **Note:** The value must be checked by {@link assertInsertable}, so an object is always a node.
+ */
+export function uncheckedToInsertableNode(value: unknown): InsertableNode | null {
+  if (typeof value === 'object' && value !== null) {
+    return value as InsertableNode;
+  }
+  return value === null || value === undefined ? null : new Text(coerceToString(value));
 }

@@ -1,4 +1,6 @@
-import { Node } from './Node.js';
+import { Node } from './Node.ts';
+
+export const SHOW_ELEMENT = 1;
 
 /**
  * @group Other

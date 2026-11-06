@@ -1,5 +1,5 @@
-import type { ChildNode } from './ChildNode.js';
-import type { ParentNode } from './ParentNode.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { ParentNode } from './ParentNode.ts';
 
 export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: ParentNode): void {
   const { firstChild } = sourceParent;
@@ -7,6 +7,8 @@ export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: P
   if (firstChild === null || sourceParent === targetParent) {
     return;
   }
+
+  targetParent['_notifyChildrenChanged']();
 
   let { lastChild } = targetParent;
 

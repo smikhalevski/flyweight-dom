@@ -1,15 +1,18 @@
-import type { Node } from './Node.js';
+import type { Node } from './Node.ts';
 
-export function uncheckedContains(parent: Node, node: Node): boolean {
-  if (parent.firstChild === null) {
-    return parent === node;
+/**
+ * Returns `true` if the other node is the node itself or its descendant.
+ */
+export function uncheckedContains(node: Node, otherNode: Node): boolean {
+  if (node.firstChild === null) {
+    return node === otherNode;
   }
 
-  for (let ancestor: Node | null = node; ancestor !== null; ancestor = ancestor.parentNode) {
-    if (parent === ancestor) {
+  for (let ancestor: Node | null = otherNode; ancestor !== null; ancestor = ancestor.parentNode) {
+    if (node === ancestor) {
       return true;
     }
   }
 
-  return parent === node;
+  return node === otherNode;
 }

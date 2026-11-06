@@ -2,9 +2,9 @@ import * as domhandler from 'domhandler';
 import * as domutils from 'domutils';
 import { describe, measure, test } from 'toofast';
 // @ts-ignore
-import { f } from '../main/dsl.ts';
+import { f } from '../../lib/dsl.js';
 // @ts-ignore
-import * as flyweightDom from '../main/index.ts';
+import * as flyweightDom from '../../lib/index.js';
 import { collectGarbage } from './test-utils.ts';
 
 /**

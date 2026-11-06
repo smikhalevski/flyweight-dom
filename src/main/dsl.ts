@@ -157,10 +157,10 @@ function appendChildren<T extends ParentNode>(parent: T, children: unknown[], st
  * @group DSL
  */
 export const f = new Proxy(nodeFactories, {
-  get(nodeFactories, key) {
-    if (typeof key === 'string' && !hasOwnProperty(nodeFactories, key)) {
+  get(target, key) {
+    if (typeof key === 'string' && !hasOwnProperty(target, key)) {
       return getElementFactory(key);
     }
-    return Reflect.get(nodeFactories, key);
+    return Reflect.get(target, key);
   },
 }) as NodeFactories & ElementFactories;

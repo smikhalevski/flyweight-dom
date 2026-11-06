@@ -45,7 +45,7 @@ export interface ChildNode extends Node {
   cloneNode(deep?: boolean): ChildNode;
 }
 
-const childConstructorCache = new WeakMap();
+const childConstructorMap = new WeakMap();
 
 /**
  * The mixin that can extend the constructor prototype with properties and methods of the {@link ChildNode}.
@@ -64,7 +64,7 @@ export function ChildNode(): new () => ChildNode;
 export function ChildNode<T extends Node>(constructor: new () => T): new () => T & ChildNode;
 
 export function ChildNode(constructor: new () => Node = Node) {
-  let childConstructor = childConstructorCache.get(constructor);
+  let childConstructor = childConstructorMap.get(constructor);
 
   if (childConstructor !== undefined) {
     return childConstructor;
@@ -152,7 +152,7 @@ export function ChildNode(constructor: new () => Node = Node) {
     }
   };
 
-  childConstructorCache.set(constructor, childConstructor);
+  childConstructorMap.set(constructor, childConstructor);
 
   return childConstructor;
 }

@@ -5,17 +5,21 @@ import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
 import type { InsertableNode } from './uncheckedToInsertableNode.ts';
 import { isDocumentFragment } from './utils.ts';
 
-export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: InsertableNode, child: ChildNode): void {
+export function uncheckedRemoveAndInsertBefore(
+  parent: ParentNode,
+  node: InsertableNode,
+  referenceChild: ChildNode
+): void {
   if (isDocumentFragment(node)) {
     node['_notifyChildrenChanged']();
 
-    let nodeChild = node.firstChild;
+    let fragmentChild = node.firstChild;
 
-    while (nodeChild !== null) {
-      const { nextSibling } = nodeChild;
+    while (fragmentChild !== null) {
+      const { nextSibling } = fragmentChild;
 
-      uncheckedInsertBefore(parent, nodeChild, child);
-      nodeChild = nextSibling;
+      uncheckedInsertBefore(parent, fragmentChild, referenceChild);
+      fragmentChild = nextSibling;
     }
 
     node.firstChild = node.lastChild = null;
@@ -28,5 +32,5 @@ export function uncheckedRemoveAndInsertBefore(parent: ParentNode, node: Inserta
     uncheckedRemoveChild(parentNode, node);
   }
 
-  uncheckedInsertBefore(parent, node, child);
+  uncheckedInsertBefore(parent, node, referenceChild);
 }

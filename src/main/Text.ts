@@ -84,15 +84,15 @@ export function setTextContent(node: ParentNode, value: string | null | undefine
  * Returns the concatenated data of all text descendants, ignoring comments, processing instructions and doctypes.
  */
 export function getTextContent(node: Node): string {
-  let value = '';
+  let textContent = '';
 
   for (let child = node.firstChild; child !== null; child = child.nextSibling) {
     if (isText(child)) {
-      value += child.data;
+      textContent += child.data;
     } else if (child.nodeType === ELEMENT_NODE) {
-      value += getTextContent(child);
+      textContent += getTextContent(child);
     }
   }
 
-  return value;
+  return textContent;
 }

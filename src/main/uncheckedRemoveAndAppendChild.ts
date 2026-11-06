@@ -8,13 +8,13 @@ export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: Insertab
   if (isDocumentFragment(node)) {
     node['_notifyChildrenChanged']();
 
-    let nodeChild = node.firstChild;
+    let fragmentChild = node.firstChild;
 
-    while (nodeChild !== null) {
-      const { nextSibling } = nodeChild;
+    while (fragmentChild !== null) {
+      const { nextSibling } = fragmentChild;
 
-      uncheckedAppendChild(parent, nodeChild);
-      nodeChild = nextSibling;
+      uncheckedAppendChild(parent, fragmentChild);
+      fragmentChild = nextSibling;
     }
 
     node.firstChild = node.lastChild = null;

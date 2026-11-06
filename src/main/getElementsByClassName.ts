@@ -25,13 +25,13 @@ export function getElementsByClassName(root: Node, className: string): Element[]
   const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
   const elements = [];
 
-  nextNode: for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
+  nextElement: for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
     // Not element.classList, since it would permanently attach a DOMTokenList to every visited element
-    const { className } = element;
+    const elementClassName = element.className;
 
     for (let i = 0; i < classNames.length; ++i) {
-      if (!hasToken(className, classNames[i])) {
-        continue nextNode;
+      if (!hasToken(elementClassName, classNames[i])) {
+        continue nextElement;
       }
     }
 

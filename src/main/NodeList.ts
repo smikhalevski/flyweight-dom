@@ -58,10 +58,10 @@ const noNodes: never[] = [];
 
 /**
  * The live {@link NodeList} of children of a node. Index access goes through a Proxy, since the list doesn't store
- * nodes, and reads them from the root on each access.
+ * nodes, and reads them from the parent on each access.
  *
- * The length and the last accessed node are cached on the root, so reading nodes one after another takes constant time
- * per access until children of the root change.
+ * The length and the last accessed node are cached on the parent, so reading nodes one after another takes constant
+ * time per access until children of the parent change.
  *
  * **Note:** Iteration reads children by index, the same as in browsers. If children change during iteration, it
  * continues from the next index, see {@link ParentNode} for details.
@@ -69,7 +69,7 @@ const noNodes: never[] = [];
  * @group Other
  */
 export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> {
-  private _root;
+  private _parent;
   private _filter;
 
   /**
@@ -81,13 +81,13 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
   /**
    * Creates a new instance of {@link ChildNodeList}.
    *
-   * @param root The node whose children the list contains.
+   * @param parent The node whose children the list contains.
    * @param filter The callback that returns `true` for children that the list contains, or `undefined` if the list
    * contains all children.
    */
-  constructor(root: Node, filter?: (node: Node) => node is T) {
+  constructor(parent: Node, filter?: (node: Node) => node is T) {
     super();
-    this._root = root;
+    this._parent = parent;
     this._filter = filter;
     this._target = this;
 
@@ -97,7 +97,7 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
   get length(): number {
     const target = this._target;
     const filter = target._filter;
-    const cache = getChildrenCache(target._root, filter);
+    const cache = getChildrenCache(target._parent, filter);
 
     if (cache.length !== -1) {
       return cache.length;
@@ -105,7 +105,7 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
 
     let length = 0;
 
-    for (let child = target._root.firstChild; child !== null; child = child.nextSibling) {
+    for (let child = target._parent.firstChild; child !== null; child = child.nextSibling) {
       if (filter === undefined || filter(child)) {
         ++length;
       }
@@ -119,7 +119,7 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
   item(index: number): T | null {
     const target = this._target;
     const filter = target._filter;
-    const cache = getChildrenCache(target._root, filter);
+    const cache = getChildrenCache(target._parent, filter);
 
     if (!Number.isInteger(index) || index < 0 || (cache.length !== -1 && index >= cache.length)) {
       return null;
@@ -129,8 +129,8 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
     const isCachedNodeCloser = cache.index !== -1 && Math.abs(cache.index - index) <= index;
 
     const node = isCachedNodeCloser
-      ? walkToIndex(cache.node, cache.index, index, filter)
-      : getChildAt(target._root, index, filter);
+      ? getSiblingAt(cache.node, cache.index, index, filter)
+      : getChildAt(target._parent, index, filter);
 
     if (node !== null) {
       cache.index = index;
@@ -142,7 +142,7 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
   values(): IterableIterator<T> {
     const target = this._target;
 
-    return new ChildNodeIterator(target._root, target._filter);
+    return new ChildNodeIterator(target._parent, target._filter);
   }
 }
 
@@ -150,8 +150,8 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
 ChildNodeList.prototype[Symbol.iterator] = ChildNodeList.prototype.values;
 
 /**
- * The cached length and the last accessed node of a {@link ChildNodeList}. Stored on the root rather than on the list,
- * so the root drops it when its children change, and the cached node isn't kept in memory after it is removed.
+ * The cached length and the last accessed node of a {@link ChildNodeList}. Stored on the parent rather than on the
+ * list, so the parent drops it when its children change, and the cached node isn't kept in memory after it is removed.
  */
 export class ChildrenCache {
   /**
@@ -170,8 +170,8 @@ export class ChildrenCache {
   node: ChildNode | null = null;
 
   /**
-   * The cache of a list of filtered children. Stored on the cache of the list of all children, so the root drops both
-   * at once.
+   * The cache of a list of filtered children. Stored on the cache of the list of all children, so the parent drops
+   * both at once.
    */
   filteredCache: ChildrenCache | null = null;
 
@@ -257,19 +257,19 @@ export class ChildNodeIterator<T extends ChildNode = ChildNode> implements Itera
   private _filter;
 
   /**
-   * The version of children of the parent when {@link _node} was returned.
+   * The version of children of the parent when {@link _lastNode} was returned.
    */
   private _childrenVersion = -1;
 
   /**
-   * The number of returned nodes.
+   * The index of the next node to return, which is the number of returned nodes.
    */
-  private _index = 0;
+  private _nextIndex = 0;
 
   /**
    * The last returned node, or `null` if no node was returned yet.
    */
-  private _node: ChildNode | null = null;
+  private _lastNode: ChildNode | null = null;
 
   /**
    * `true` if all nodes were returned.
@@ -295,7 +295,7 @@ export class ChildNodeIterator<T extends ChildNode = ChildNode> implements Itera
 
     const parent = this._parent;
     const filter = this._filter;
-    const lastNode = this._node;
+    const lastNode = this._lastNode;
     const childrenVersion = getChildrenVersion(parent);
 
     let node;
@@ -305,18 +305,18 @@ export class ChildNodeIterator<T extends ChildNode = ChildNode> implements Itera
     } else {
       // The first node, or children changed and the last node may have been moved, so the node is found by its index
       this._childrenVersion = childrenVersion;
-      node = getChildAt(parent, this._index, filter);
+      node = getChildAt(parent, this._nextIndex, filter);
     }
 
     if (node === null) {
       this._isDone = true;
       // Releases the node, so a finished iterator doesn't keep it in memory
-      this._node = null;
+      this._lastNode = null;
       return { value: undefined, done: true };
     }
 
-    this._node = node;
-    ++this._index;
+    this._lastNode = node;
+    ++this._nextIndex;
 
     return { value: node as T, done: false };
   }
@@ -337,25 +337,25 @@ Object.setPrototypeOf(ChildNodeIterator.prototype, iteratorPrototype);
  * Returns the child at the index, counting only children that pass the filter, or `null` if there's no such child.
  */
 function getChildAt(parent: Node, index: number, filter: ChildFilter | undefined): ChildNode | null {
-  return walkToIndex(getNextFilteredSiblingOrSelf(parent.firstChild, filter), 0, index, filter);
+  return getSiblingAt(getNextFilteredSiblingOrSelf(parent.firstChild, filter), 0, index, filter);
 }
 
 /**
  * Walks siblings from the node at the given index to the node at the target index, counting only nodes that pass the
  * filter. Returns `null` if there's no node at the target index.
  */
-function walkToIndex(
+function getSiblingAt(
   node: ChildNode | null,
   nodeIndex: number,
-  index: number,
+  targetIndex: number,
   filter: ChildFilter | undefined
 ): ChildNode | null {
-  while (node !== null && nodeIndex < index) {
+  while (node !== null && nodeIndex < targetIndex) {
     node = getNextFilteredSiblingOrSelf(node.nextSibling, filter);
     ++nodeIndex;
   }
 
-  while (node !== null && nodeIndex > index) {
+  while (node !== null && nodeIndex > targetIndex) {
     node = getPreviousFilteredSiblingOrSelf(node.previousSibling, filter);
     --nodeIndex;
   }

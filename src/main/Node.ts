@@ -176,8 +176,8 @@ export class Node {
   /**
    * @see [Node.contains](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains) on MDN
    */
-  contains(node: Node | null | undefined): boolean {
-    return node !== null && node !== undefined && uncheckedContains(this, node);
+  contains(otherNode: Node | null | undefined): boolean {
+    return otherNode !== null && otherNode !== undefined && uncheckedContains(this, otherNode);
   }
 
   /**

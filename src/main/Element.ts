@@ -145,19 +145,19 @@ export class Element extends ParentNode(ChildNode()) {
    */
   toggleAttribute(name: string, force?: boolean): boolean {
     const value = this.getAttribute(name);
-    const exists = value !== null;
+    const isPresent = value !== null;
 
-    if (!exists && (force === undefined || force)) {
+    if (!isPresent && (force === undefined || force)) {
       this.setAttribute(name, '');
       return true;
     }
 
-    if (exists && (force === undefined || !force)) {
+    if (isPresent && (force === undefined || !force)) {
       this.removeAttribute(name);
       return false;
     }
 
-    return exists;
+    return isPresent;
   }
 
   /**
@@ -208,14 +208,18 @@ defineNodeType(Element, ELEMENT_NODE, element => element.tagName);
  * two closures that capture the element.
  */
 class ClassAttributeAccessor implements ValueAccessor {
-  constructor(private readonly element: Element) {}
+  private _element: Element;
+
+  constructor(element: Element) {
+    this._element = element;
+  }
 
   get(): string | null {
-    return this.element.getAttribute('class');
+    return this._element.getAttribute('class');
   }
 
   set(value: string): void {
-    this.element.attributes.class = value;
+    this._element.attributes.class = value;
   }
 }
 

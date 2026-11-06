@@ -107,25 +107,25 @@ export class DOMTokenList {
   /**
    * @see [DOMTokenList.replace](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/replace) on MDN
    */
-  replace(replacedToken: string, token: string): boolean {
-    assertToken(replacedToken);
-    assertToken(token);
+  replace(oldToken: string, newToken: string): boolean {
+    assertToken(oldToken);
+    assertToken(newToken);
 
     const tokens = getTokens(this);
-    const index = tokens.indexOf(replacedToken);
+    const oldTokenIndex = tokens.indexOf(oldToken);
 
-    if (index === -1) {
+    if (oldTokenIndex === -1) {
       return false;
     }
 
-    const tokenIndex = tokens.indexOf(token);
+    const newTokenIndex = tokens.indexOf(newToken);
 
-    if (tokenIndex === -1) {
-      tokens[index] = token;
-    } else if (tokenIndex !== index) {
-      // The token is already present, so keep it at whichever position comes first
-      tokens[Math.min(index, tokenIndex)] = token;
-      tokens.splice(Math.max(index, tokenIndex), 1);
+    if (newTokenIndex === -1) {
+      tokens[oldTokenIndex] = newToken;
+    } else if (newTokenIndex !== oldTokenIndex) {
+      // The new token is already present, so keep it at whichever position comes first
+      tokens[Math.min(oldTokenIndex, newTokenIndex)] = newToken;
+      tokens.splice(Math.max(oldTokenIndex, newTokenIndex), 1);
     }
 
     setTokens(this, tokens);
@@ -140,21 +140,21 @@ export class DOMTokenList {
 
     const tokens = getTokens(this);
     const index = tokens.indexOf(token);
-    const exists = index !== -1;
+    const isPresent = index !== -1;
 
-    if (!exists && (force === undefined || force)) {
+    if (!isPresent && (force === undefined || force)) {
       tokens.push(token);
       setTokens(this, tokens);
       return true;
     }
 
-    if (exists && (force === undefined || !force)) {
+    if (isPresent && (force === undefined || !force)) {
       tokens.splice(index, 1);
       setTokens(this, tokens);
       return false;
     }
 
-    return exists;
+    return isPresent;
   }
 
   /**
@@ -175,7 +175,7 @@ export class DOMTokenList {
   /**
    * @see [DOMTokenList.forEach](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/forEach) on MDN
    */
-  forEach(callback: (value: string, index: number, parent: DOMTokenList) => void, thisArg?: any): void {
+  forEach(callback: (value: string, index: number, tokenList: DOMTokenList) => void, thisArg?: any): void {
     const tokens = getTokens(this);
 
     for (let i = 0; i < tokens.length; ++i) {

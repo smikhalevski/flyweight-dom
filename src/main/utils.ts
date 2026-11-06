@@ -13,10 +13,10 @@ export const DOCUMENT_NODE = 9;
 export const DOCUMENT_TYPE_NODE = 10;
 export const DOCUMENT_FRAGMENT_NODE = 11;
 
-export const _hasOwnProperty = Object.prototype.hasOwnProperty;
+const objectHasOwnProperty = Object.prototype.hasOwnProperty;
 
 export function hasOwnProperty(object: object, key: PropertyKey): boolean {
-  return _hasOwnProperty.call(object, key);
+  return objectHasOwnProperty.call(object, key);
 }
 
 /**

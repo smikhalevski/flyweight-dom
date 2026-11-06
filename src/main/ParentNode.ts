@@ -65,7 +65,7 @@ export interface ParentNode extends Node, Iterable<ChildNode> {
   [Symbol.iterator](): IterableIterator<ChildNode>;
 }
 
-const parentConstructorCache = new WeakMap();
+const parentConstructorMap = new WeakMap();
 
 /**
  * The mixin that can extend the constructor prototype with properties and methods of the {@link ParentNode}.
@@ -84,7 +84,7 @@ export function ParentNode(): new () => ParentNode;
 export function ParentNode<T extends Node>(constructor: new () => T): new () => T & ParentNode;
 
 export function ParentNode(constructor: new () => Node = Node) {
-  let parentConstructor = parentConstructorCache.get(constructor);
+  let parentConstructor = parentConstructorMap.get(constructor);
 
   if (parentConstructor !== undefined) {
     return parentConstructor;
@@ -249,7 +249,7 @@ export function ParentNode(constructor: new () => Node = Node) {
   // Tells the Node constructor to initialize parent node fields
   Object.defineProperty(parentConstructor.prototype, '_isParentNode', { value: true });
 
-  parentConstructorCache.set(constructor, parentConstructor);
+  parentConstructorMap.set(constructor, parentConstructor);
 
   return parentConstructor;
 }

@@ -247,22 +247,22 @@ export class TreeWalker {
         }
       }
 
-      let parent: Node | null = node;
+      let ancestor: Node | null = node;
 
-      while (parent !== null) {
-        if (parent === root) {
+      while (ancestor !== null) {
+        if (ancestor === root) {
           return null;
         }
 
-        if ((candidate = parent.nextSibling) !== null) {
+        if ((candidate = ancestor.nextSibling) !== null) {
           node = candidate;
           break;
         }
 
-        parent = parent.parentNode;
+        ancestor = ancestor.parentNode;
       }
 
-      if (parent === null) {
+      if (ancestor === null) {
         // The current node isn't inside the root, for example, it was removed from the tree
         return null;
       }

@@ -25,9 +25,9 @@ export function uncheckedInsertNodeAfter(
     return anchor;
   }
 
-  const child = anchor !== null ? anchor.nextSibling : parent.firstChild;
+  const referenceChild = anchor !== null ? anchor.nextSibling : parent.firstChild;
 
-  if (child === node) {
+  if (referenceChild === node) {
     // Already in place, and inserting a node before itself would break sibling links
     return node;
   }
@@ -35,8 +35,8 @@ export function uncheckedInsertNodeAfter(
   // A fragment is replaced by its children, so the next value goes after its last child
   const nextAnchor = isDocumentFragment(node) ? (node.lastChild !== null ? node.lastChild : anchor) : node;
 
-  if (child !== null) {
-    uncheckedRemoveAndInsertBefore(parent, node, child);
+  if (referenceChild !== null) {
+    uncheckedRemoveAndInsertBefore(parent, node, referenceChild);
   } else {
     uncheckedRemoveAndAppendChild(parent, node);
   }

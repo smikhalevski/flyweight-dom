@@ -1,5 +1,5 @@
-import { CharacterData } from './CharacterData.js';
-import { COMMENT_NODE, defineNodeType } from './utils.js';
+import { CharacterData } from './CharacterData.ts';
+import { COMMENT_NODE, defineNodeType } from './utils.ts';
 
 /**
  * @see [Comment](https://developer.mozilla.org/en-US/docs/Web/API/Comment) on MDN

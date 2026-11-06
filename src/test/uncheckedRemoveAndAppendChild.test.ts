@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
-import { DocumentFragment, Element, Text } from '../main/index.js';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
-import { uncheckedRemoveAndAppendChild } from '../main/uncheckedRemoveAndAppendChild.js';
+import { DocumentFragment, Element, Text } from '../main/index.ts';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.ts';
+import { uncheckedRemoveAndAppendChild } from '../main/uncheckedRemoveAndAppendChild.ts';
 
 test('appends a node to an empty parent', () => {
   const parent = new Element('parent');

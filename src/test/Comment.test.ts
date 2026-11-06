@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { CharacterData, Comment, Node } from '../main/index.js';
+import { CharacterData, Comment, Node } from '../main/index.ts';
 
 test('creates an empty comment', () => {
   const node = new Comment();

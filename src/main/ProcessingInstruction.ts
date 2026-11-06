@@ -1,6 +1,6 @@
-import { CharacterData } from './CharacterData.js';
-import { Node } from './Node.js';
-import { defineNodeType, isEqualConstructor, PROCESSING_INSTRUCTION_NODE } from './utils.js';
+import { CharacterData } from './CharacterData.ts';
+import { Node } from './Node.ts';
+import { defineNodeType, isEqualConstructor, PROCESSING_INSTRUCTION_NODE } from './utils.ts';
 
 /**
  * @see [ProcessingInstruction](https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction) on MDN

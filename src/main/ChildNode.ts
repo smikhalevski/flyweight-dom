@@ -1,9 +1,9 @@
-import type { Element } from './Element.js';
-import { Node } from './Node.js';
-import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertInsertable } from './uncheckedToInsertableNode.js';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.js';
+import type { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { assertInsertable } from './uncheckedToInsertableNode.ts';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.ts';
 
 /**
  * The node that can be a child of another node.

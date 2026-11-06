@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { CDATASection, CharacterData, Node, Text } from '../main/index.js';
+import { CDATASection, CharacterData, Node, Text } from '../main/index.ts';
 
 test('creates an empty CDATA section', () => {
   const node = new CDATASection();

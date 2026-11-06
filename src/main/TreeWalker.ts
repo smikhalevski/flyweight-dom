@@ -1,5 +1,5 @@
-import { Node } from './Node.js';
-import type { NodeFilter } from './NodeFilter.js';
+import { Node } from './Node.ts';
+import type { NodeFilter } from './NodeFilter.ts';
 
 // Declared here rather than imported from NodeFilter.ts, since reading imported constants makes nextNode() about 25%
 // slower in V8

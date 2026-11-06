@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
-import { Element, Text } from '../main/index.js';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
-import { uncheckedRemoveChild } from '../main/uncheckedRemoveChild.js';
+import { Element, Text } from '../main/index.ts';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.ts';
+import { uncheckedRemoveChild } from '../main/uncheckedRemoveChild.ts';
 
 test('removes the only child', () => {
   const parent = new Element('parent');

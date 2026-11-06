@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { Element, Text } from '../main/index.js';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
+import { Element, Text } from '../main/index.ts';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.ts';
 
 test('appends a text node to an empty parent', () => {
   const parent = new Element('parent');

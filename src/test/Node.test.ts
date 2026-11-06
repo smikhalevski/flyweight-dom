@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { ChildNode, Document, DocumentFragment, Element, Node, ParentNode, Text } from '../main/index.js';
-import { EmptyNodeList, ChildNodeList } from '../main/NodeList.js';
+import { ChildNode, Document, DocumentFragment, Element, Node, ParentNode, Text } from '../main/index.ts';
+import { EmptyNodeList, ChildNodeList } from '../main/NodeList.ts';
 
 class MockNode extends Node {
   readonly nodeName = '';

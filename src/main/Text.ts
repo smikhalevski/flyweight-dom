@@ -1,10 +1,10 @@
-import { CharacterData } from './CharacterData.js';
-import type { ChildNode } from './ChildNode.js';
-import type { Node } from './Node.js';
-import type { ParentNode } from './ParentNode.js';
-import { uncheckedAppendChild } from './uncheckedAppendChild.js';
-import { uncheckedInsertBefore } from './uncheckedInsertBefore.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
+import { CharacterData } from './CharacterData.ts';
+import type { ChildNode } from './ChildNode.ts';
+import type { Node } from './Node.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { uncheckedAppendChild } from './uncheckedAppendChild.ts';
+import { uncheckedInsertBefore } from './uncheckedInsertBefore.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
 import {
   defineNodeType,
   ELEMENT_NODE,
@@ -12,7 +12,7 @@ import {
   TEXT_NODE,
   coerceToString,
   coerceToNonNegativeInteger,
-} from './utils.js';
+} from './utils.ts';
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN

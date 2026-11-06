@@ -1,9 +1,9 @@
-import type { ChildNode } from './ChildNode.js';
-import type { ParentNode } from './ParentNode.js';
-import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
-import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
-import { uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
-import { isDocumentFragment } from './utils.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.ts';
+import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.ts';
+import { uncheckedToInsertableNode } from './uncheckedToInsertableNode.ts';
+import { isDocumentFragment } from './utils.ts';
 
 /**
  * Inserts the value after the anchor, or as the first child if the anchor is `null`, and returns the anchor for the

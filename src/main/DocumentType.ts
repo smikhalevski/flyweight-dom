@@ -1,6 +1,6 @@
-import { ChildNode } from './ChildNode.js';
-import type { Node } from './Node.js';
-import { defineNodeType, DOCUMENT_TYPE_NODE, isEqualConstructor } from './utils.js';
+import { ChildNode } from './ChildNode.ts';
+import type { Node } from './Node.ts';
+import { defineNodeType, DOCUMENT_TYPE_NODE, isEqualConstructor } from './utils.ts';
 
 /**
  * @see [DocumentType](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN

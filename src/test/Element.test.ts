@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { InsertPosition } from '../main/Element.js';
-import { Comment, DOMTokenList, Element, Node, Text } from '../main/index.js';
+import type { InsertPosition } from '../main/Element.ts';
+import { Comment, DOMTokenList, Element, Node, Text } from '../main/index.ts';
 
 test('creates an element without children', () => {
   const node = new Element('aaa');

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { ChildNode, DocumentFragment, Element, Node, Text } from '../main/index.js';
-import { getChildNodes } from './utils.js';
+import { ChildNode, DocumentFragment, Element, Node, Text } from '../main/index.ts';
+import { getChildNodes } from './test-utils.ts';
 
 test('returns the same class for the same base class', () => {
   expect(ChildNode()).toBe(ChildNode());

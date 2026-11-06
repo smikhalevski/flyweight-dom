@@ -1,10 +1,7 @@
-// @ts-expect-error Node types aren't installed
 import { setImmediate } from 'node:timers/promises';
-// @ts-expect-error Node types aren't installed
 import { setFlagsFromString } from 'node:v8';
-// @ts-expect-error Node types aren't installed
 import { runInNewContext } from 'node:vm';
-import type { Node } from '../main/index.js';
+import type { Node } from '../main/index.ts';
 
 setFlagsFromString('--expose-gc');
 

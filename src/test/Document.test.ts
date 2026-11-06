@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { Document, DocumentType, Element, Node, Text } from '../main/index.js';
+import { Document, DocumentType, Element, Node, Text } from '../main/index.ts';
 
 test('creates an empty document', () => {
   const node = new Document();

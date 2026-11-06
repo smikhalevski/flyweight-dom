@@ -1,9 +1,9 @@
 /// <reference lib="es2021.weakref" />
 import { describe, expect, test } from 'vitest';
-import { DocumentFragment, Element, Text } from '../main/index.js';
-import { EmptyNodeList, ChildNodeIterator, ChildNodeList } from '../main/NodeList.js';
-import { isElement, isText } from '../main/utils.js';
-import { collectGarbage } from './utils.js';
+import { DocumentFragment, Element, Text } from '../main/index.ts';
+import { EmptyNodeList, ChildNodeIterator, ChildNodeList } from '../main/NodeList.ts';
+import { isElement, isText } from '../main/utils.ts';
+import { collectGarbage } from './test-utils.ts';
 
 /**
  * Appends a child to the element, reads it from lists of the element, removes it, and returns a weak reference to it.

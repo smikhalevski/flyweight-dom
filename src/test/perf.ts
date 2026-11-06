@@ -1,12 +1,11 @@
 import * as domhandler from 'domhandler';
 import * as domutils from 'domutils';
-import { JSDOM } from 'jsdom';
 import { describe, measure, test } from 'toofast';
 // @ts-ignore
-import { f } from '../main/dsl.js';
+import { f } from '../main/dsl.ts';
 // @ts-ignore
-import * as flyweightDom from '../main/index.js';
-import { collectGarbage } from './utils.ts';
+import * as flyweightDom from '../main/index.ts';
+import { collectGarbage } from './test-utils.ts';
 
 /**
  * The number of children that are created before each batch of a measure that changes them. Fewer children make
@@ -58,6 +57,7 @@ const domhandlerFactory: TestFactory<domhandler.Element, domhandler.Text> = {
  * tests don't load it.
  */
 async function makeTestJsdom() {
+  const { JSDOM } = await import('jsdom');
   const { window } = new JSDOM('');
   const { document } = window;
 

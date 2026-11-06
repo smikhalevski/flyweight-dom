@@ -1,9 +1,9 @@
-import type { ChildNode } from './ChildNode.js';
-import type { Element } from './Element.js';
-import { EmptyNodeList, type ChildrenCache, type NodeList } from './NodeList.js';
-import type { ParentNode } from './ParentNode.js';
-import { uncheckedContains } from './uncheckedContains.js';
-import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { Element } from './Element.ts';
+import { EmptyNodeList, type ChildrenCache, type NodeList } from './NodeList.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { uncheckedContains } from './uncheckedContains.ts';
+import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.ts';
 
 /**
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN

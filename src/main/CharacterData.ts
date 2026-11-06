@@ -1,6 +1,6 @@
-import { ChildNode } from './ChildNode.js';
-import type { Node } from './Node.js';
-import { coerceToNonNegativeInteger, coerceToString, isEqualConstructor } from './utils.js';
+import { ChildNode } from './ChildNode.ts';
+import type { Node } from './Node.ts';
+import { coerceToNonNegativeInteger, coerceToString, isEqualConstructor } from './utils.ts';
 
 /**
  * @see [CharacterData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData) on MDN

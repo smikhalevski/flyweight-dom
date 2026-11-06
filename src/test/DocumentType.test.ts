@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { DocumentType, Node } from '../main/index.js';
+import { DocumentType, Node } from '../main/index.ts';
 
 test('creates a doctype with empty IDs', () => {
   const node = new DocumentType('aaa');

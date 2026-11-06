@@ -9,8 +9,8 @@ import {
   Node,
   ProcessingInstruction,
   Text,
-} from '../main/index.js';
-import { coerceToNonNegativeInteger, coerceToString, defineNodeType } from '../main/utils.js';
+} from '../main/index.ts';
+import { coerceToNonNegativeInteger, coerceToString, defineNodeType } from '../main/utils.ts';
 
 describe('defineNodeType', () => {
   test('defines nodeType and nodeName on the prototype', () => {

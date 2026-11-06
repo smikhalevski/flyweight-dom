@@ -1,5 +1,5 @@
-import { Text } from './Text.js';
-import { CDATA_SECTION_NODE, defineNodeType } from './utils.js';
+import { Text } from './Text.ts';
+import { CDATA_SECTION_NODE, defineNodeType } from './utils.ts';
 
 /**
  * @see [CDATASection](https://developer.mozilla.org/en-US/docs/Web/API/CDATASection) on MDN

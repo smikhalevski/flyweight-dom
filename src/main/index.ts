@@ -18,23 +18,23 @@
  * @module flyweight-dom
  */
 
-export { Node } from './Node.js';
-export { CDATASection } from './CDATASection.js';
-export { CharacterData } from './CharacterData.js';
-export { ChildNode } from './ChildNode.js';
-export { Comment } from './Comment.js';
-export { Document } from './Document.js';
-export { DocumentFragment } from './DocumentFragment.js';
-export { DocumentType } from './DocumentType.js';
-export { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
-export { Element, type InsertPosition } from './Element.js';
-export { NodeFilter } from './NodeFilter.js';
-export { NodeList, EmptyNodeList, ChildNodeList } from './NodeList.js';
-export { ParentNode } from './ParentNode.js';
-export { ProcessingInstruction } from './ProcessingInstruction.js';
-export { Text } from './Text.js';
-export { TreeWalker } from './TreeWalker.js';
-export { getElementById } from './getElementById.js';
-export { getElementsByClassName } from './getElementsByClassName.js';
-export { getElementsByName } from './getElementsByName.js';
-export { getElementsByTagName } from './getElementsByTagName.js';
+export { Node } from './Node.ts';
+export { CDATASection } from './CDATASection.ts';
+export { CharacterData } from './CharacterData.ts';
+export { ChildNode } from './ChildNode.ts';
+export { Comment } from './Comment.ts';
+export { Document } from './Document.ts';
+export { DocumentFragment } from './DocumentFragment.ts';
+export { DocumentType } from './DocumentType.ts';
+export { DOMTokenList, type ValueAccessor } from './DOMTokenList.ts';
+export { Element, type InsertPosition } from './Element.ts';
+export { NodeFilter } from './NodeFilter.ts';
+export { NodeList, EmptyNodeList, ChildNodeList } from './NodeList.ts';
+export { ParentNode } from './ParentNode.ts';
+export { ProcessingInstruction } from './ProcessingInstruction.ts';
+export { Text } from './Text.ts';
+export { TreeWalker } from './TreeWalker.ts';
+export { getElementById } from './getElementById.ts';
+export { getElementsByClassName } from './getElementsByClassName.ts';
+export { getElementsByName } from './getElementsByName.ts';
+export { getElementsByTagName } from './getElementsByTagName.ts';

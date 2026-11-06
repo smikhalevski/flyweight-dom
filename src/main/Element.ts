@@ -1,9 +1,9 @@
-import { ChildNode } from './ChildNode.js';
-import { DOMTokenList, type ValueAccessor } from './DOMTokenList.js';
-import type { Node } from './Node.js';
-import { ParentNode } from './ParentNode.js';
-import { getTextContent, setTextContent, Text } from './Text.js';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
+import { ChildNode } from './ChildNode.ts';
+import { DOMTokenList, type ValueAccessor } from './DOMTokenList.ts';
+import type { Node } from './Node.ts';
+import { ParentNode } from './ParentNode.ts';
+import { getTextContent, setTextContent, Text } from './Text.ts';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.ts';
 import {
   coerceToString,
   defineNodeType,
@@ -11,7 +11,7 @@ import {
   hasOwnProperty,
   isEqualChildNodes,
   isEqualConstructor,
-} from './utils.js';
+} from './utils.ts';
 
 /**
  * The position is case-insensitive.

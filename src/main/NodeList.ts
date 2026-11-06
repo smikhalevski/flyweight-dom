@@ -1,5 +1,5 @@
-import type { ChildNode } from './ChildNode.js';
-import type { Node } from './Node.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { Node } from './Node.ts';
 
 /**
  * The callback that returns `true` for children that a list contains.

@@ -1,8 +1,8 @@
-import { Element } from './Element.js';
-import { Node } from './Node.js';
-import { SHOW_ELEMENT } from './NodeFilter.js';
-import { TreeWalker } from './TreeWalker.js';
-import { coerceToString } from './utils.js';
+import { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import { SHOW_ELEMENT } from './NodeFilter.ts';
+import { TreeWalker } from './TreeWalker.ts';
+import { coerceToString } from './utils.ts';
 
 /**
  * Returns an array of elements with the given tag name.

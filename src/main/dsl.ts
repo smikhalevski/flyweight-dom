@@ -16,18 +16,18 @@
  * @module flyweight-dom/dsl
  */
 
-import { CDATASection } from './CDATASection.js';
-import { Comment } from './Comment.js';
-import { Document } from './Document.js';
-import { DocumentFragment } from './DocumentFragment.js';
-import { DocumentType } from './DocumentType.js';
-import { Element } from './Element.js';
-import { Node } from './Node.js';
-import type { ParentNode } from './ParentNode.js';
-import { ProcessingInstruction } from './ProcessingInstruction.js';
-import { Text } from './Text.js';
-import { assertInsertable } from './uncheckedToInsertableNode.js';
-import { hasOwnProperty } from './utils.js';
+import { CDATASection } from './CDATASection.ts';
+import { Comment } from './Comment.ts';
+import { Document } from './Document.ts';
+import { DocumentFragment } from './DocumentFragment.ts';
+import { DocumentType } from './DocumentType.ts';
+import { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { ProcessingInstruction } from './ProcessingInstruction.ts';
+import { Text } from './Text.ts';
+import { assertInsertable } from './uncheckedToInsertableNode.ts';
+import { hasOwnProperty } from './utils.ts';
 
 /**
  * A child of a node created by the DSL. Strings, numbers and bigints become text nodes, while `null`, `undefined` and

@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
-import { Document, Element, NodeFilter, Text, TreeWalker } from '../main/index.js';
-import { filterNode } from '../main/TreeWalker.js';
+import { Document, Element, NodeFilter, Text, TreeWalker } from '../main/index.ts';
+import { filterNode } from '../main/TreeWalker.ts';
 
 /*
  * <document>

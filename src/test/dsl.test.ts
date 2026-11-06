@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { f } from '../main/dsl.js';
-import { CDATASection, Comment, Document, Element, ProcessingInstruction, Text } from '../main/index.js';
+import { f } from '../main/dsl.ts';
+import { CDATASection, Comment, Document, Element, ProcessingInstruction, Text } from '../main/index.ts';
 
 test('creates a document with a doctype and the children of a fragment', () => {
   const doctype = f.doctype('html');

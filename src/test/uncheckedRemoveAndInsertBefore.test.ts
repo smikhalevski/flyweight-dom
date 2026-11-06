@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
-import { DocumentFragment, Element, Text } from '../main/index.js';
-import { uncheckedAppendChild } from '../main/uncheckedAppendChild.js';
-import { uncheckedRemoveAndInsertBefore } from '../main/uncheckedRemoveAndInsertBefore.js';
+import { DocumentFragment, Element, Text } from '../main/index.ts';
+import { uncheckedAppendChild } from '../main/uncheckedAppendChild.ts';
+import { uncheckedRemoveAndInsertBefore } from '../main/uncheckedRemoveAndInsertBefore.ts';
 
 test('inserts a node before a child', () => {
   const parent = new Element('parent');

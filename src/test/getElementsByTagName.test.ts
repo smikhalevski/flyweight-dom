@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { f } from '../main/dsl.js';
-import { getElementsByTagName } from '../main/index.js';
+import { f } from '../main/dsl.ts';
+import { getElementsByTagName } from '../main/index.ts';
 
 test('returns elements with the given tag name', () => {
   const root = f.doc(f.xxx(f.yyy(), f.zzz()), f.zzz());

@@ -1,4 +1,4 @@
-import { isSpaceChar } from './utils.js';
+import { isSpaceChar } from './utils.ts';
 
 const SEPARATOR = ' ';
 

@@ -1,4 +1,4 @@
-import type { Node } from './Node.js';
+import type { Node } from './Node.ts';
 
 export function uncheckedContains(parent: Node, node: Node): boolean {
   if (parent.firstChild === null) {

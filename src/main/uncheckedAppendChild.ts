@@ -1,5 +1,5 @@
-import type { ChildNode } from './ChildNode.js';
-import type { ParentNode } from './ParentNode.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { ParentNode } from './ParentNode.ts';
 
 export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
   const { lastChild } = parent;

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { DOMTokenList, ValueAccessor } from '../main/index.js';
+import { DOMTokenList, type ValueAccessor } from '../main/index.ts';
 
 let valueMock: string | null = '';
 

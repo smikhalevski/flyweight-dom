@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { ChildNode, Document, Element, Node, NodeList, ParentNode, Text } from '../main/index.js';
-import { getChildNodes } from './utils.js';
+import { ChildNode, Document, Element, Node, NodeList, ParentNode, Text } from '../main/index.ts';
+import { getChildNodes } from './test-utils.ts';
 
 test('cloneNode throws if the base class does not support it', () => {
   expect(() => new (ParentNode())().cloneNode()).toThrow('This node type does not support this method');

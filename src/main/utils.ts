@@ -1,7 +1,7 @@
-import type { DocumentFragment } from './DocumentFragment.js';
-import type { Element } from './Element.js';
-import type { Node } from './Node.js';
-import type { Text } from './Text.js';
+import type { DocumentFragment } from './DocumentFragment.ts';
+import type { Element } from './Element.ts';
+import type { Node } from './Node.ts';
+import type { Text } from './Text.ts';
 
 export const ELEMENT_NODE = 1;
 export const ATTRIBUTE_NODE = 2;

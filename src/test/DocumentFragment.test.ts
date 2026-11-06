@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { Document, DocumentFragment, Element, Node, Text } from '../main/index.js';
+import { Document, DocumentFragment, Element, Node, Text } from '../main/index.ts';
 
 test('creates an empty fragment', () => {
   const node = new DocumentFragment();

@@ -1,7 +1,7 @@
-import { ParentNode } from './ParentNode.js';
-import { getTextContent, setTextContent } from './Text.js';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren.js';
-import { defineNodeType, DOCUMENT_FRAGMENT_NODE } from './utils.js';
+import { ParentNode } from './ParentNode.ts';
+import { getTextContent, setTextContent } from './Text.ts';
+import { uncheckedCloneChildren } from './uncheckedCloneChildren.ts';
+import { defineNodeType, DOCUMENT_FRAGMENT_NODE } from './utils.ts';
 
 /**
  * @see [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) on MDN

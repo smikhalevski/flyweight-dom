@@ -15,6 +15,7 @@
     "build": "tsc --project tsconfig.build.json && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
     "clean": "rimraf lib docs coverage",
     "test": "vitest run",
+    "typecheck": "tsc",
     "lint": "oxlint --tsconfig tsconfig.json src/main",
     "format": "oxfmt 'src/**/*.{ts,js}'",
     "perf": "npm run build && toofast",
@@ -35,6 +36,7 @@
   "homepage": "https://github.com/smikhalevski/flyweight-dom#readme",
   "devDependencies": {
     "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.6",
     "domhandler": "^6.0.1",
     "domutils": "^4.0.2",
     "jsdom": "^31.0.0",

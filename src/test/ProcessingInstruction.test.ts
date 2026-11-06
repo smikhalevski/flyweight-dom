@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { CharacterData, Node, ProcessingInstruction } from '../main/index.js';
+import { CharacterData, Node, ProcessingInstruction } from '../main/index.ts';
 
 test('creates a processing instruction without data', () => {
   const node = new ProcessingInstruction('xml');

@@ -1,10 +1,10 @@
-import type { ChildNode } from './ChildNode.js';
-import type { DocumentFragment } from './DocumentFragment.js';
-import type { Node } from './Node.js';
-import type { ParentNode } from './ParentNode.js';
-import { Text } from './Text.js';
-import { uncheckedContains } from './uncheckedContains.js';
-import { ATTRIBUTE_NODE, coerceToString, DOCUMENT_NODE } from './utils.js';
+import type { ChildNode } from './ChildNode.ts';
+import type { DocumentFragment } from './DocumentFragment.ts';
+import type { Node } from './Node.ts';
+import type { ParentNode } from './ParentNode.ts';
+import { Text } from './Text.ts';
+import { uncheckedContains } from './uncheckedContains.ts';
+import { ATTRIBUTE_NODE, coerceToString, DOCUMENT_NODE } from './utils.ts';
 
 export type InsertableNode = DocumentFragment | ChildNode;
 

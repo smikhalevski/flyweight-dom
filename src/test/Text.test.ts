@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { CDATASection, CharacterData, Element, Node, Text } from '../main/index.js';
-import { getChildNodes } from './utils.js';
+import { CDATASection, CharacterData, Element, Node, Text } from '../main/index.ts';
+import { getChildNodes } from './test-utils.ts';
 
 test('creates an empty text node', () => {
   const node = new Text();

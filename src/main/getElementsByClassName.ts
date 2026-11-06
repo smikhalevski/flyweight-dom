@@ -1,9 +1,9 @@
-import { splitTokens } from './DOMTokenList.js';
-import { Element } from './Element.js';
-import { Node } from './Node.js';
-import { SHOW_ELEMENT } from './NodeFilter.js';
-import { TreeWalker } from './TreeWalker.js';
-import { coerceToString, isSpaceChar } from './utils.js';
+import { splitTokens } from './DOMTokenList.ts';
+import { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import { SHOW_ELEMENT } from './NodeFilter.ts';
+import { TreeWalker } from './TreeWalker.ts';
+import { coerceToString, isSpaceChar } from './utils.ts';
 
 /**
  * Returns an array elements which have all of the given class name(s).

@@ -1,13 +1,13 @@
-import { ChildNode } from './ChildNode.js';
-import type { Element } from './Element.js';
-import { Node } from './Node.js';
-import { ChildNodeIterator, ChildNodeList, type NodeList } from './NodeList.js';
-import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.js';
-import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.js';
-import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.js';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.js';
-import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.js';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.js';
+import { ChildNode } from './ChildNode.ts';
+import type { Element } from './Element.ts';
+import { Node } from './Node.ts';
+import { ChildNodeIterator, ChildNodeList, type NodeList } from './NodeList.ts';
+import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
+import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.ts';
+import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.ts';
+import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.ts';
+import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.ts';
 
 /**
  * The node that can be a parent of another node.

@@ -2,7 +2,7 @@ import * as domhandler from 'domhandler';
 import * as domutils from 'domutils';
 import { describe, measure, test } from 'toofast';
 // @ts-ignore
-import { f } from '../../lib/dsl.js';
+import { h } from '../../lib/dsl.js';
 // @ts-ignore
 import * as flyweightDom from '../../lib/index.js';
 import { collectGarbage } from './test-utils.ts';
@@ -368,9 +368,9 @@ describe('new Document', () => {
   });
 });
 
-describe('f.div', () => {
+describe('h', () => {
   test('flyweight-dom', () => {
-    measure(() => f.div({ class: 'aaa' }, 'bbb', f.span('ccc')));
+    measure(() => h('div', { class: 'aaa' }, 'bbb', h('span', 'ccc')));
   });
 });
 

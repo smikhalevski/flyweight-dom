@@ -233,7 +233,7 @@ export class Element extends ParentNode(ChildNode()) {
       if (index !== -1) {
         throw new Error(
           "The namespace URI provided ('" +
-            namespaceURI +
+            coerceToString(namespaceURI) +
             "') is not valid for the qualified name provided ('" +
             qualifiedName +
             "')"
@@ -246,7 +246,7 @@ export class Element extends ParentNode(ChildNode()) {
       if (namespaceURI !== XMLNS_NAMESPACE || qualifiedName !== 'xmlns') {
         throw new Error(
           "The namespace URI provided ('" +
-            namespaceURI +
+            coerceToString(namespaceURI) +
             "') is not valid for the qualified name provided ('" +
             qualifiedName +
             "')"

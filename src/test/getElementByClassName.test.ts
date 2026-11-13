@@ -1,22 +1,22 @@
 import { expect, test } from 'vitest';
-import { f } from '../main/dsl.ts';
+import { h } from '../main/dsl.ts';
 import { getElementsByClassName } from '../main/getElementsByClassName.ts';
 import { Element } from '../main/index.ts';
 
 test('returns elements with the given class name', () => {
-  const root = f.doc(f.xxx({ class: 'vvv aaa' }, f.yyy(), f.zzz({ class: 'aaa' })));
+  const root = h.document(h('xxx', { class: 'vvv aaa' }, h('yyy'), h('zzz', { class: 'aaa' })));
 
   expect(getElementsByClassName(root, 'aaa')).toStrictEqual([root.childNodes[0], root.childNodes[0].childNodes[1]]);
 });
 
 test('returns elements that have all given class names', () => {
-  const root = f.doc(f.xxx({ class: 'vvv aaa' }, f.yyy(), f.zzz({ class: 'aaa' })));
+  const root = h.document(h('xxx', { class: 'vvv aaa' }, h('yyy'), h('zzz', { class: 'aaa' })));
 
   expect(getElementsByClassName(root, 'aaa vvv')).toStrictEqual([root.childNodes[0]]);
 });
 
 test('does not create classList on visited elements', () => {
-  const root = f.doc(f.xxx({ class: 'aaa' }));
+  const root = h.document(h('xxx', { class: 'aaa' }));
 
   getElementsByClassName(root, 'aaa');
 
@@ -24,11 +24,11 @@ test('does not create classList on visited elements', () => {
 });
 
 test('does not match a class name that is part of another class name', () => {
-  const root = f.doc(f.xxx({ class: 'aaabbb bbbaaa' }));
+  const root = h.document(h('xxx', { class: 'aaabbb bbbaaa' }));
 
   expect(getElementsByClassName(root, 'aaa')).toStrictEqual([]);
 });
 
 test('returns an empty array if class names are blank', () => {
-  expect(getElementsByClassName(f.aaa(f.bbb({ class: 'ccc' })), ' \t')).toStrictEqual([]);
+  expect(getElementsByClassName(h('aaa', h('bbb', { class: 'ccc' })), ' \t')).toStrictEqual([]);
 });

@@ -2,9 +2,9 @@
  * The DSL that streamlines DOM authoring.
  *
  * ```ts
- * import { f } from 'flyweight-dom/dsl';
+ * import { h } from 'flyweight-dom/dsl';
  *
- * const element = f.div({ class: 'red' }, 'Hello, ', f.strong('world!'));
+ * const element = h('div', { class: 'red' }, 'Hello, ', h('strong', 'world!'));
  *
  * element.className;
  * // ⮕ 'red'
@@ -27,51 +27,103 @@ import type { ParentNode } from './ParentNode.ts';
 import { ProcessingInstruction } from './ProcessingInstruction.ts';
 import { Text } from './Text.ts';
 import { assertInsertable } from './uncheckedToInsertableNode.ts';
-import { hasOwnProperty } from './utils.ts';
 
 /**
  * A child of a node created by the DSL. Strings, numbers and bigints become text nodes, while `null`, `undefined` and
- * booleans are skipped, so a child can be conditional: `f.ul(isEmpty && f.li('Empty'))`.
+ * booleans are skipped, so a child can be conditional: `h('ul', isEmpty && h('li', 'Empty'))`.
  *
  * @group DSL
  */
 export type Child = Node | string | number | boolean | bigint | null | undefined;
 
 /**
+ * Creates an element with the given tag name, optional attributes, and children.
+ *
+ * @group DSL
+ */
+export interface ElementFactory {
+  (tagName: string, attributes: Record<string, string>, ...children: Child[]): Element;
+
+  (tagName: string, ...children: Child[]): Element;
+}
+
+/**
+ * Factories of nodes that aren't elements. These nodes have no namespace, so the factories are available on {@link h}
+ * only.
+ *
  * @group DSL
  */
 export interface NodeFactories {
-  doc(...children: Child[]): Document;
+  /**
+   * Creates a document with the given children.
+   */
+  document(...children: Child[]): Document;
 
+  /**
+   * Creates a document type.
+   */
   doctype(name: string, publicId?: string, systemId?: string): DocumentType;
 
-  f(...children: Child[]): DocumentFragment;
+  /**
+   * Creates a document fragment with the given children.
+   */
+  fragment(...children: Child[]): DocumentFragment;
 
-  pi(target: string, data?: string): ProcessingInstruction;
+  /**
+   * Creates a processing instruction.
+   */
+  processingInstruction(target: string, data?: string): ProcessingInstruction;
 
+  /**
+   * Creates a CDATA section.
+   */
   cdata(data?: string): CDATASection;
 
+  /**
+   * Creates a comment.
+   */
   comment(data?: string): Comment;
 }
 
 /**
+ * Creates a factory of elements that have the given namespace.
+ *
+ * ```ts
+ * const s = createElementFactory('http://www.w3.org/2000/svg');
+ *
+ * s('svg', s('circle', { r: '10' })).firstElementChild.namespaceURI;
+ * // ⮕ 'http://www.w3.org/2000/svg'
+ * ```
+ *
+ * @param namespaceURI The namespace of created elements.
  * @group DSL
  */
-export interface ElementFactory {
-  (attributes: Record<string, string>, ...children: Child[]): Element;
+export function createElementFactory(namespaceURI: string | null): ElementFactory {
+  return (tagName: string, ...args: unknown[]) => {
+    const attributes = args[0];
 
-  (...children: Child[]): Element;
+    // The argument after the tag name holds attributes if it's an object that isn't a node, otherwise it's a child
+    if (typeof attributes !== 'object' || attributes === null || attributes instanceof Node) {
+      return appendChildren(new Element(tagName, undefined, namespaceURI), args);
+    }
+
+    // Element owns its attributes object, so copy the caller's object, which may be reused or frozen
+    return appendChildren(new Element(tagName, { ...attributes }, namespaceURI), args, 1);
+  };
 }
 
 /**
+ * Creates an element that has no namespace, and has factories of other nodes as its properties. Other nodes aren't
+ * separate exports, so their full names, like `document`, don't shadow globals in the importing module.
+ *
+ * ```ts
+ * h.document(h.documentType('html'), h('html', h.comment('Hello')));
+ * ```
+ *
  * @group DSL
  */
-export interface ElementFactories {
-  [tagName: string]: ElementFactory;
-}
-
-const nodeFactories: NodeFactories = {
-  doc(...children) {
+export const h = Object.assign<ElementFactory, NodeFactories>(createElementFactory(null), {
+  document(...children) {
     return appendChildren(new Document(), children);
   },
 
@@ -79,11 +131,11 @@ const nodeFactories: NodeFactories = {
     return new DocumentType(name, publicId, systemId);
   },
 
-  f(...children) {
+  fragment(...children) {
     return appendChildren(new DocumentFragment(), children);
   },
 
-  pi(target, data) {
+  processingInstruction(target, data) {
     return new ProcessingInstruction(target, data);
   },
 
@@ -94,59 +146,7 @@ const nodeFactories: NodeFactories = {
   comment(data) {
     return new Comment(data);
   },
-};
-
-/**
- * Creates factories of elements that have the given namespace.
- *
- * ```ts
- * const s = createElementFactories('http://www.w3.org/2000/svg');
- *
- * s.svg(s.circle({ r: '10' })).firstElementChild.namespaceURI;
- * // ⮕ 'http://www.w3.org/2000/svg'
- * ```
- *
- * @param namespaceURI The namespace of created elements.
- * @group DSL
- */
-export function createElementFactories(namespaceURI: string | null): ElementFactories {
-  const elementFactoryMap = new Map<string, ElementFactory>();
-
-  return new Proxy<ElementFactories>(
-    {},
-    {
-      get(_target, key) {
-        if (typeof key !== 'string') {
-          return undefined;
-        }
-
-        let elementFactory = elementFactoryMap.get(key);
-
-        if (elementFactory === undefined) {
-          elementFactory = createElementFactory(key, namespaceURI);
-          elementFactoryMap.set(key, elementFactory);
-        }
-        return elementFactory;
-      },
-    }
-  );
-}
-
-function createElementFactory(tagName: string, namespaceURI: string | null): ElementFactory {
-  return (...args: unknown[]) => {
-    const attributes = args[0];
-
-    // The first argument holds attributes if it's an object that isn't a node, otherwise it's a child
-    if (typeof attributes !== 'object' || attributes === null || attributes instanceof Node) {
-      return appendChildren(new Element(tagName, undefined, namespaceURI), args);
-    }
-
-    // Element owns its attributes object, so copy the caller's object, which may be reused or frozen
-    return appendChildren(new Element(tagName, { ...attributes }, namespaceURI), args, 1);
-  };
-}
-
-const elementFactories = createElementFactories(null);
+});
 
 /**
  * Appends children to the parent and returns the parent.
@@ -176,17 +176,3 @@ function appendChildren<T extends ParentNode>(parent: T, children: unknown[], st
   }
   return parent;
 }
-
-/**
- * Node factories, and element factories for all other tag names.
- *
- * @group DSL
- */
-export const f = new Proxy(nodeFactories, {
-  get(target, key) {
-    if (typeof key === 'string' && !hasOwnProperty(target, key)) {
-      return elementFactories[key];
-    }
-    return Reflect.get(target, key);
-  },
-}) as NodeFactories & ElementFactories;

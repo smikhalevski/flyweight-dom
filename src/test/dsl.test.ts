@@ -1,73 +1,133 @@
-import { expect, test } from 'vitest';
-import { createElementFactories, f } from '../main/dsl.ts';
-import { CDATASection, Comment, Document, Element, ProcessingInstruction, Text } from '../main/index.ts';
+import { describe, expect, test } from 'vitest';
+import { createElementFactory, h } from '../main/dsl.ts';
+import {
+  CDATASection,
+  Comment,
+  Document,
+  DocumentFragment,
+  DocumentType,
+  Element,
+  ProcessingInstruction,
+  Text,
+} from '../main/index.ts';
 
-test('creates a document with a doctype and the children of a fragment', () => {
-  const doctype = f.doctype('html');
-  const element = f.html();
-  const document = f.doc(doctype, f.f(element));
+describe('h', () => {
+  test('creates an element with attributes and text', () => {
+    const element = h('span', { className: 'xxx' }, 'yyy');
 
-  expect(document).toBeInstanceOf(Document);
-  expect(Array.from(document)).toStrictEqual([doctype, element]);
+    expect(element).toBeInstanceOf(Element);
+    expect(element.tagName).toBe('span');
+    expect(element.namespaceURI).toBeNull();
+    expect(element.attributes.className).toBe('xxx');
+    expect(element.childNodes.length).toBe(1);
+    expect(element.childNodes[0]).toBeInstanceOf(Text);
+  });
+
+  test('creates an element without attributes', () => {
+    const child = new Element('aaa');
+    const element = h('bbb', child);
+
+    expect(element.attributes).toStrictEqual({});
+    expect(element.firstChild).toBe(child);
+  });
+
+  test('does not share attributes with the caller', () => {
+    const attributes = { class: 'aaa' };
+    const element1 = h('span', attributes);
+    const element2 = h('span', attributes);
+
+    element1.setAttribute('class', 'bbb');
+
+    expect(attributes).toStrictEqual({ class: 'aaa' });
+    expect(element2.getAttribute('class')).toBe('aaa');
+  });
+
+  test('skips null, undefined and boolean children', () => {
+    expect(h('div', null, undefined, true, false).firstChild).toBeNull();
+  });
+
+  test('throws if a child is an object that is not a node', () => {
+    // @ts-expect-error Objects aren't children
+    expect(() => h('div', 'aaa', {})).toThrow('The value must be a Node or a primitive');
+  });
+
+  test('does not move children out of their parents if a child cannot be appended', () => {
+    const text = new Text();
+    const parent = new Element('aaa').append(text);
+
+    expect(() => h('bbb', text, new Document())).toThrow('Node cannot be a child');
+    expect(text.parentNode).toBe(parent);
+  });
 });
 
-test('creates an element with attributes and text', () => {
-  const element = f.span({ className: 'xxx' }, 'yyy');
+describe('createElementFactory', () => {
+  test('creates elements with a namespace', () => {
+    const s = createElementFactory('urn:111');
+    const element = s('aaa', { bbb: 'ccc' }, s('ddd'));
 
-  expect(element).toBeInstanceOf(Element);
-  expect(element.tagName).toBe('span');
-  expect(element.attributes.className).toBe('xxx');
-  expect(element.childNodes.length).toBe(1);
-  expect(element.childNodes[0]).toBeInstanceOf(Text);
+    expect(element.namespaceURI).toBe('urn:111');
+    expect(element.getAttribute('bbb')).toBe('ccc');
+    expect(element.firstElementChild!.namespaceURI).toBe('urn:111');
+  });
 });
 
-test('does not share attributes with the caller', () => {
-  const attributes = { class: 'aaa' };
-  const element1 = f.span(attributes);
-  const element2 = f.span(attributes);
+describe('h.document', () => {
+  test('creates a document with children', () => {
+    const element = h('html');
+    const document = h.document(element);
 
-  element1.setAttribute('class', 'bbb');
+    expect(document).toBeInstanceOf(Document);
+    expect(Array.from(document)).toStrictEqual([element]);
+  });
 
-  expect(attributes).toStrictEqual({ class: 'aaa' });
-  expect(element2.getAttribute('class')).toBe('aaa');
+  test('does not move children out of their parents if a child cannot be appended', () => {
+    const text = new Text();
+    const parent = new Element('aaa').append(text);
+
+    expect(() => h.document(text, new Document())).toThrow('Node cannot be a child');
+    expect(text.parentNode).toBe(parent);
+  });
 });
 
-test('creates element factories after a factory named hasOwnProperty was created', () => {
-  f.hasOwnProperty;
-
-  expect(f.aaa()).toBeInstanceOf(Element);
+describe('h.doctype', () => {
+  test('creates a document type', () => {
+    expect(h.doctype('aaa', 'bbb', 'ccc')).toStrictEqual(new DocumentType('aaa', 'bbb', 'ccc'));
+  });
 });
 
-test('creates a processing instruction, a CDATA section and a comment', () => {
-  expect(f.pi('aaa', 'bbb')).toStrictEqual(new ProcessingInstruction('aaa', 'bbb'));
-  expect(f.cdata('aaa')).toStrictEqual(new CDATASection('aaa'));
-  expect(f.comment('aaa')).toStrictEqual(new Comment('aaa'));
+describe('h.fragment', () => {
+  test('creates a fragment with children', () => {
+    const element = h('aaa');
+    const node = h.fragment(element, 'bbb');
+
+    expect(node).toBeInstanceOf(DocumentFragment);
+    expect(node.firstChild).toBe(element);
+    expect(node.lastChild).toBeInstanceOf(Text);
+  });
+
+  test('does not move children out of their parents if a child cannot be appended', () => {
+    const text = new Text();
+    const parent = new Element('aaa').append(text);
+
+    expect(() => h.fragment(text, new Document())).toThrow('Node cannot be a child');
+    expect(text.parentNode).toBe(parent);
+  });
 });
 
-test('skips null, undefined and boolean children', () => {
-  expect(f.div(null, undefined, true, false).firstChild).toBeNull();
+describe('h.processingInstruction', () => {
+  test('creates a processing instruction', () => {
+    expect(h.processingInstruction('aaa', 'bbb')).toStrictEqual(new ProcessingInstruction('aaa', 'bbb'));
+  });
 });
 
-test('throws if a child is an object that is not a node', () => {
-  // @ts-expect-error Objects aren't children
-  expect(() => f.div('aaa', {})).toThrow('The value must be a Node or a primitive');
+describe('h.cdata', () => {
+  test('creates a CDATA section', () => {
+    expect(h.cdata('aaa')).toStrictEqual(new CDATASection('aaa'));
+  });
 });
 
-test('does not move children out of their parents if a child cannot be appended', () => {
-  const text = new Text();
-  const parent = new Element('aaa').append(text);
-
-  expect(() => f.bbb(text, new Document())).toThrow('Node cannot be a child');
-  expect(() => f.f(text, new Document())).toThrow('Node cannot be a child');
-  expect(() => f.doc(text, new Document())).toThrow('Node cannot be a child');
-  expect(text.parentNode).toBe(parent);
-});
-
-test('creates elements with a namespace', () => {
-  const s = createElementFactories('urn:111');
-  const element = s.aaa({ bbb: 'ccc' }, s.ddd());
-
-  expect(element.namespaceURI).toBe('urn:111');
-  expect(element.getAttribute('bbb')).toBe('ccc');
-  expect(element.firstElementChild!.namespaceURI).toBe('urn:111');
+describe('h.comment', () => {
+  test('creates a comment', () => {
+    expect(h.comment('aaa')).toStrictEqual(new Comment('aaa'));
+  });
 });

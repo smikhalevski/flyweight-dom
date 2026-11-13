@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { f } from '../main/dsl.ts';
-import { Element, getElementsByClassName } from '../main/index.ts';
+import { getElementsByClassName } from '../main/getElementsByClassName.ts';
+import { Element } from '../main/index.ts';
 
 test('returns elements with the given class name', () => {
   const root = f.doc(f.xxx({ class: 'vvv aaa' }, f.yyy(), f.zzz({ class: 'aaa' })));

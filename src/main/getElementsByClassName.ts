@@ -1,6 +1,6 @@
 import { splitTokens } from './DOMTokenList.ts';
-import { Element } from './Element.ts';
-import { Node } from './Node.ts';
+import type { Element } from './Element.ts';
+import type { Node } from './Node.ts';
 import { SHOW_ELEMENT } from './NodeFilter.ts';
 import { TreeWalker } from './TreeWalker.ts';
 import { coerceToString, isSpaceChar } from './utils.ts';
@@ -11,7 +11,6 @@ import { coerceToString, isSpaceChar } from './utils.ts';
  * @param root The root node where the lookup starts.
  * @param className A string representing the class name(s) to match; multiple class names are separated by whitespace.
  * @see [getElementsByClassName](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByClassName) on MDN
- * @group Other
  */
 export function getElementsByClassName(root: Node, className: string): Element[] {
   className = coerceToString(className);

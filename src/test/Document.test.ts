@@ -80,3 +80,48 @@ test('setting textContent does nothing', () => {
 
   expect(document.firstChild).toBeNull();
 });
+
+test('returns the descendant with the given ID', () => {
+  const document = new Document();
+  const element = new Element('aaa', { id: 'bbb' });
+
+  document.append(new Element('ccc').append(element));
+
+  expect(document.getElementById('bbb')).toBe(element);
+});
+
+test('returns descendants with the given class name', () => {
+  const document = new Document();
+  const element = new Element('aaa', { class: 'bbb' });
+
+  document.append(new Element('ccc').append(element));
+
+  expect(document.getElementsByClassName('bbb')).toStrictEqual([element]);
+});
+
+test('returns descendants with the given name', () => {
+  const document = new Document();
+  const element = new Element('aaa', { name: 'bbb' });
+
+  document.append(new Element('ccc').append(element));
+
+  expect(document.getElementsByName('bbb')).toStrictEqual([element]);
+});
+
+test('returns descendants with the given tag name', () => {
+  const document = new Document();
+  const element = new Element('aaa');
+
+  document.append(new Element('ccc').append(element));
+
+  expect(document.getElementsByTagName('aaa')).toStrictEqual([element]);
+});
+
+test('returns descendants with the given namespace and local name', () => {
+  const document = new Document();
+  const element = new Element('xxx:aaa', {}, 'urn:111');
+
+  document.append(new Element('aaa').append(element));
+
+  expect(document.getElementsByTagNameNS('urn:111', 'aaa')).toStrictEqual([element]);
+});

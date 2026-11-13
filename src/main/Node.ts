@@ -1,5 +1,7 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { Element } from './Element.ts';
+import { lookupNamespaceURI } from './lookupNamespaceURI.ts';
+import { lookupPrefix } from './lookupPrefix.ts';
 import { EmptyNodeList, type ChildrenCache, type NodeList } from './NodeList.ts';
 import type { ParentNode } from './ParentNode.ts';
 import { uncheckedContains } from './uncheckedContains.ts';
@@ -206,6 +208,26 @@ export class Node {
    */
   cloneNode(deep?: boolean): Node {
     throw new Error('This node type does not support this method');
+  }
+
+  /**
+   * Returns the namespace that the prefix is bound to at this node, or `null` if the prefix isn't bound.
+   *
+   * @param prefix The prefix to look up, or `null` to look up the default namespace.
+   * @see [Node.lookupNamespaceURI](https://developer.mozilla.org/en-US/docs/Web/API/Node/lookupNamespaceURI) on MDN
+   */
+  lookupNamespaceURI(prefix: string | null | undefined): string | null {
+    return lookupNamespaceURI(this, prefix);
+  }
+
+  /**
+   * Returns a prefix that is bound to the namespace at this node, or `null` if there's no such prefix.
+   *
+   * @param namespaceURI The namespace to look up.
+   * @see [Node.lookupPrefix](https://developer.mozilla.org/en-US/docs/Web/API/Node/lookupPrefix) on MDN
+   */
+  lookupPrefix(namespaceURI: string | null | undefined): string | null {
+    return lookupPrefix(this, namespaceURI);
   }
 
   /**

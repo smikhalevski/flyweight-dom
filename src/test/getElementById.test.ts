@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { f } from '../main/dsl.ts';
-import { getElementById } from '../main/index.ts';
+import { getElementById } from '../main/getElementById.ts';
 
 test('returns the element with the given ID', () => {
   const root = f.doc(f.xxx(f.yyy(), f.zzz({ id: 'aaa' })));

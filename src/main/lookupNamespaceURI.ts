@@ -13,7 +13,6 @@ import { DOCUMENT_NODE, isElement, XML_NAMESPACE, XMLNS_NAMESPACE } from './util
  * @param node The node where the lookup starts.
  * @param prefix The prefix to look up, or `null` to look up the default namespace.
  * @see [Node.lookupNamespaceURI](https://developer.mozilla.org/en-US/docs/Web/API/Node/lookupNamespaceURI) on MDN
- * @group Other
  */
 export function lookupNamespaceURI(node: Node, prefix: string | null | undefined): string | null {
   if (prefix === undefined || prefix === '') {

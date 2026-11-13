@@ -262,6 +262,12 @@ describe('ChildNodeIterator', () => {
     expect(iterator.next()).toStrictEqual({ value: undefined, done: true });
   });
 
+  test('is its own iterator', () => {
+    const iterator = new ChildNodeIterator(new Element('aaa'), undefined);
+
+    expect(iterator[Symbol.iterator]()).toBe(iterator);
+  });
+
   test('supports iterator helpers', () => {
     const text = new Text();
     const iterator = new ChildNodeIterator(new Element('aaa').append(text), undefined);

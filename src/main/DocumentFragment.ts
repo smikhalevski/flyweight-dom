@@ -1,3 +1,5 @@
+import type { Element } from './Element.ts';
+import { getElementById } from './getElementById.ts';
 import { ParentNode } from './ParentNode.ts';
 import { getTextContent, setTextContent } from './Text.ts';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.ts';
@@ -14,6 +16,13 @@ export class DocumentFragment extends ParentNode() {
 
   set textContent(value: string | null | undefined) {
     setTextContent(this, value);
+  }
+
+  /**
+   * @see [DocumentFragment.getElementById](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment/getElementById) on MDN
+   */
+  getElementById(id: string): Element | null {
+    return getElementById(this, id);
   }
 
   cloneNode(deep?: boolean): DocumentFragment {

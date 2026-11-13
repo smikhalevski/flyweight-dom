@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
-import { Element, getElementsByTagNameNS } from '../main/index.ts';
+import { getElementsByTagNameNS } from '../main/getElementsByTagNameNS.ts';
+import { Element } from '../main/index.ts';
 
 function makeTestRoot() {
   const root = new Element('aaa');

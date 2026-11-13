@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
-import { Document, Element, lookupNamespaceURI, Text, XML_NAMESPACE, XMLNS_NAMESPACE } from '../main/index.ts';
+import { Document, Element, Text, XML_NAMESPACE, XMLNS_NAMESPACE } from '../main/index.ts';
+import { lookupNamespaceURI } from '../main/lookupNamespaceURI.ts';
 
 test('returns the namespace that an ancestor declares for the prefix', () => {
   const parent = new Element('aaa', { 'xmlns:xxx': 'urn:111' });

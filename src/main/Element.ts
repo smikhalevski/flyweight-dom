@@ -1,5 +1,8 @@
 import { ChildNode } from './ChildNode.ts';
 import { DOMTokenList, type ValueAccessor } from './DOMTokenList.ts';
+import { getElementsByClassName } from './getElementsByClassName.ts';
+import { getElementsByTagName } from './getElementsByTagName.ts';
+import { getElementsByTagNameNS } from './getElementsByTagNameNS.ts';
 import { lookupNamespaceURI } from './lookupNamespaceURI.ts';
 import type { Node } from './Node.ts';
 import { ParentNode } from './ParentNode.ts';
@@ -124,7 +127,6 @@ export class Element extends ParentNode(ChildNode()) {
     readonly attributes: Record<string, string> = {},
     /**
      * @see [Element.namespaceURI](https://developer.mozilla.org/en-US/docs/Web/API/Element/namespaceURI) on MDN
-     * @default null
      */
     readonly namespaceURI: string | null = null
   ) {
@@ -229,14 +231,26 @@ export class Element extends ParentNode(ChildNode()) {
 
     if (namespaceURI === null || namespaceURI === undefined || namespaceURI === '') {
       if (index !== -1) {
-        throw new Error('qualifiedName must not have a prefix if namespaceURI is null');
+        throw new Error(
+          "The namespace URI provided ('" +
+            namespaceURI +
+            "') is not valid for the qualified name provided ('" +
+            qualifiedName +
+            "')"
+        );
       }
       return this.setAttribute(qualifiedName, value);
     }
 
     if (index === -1) {
       if (namespaceURI !== XMLNS_NAMESPACE || qualifiedName !== 'xmlns') {
-        throw new Error('qualifiedName must have a prefix if namespaceURI is not null');
+        throw new Error(
+          "The namespace URI provided ('" +
+            namespaceURI +
+            "') is not valid for the qualified name provided ('" +
+            qualifiedName +
+            "')"
+        );
       }
       return this.setAttribute(qualifiedName, value);
     }
@@ -279,6 +293,27 @@ export class Element extends ParentNode(ChildNode()) {
       delete this.attributes[name];
     }
     return this;
+  }
+
+  /**
+   * @see [Element.getElementsByClassName](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByClassName) on MDN
+   */
+  getElementsByClassName(className: string): Element[] {
+    return getElementsByClassName(this, className);
+  }
+
+  /**
+   * @see [Element.getElementsByTagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagName) on MDN
+   */
+  getElementsByTagName(tagName: string): Element[] {
+    return getElementsByTagName(this, tagName);
+  }
+
+  /**
+   * @see [Element.getElementsByTagNameNS](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagNameNS) on MDN
+   */
+  getElementsByTagNameNS(namespaceURI: string | null | undefined, localName: string): Element[] {
+    return getElementsByTagNameNS(this, namespaceURI, localName);
   }
 
   /**

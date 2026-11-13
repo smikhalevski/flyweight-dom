@@ -129,3 +129,19 @@ test('does not contain null or undefined', () => {
   expect(new Element('aaa').contains(null)).toBe(false);
   expect(new Element('aaa').contains(undefined)).toBe(false);
 });
+
+test('returns the namespace that the prefix is bound to at the node', () => {
+  const text = new Text();
+
+  new Element('aaa', { 'xmlns:xxx': 'urn:111' }).append(text);
+
+  expect(text.lookupNamespaceURI('xxx')).toBe('urn:111');
+});
+
+test('returns the prefix that is bound to the namespace at the node', () => {
+  const text = new Text();
+
+  new Element('aaa', { 'xmlns:xxx': 'urn:111' }).append(text);
+
+  expect(text.lookupPrefix('urn:111')).toBe('xxx');
+});

@@ -553,6 +553,28 @@ test('updates an attribute that has the same namespace and local name, and keeps
   expect(element.getAttribute('xxx:bbb')).toBe('ddd');
 });
 
+test('sets an attribute without a namespace', () => {
+  const element = new Element('aaa');
+
+  element.setAttributeNS(null, 'bbb', 'ccc');
+
+  expect(element.attributes).toStrictEqual({ bbb: 'ccc' });
+});
+
+test('sets the xmlns attribute', () => {
+  const element = new Element('aaa');
+
+  element.setAttributeNS(XMLNS_NAMESPACE, 'xmlns', 'urn:111');
+
+  expect(element.attributes).toStrictEqual({ xmlns: 'urn:111' });
+});
+
+test('throws if a qualified name has a prefix and the namespace is null', () => {
+  expect(() => new Element('aaa').setAttributeNS(null, 'xxx:bbb', 'ccc')).toThrow(
+    "The namespace URI provided ('') is not valid for the qualified name provided ('xxx:bbb')"
+  );
+});
+
 test('throws if the prefix is bound to a different namespace', () => {
   const element = new Element('aaa', { 'xmlns:xxx': 'urn:111' });
 
@@ -563,7 +585,7 @@ test('throws if the prefix is bound to a different namespace', () => {
 
 test('throws if a qualified name has no prefix and the namespace is not null', () => {
   expect(() => new Element('aaa').setAttributeNS('urn:111', 'bbb', 'ccc')).toThrow(
-    'qualifiedName must have a prefix if namespaceURI is not null'
+    "The namespace URI provided ('urn:111') is not valid for the qualified name provided ('bbb')"
   );
 });
 
@@ -573,4 +595,31 @@ test('removes an attribute with the given namespace and local name', () => {
   element.removeAttributeNS('urn:111', 'bbb');
 
   expect(element.attributes).toStrictEqual({ 'xmlns:xxx': 'urn:111' });
+});
+
+test('returns descendants with the given class name, but not the element itself', () => {
+  const parent = new Element('aaa', { class: 'bbb' });
+  const child = new Element('ccc', { class: 'bbb' });
+
+  parent.append(child);
+
+  expect(parent.getElementsByClassName('bbb')).toStrictEqual([child]);
+});
+
+test('returns descendants with the given tag name, but not the element itself', () => {
+  const parent = new Element('aaa');
+  const child = new Element('aaa');
+
+  parent.append(child);
+
+  expect(parent.getElementsByTagName('aaa')).toStrictEqual([child]);
+});
+
+test('returns descendants with the given namespace and local name, but not the element itself', () => {
+  const parent = new Element('xxx:aaa', {}, 'urn:111');
+  const child = new Element('xxx:aaa', {}, 'urn:111');
+
+  parent.append(child);
+
+  expect(parent.getElementsByTagNameNS('urn:111', 'aaa')).toStrictEqual([child]);
 });

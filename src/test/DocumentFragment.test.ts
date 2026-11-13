@@ -68,3 +68,12 @@ test('fragments are equal if children are equal', () => {
   expect(new DocumentFragment().append('aaa').isEqualNode(new DocumentFragment().append('bbb'))).toBe(false);
   expect(new DocumentFragment().isEqualNode(new Document())).toBe(false);
 });
+
+test('returns the descendant with the given ID', () => {
+  const fragment = new DocumentFragment();
+  const element = new Element('aaa', { id: 'bbb' });
+
+  fragment.append(new Element('ccc').append(element));
+
+  expect(fragment.getElementById('bbb')).toBe(element);
+});

@@ -1027,7 +1027,11 @@ describe('Element.isEqualNode', () => {
 describe('Element.contains', () => {
   test('flyweight-dom', () => {
     const tree = makeTestTree(flyweightFactory);
-    const element = flyweightDom.getElementById(tree, 'id340');
+    const fragment = new flyweightDom.DocumentFragment();
+
+    fragment.append(tree);
+
+    const element = fragment.getElementById('id340');
 
     measure(() => tree.contains(element));
   });
@@ -1092,9 +1096,11 @@ describe('TreeWalker.nextNode with filter', () => {
 
 describe('getElementById', () => {
   test('flyweight-dom', () => {
-    const tree = makeTestTree(flyweightFactory);
+    const fragment = new flyweightDom.DocumentFragment();
 
-    measure(() => flyweightDom.getElementById(tree, 'id340'));
+    fragment.append(makeTestTree(flyweightFactory));
+
+    measure(() => fragment.getElementById('id340'));
   });
 
   test('domhandler', () => {
@@ -1118,7 +1124,7 @@ describe('getElementsByTagName', () => {
   test('flyweight-dom', () => {
     const tree = makeTestTree(flyweightFactory);
 
-    measure(() => flyweightDom.getElementsByTagName(tree, 'span'));
+    measure(() => tree.getElementsByTagName('span'));
   });
 
   test('domhandler', () => {
@@ -1147,7 +1153,7 @@ describe('getElementsByClassName', () => {
   test('flyweight-dom', () => {
     const tree = makeTestTree(flyweightFactory);
 
-    measure(() => flyweightDom.getElementsByClassName(tree, 'bbb'));
+    measure(() => tree.getElementsByClassName('bbb'));
   });
 
   test('domhandler', () => {
@@ -1174,9 +1180,12 @@ describe('getElementsByClassName', () => {
 
 describe('getElementsByName', () => {
   test('flyweight-dom', () => {
-    const tree = makeTestTree(flyweightFactory);
+    const document = new flyweightDom.Document();
 
-    measure(() => flyweightDom.getElementsByName(tree, 'ccc'));
+    // Only documents have getElementsByName
+    document.append(makeTestTree(flyweightFactory));
+
+    measure(() => document.getElementsByName('ccc'));
   });
 
   test('domhandler', () => {

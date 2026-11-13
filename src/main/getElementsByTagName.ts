@@ -1,5 +1,5 @@
-import { Element } from './Element.ts';
-import { Node } from './Node.ts';
+import type { Element } from './Element.ts';
+import type { Node } from './Node.ts';
 import { SHOW_ELEMENT } from './NodeFilter.ts';
 import { TreeWalker } from './TreeWalker.ts';
 import { coerceToString } from './utils.ts';
@@ -10,7 +10,6 @@ import { coerceToString } from './utils.ts';
  * @param root The root node where the lookup starts.
  * @param tagName A string representing the name of the elements. The special string `*` represents all elements.
  * @see [getElementsByTagName](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByTagName) on MDN
- * @group Other
  */
 export function getElementsByTagName(root: Node, tagName: string): Element[] {
   tagName = coerceToString(tagName);

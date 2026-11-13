@@ -1,5 +1,5 @@
-import { Element } from './Element.ts';
-import { Node } from './Node.ts';
+import type { Element } from './Element.ts';
+import type { Node } from './Node.ts';
 import { SHOW_ELEMENT } from './NodeFilter.ts';
 import { TreeWalker } from './TreeWalker.ts';
 import { coerceToString } from './utils.ts';
@@ -11,7 +11,6 @@ import { coerceToString } from './utils.ts';
  * @param namespaceURI The namespace of the elements. The special string `*` represents all namespaces.
  * @param localName The local name of the elements. The special string `*` represents all elements.
  * @see [getElementsByTagNameNS](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByTagNameNS) on MDN
- * @group Other
  */
 export function getElementsByTagNameNS(
   root: Node,

@@ -24,20 +24,28 @@ export function getElementsByClassName(root: Node, className: string): Element[]
   const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
   const elements = [];
 
-  nextElement: for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-    // Not element.classList, since it would permanently attach a DOMTokenList to every visited element
-    const elementClassName = element.className;
-
-    for (let i = 0; i < classNames.length; ++i) {
-      if (!hasToken(elementClassName, classNames[i])) {
-        continue nextElement;
-      }
+  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
+    if (hasClassNames(element, classNames)) {
+      elements.push(element);
     }
-
-    elements.push(element);
   }
 
   return elements;
+}
+
+/**
+ * Returns `true` if the element has all of the given class names.
+ */
+export function hasClassNames(element: Element, classNames: string[]): boolean {
+  // Not element.classList, since it would permanently attach a DOMTokenList to every checked element
+  const elementClassName = element.className;
+
+  for (let i = 0; i < classNames.length; ++i) {
+    if (!hasToken(elementClassName, classNames[i])) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**

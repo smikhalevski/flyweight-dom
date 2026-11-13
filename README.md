@@ -10,6 +10,7 @@ The extremely fast DOM implementation.
 
 - The DOM API you know from browsers: nodes, tree changes, lookups and traversal.
 - [XML namespaces.](#namespaces)
+- [jQuery-style queries.](#queries)
 - [DSL for DOM authoring.](#dsl)
 - [Custom nodes.](#custom-nodes)
 - Low memory consumption, minimal amount of allocations.
@@ -27,6 +28,7 @@ npm install --save-prod flyweight-dom
 - [Nodes](#nodes)
 - [Attributes](#attributes)
 - [Lookups](#lookups)
+- [Queries](#queries)
 - [Traversal](#traversal)
 - [Namespaces](#namespaces)
 - [DSL](#dsl)
@@ -119,6 +121,57 @@ document.getElementsByClassName('item').length;
 ```
 
 Lookup methods return arrays, not live collections.
+
+# Queries
+
+Use [`$`](https://smikhalevski.github.io/flyweight-dom/functions/flyweight-dom_query._.html) to select elements in a
+jQuery style:
+
+```ts
+import { $ } from 'flyweight-dom/query';
+
+const query = $(document).descendants('ul').children('li').hasAttribute('class', 'item');
+
+query.nodes.length;
+// ⮕ 2
+```
+
+Each method returns a new
+[`NodeQuery`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html). See its API docs
+for all methods.
+
+Elements are matched by a local name and a namespace. Both are `*` by default, which matches any value:
+
+```ts
+// All <circle> elements in the SVG namespace
+$(document).descendants('circle', 'http://www.w3.org/2000/svg');
+
+// All elements in the SVG namespace
+$(document).descendants('*', 'http://www.w3.org/2000/svg');
+```
+
+[`hasAttribute`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasattribute)
+and
+[`hasAttributeNS`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasattributens)
+check the attribute value with a string, a regular expression or a callback:
+
+```ts
+$(document).descendants().hasAttribute('class', /^it/);
+
+$(document)
+  .descendants()
+  .hasAttributeNS('http://www.w3.org/1999/xlink', 'href', value => value.startsWith('#'));
+```
+
+Read results from
+[`nodes`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#nodes), or iterate
+over the query:
+
+```ts
+for (const element of $(document).descendants('li')) {
+  // Process the element
+}
+```
 
 # Traversal
 

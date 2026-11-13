@@ -8,6 +8,7 @@
   "exports": {
     ".": "./index.js",
     "./dsl": "./dsl.js",
+    "./query": "./query.js",
     "./package.json": "./package.json"
   },
   "sideEffects": false,

@@ -28,15 +28,26 @@ export function getElementsByTagNameNS(
   const elements = [];
 
   for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-    if (
-      (namespaceURI === '*' || element.namespaceURI === namespaceURI) &&
-      (localName === '*' || hasLocalName(element, localName))
-    ) {
+    if (hasTagNameNS(element, namespaceURI, localName)) {
       elements.push(element);
     }
   }
 
   return elements;
+}
+
+/**
+ * Returns `true` if the element has the given namespace and local name.
+ *
+ * @param element The element to check.
+ * @param namespaceURI The namespace of the element. The special string `*` represents all namespaces.
+ * @param localName The local name of the element. The special string `*` represents all elements.
+ */
+export function hasTagNameNS(element: Element, namespaceURI: string | null, localName: string): boolean {
+  return (
+    (namespaceURI === '*' || element.namespaceURI === namespaceURI) &&
+    (localName === '*' || hasLocalName(element, localName))
+  );
 }
 
 /**

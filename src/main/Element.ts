@@ -1,5 +1,6 @@
 import { ChildNode } from './ChildNode.ts';
 import { DOMTokenList, type ValueAccessor } from './DOMTokenList.ts';
+import { lookupNamespaceURI } from './lookupNamespaceURI.ts';
 import type { Node } from './Node.ts';
 import { ParentNode } from './ParentNode.ts';
 import { getTextContent, setTextContent, Text } from './Text.ts';
@@ -11,6 +12,7 @@ import {
   hasOwnProperty,
   isEqualChildNodes,
   isEqualConstructor,
+  XMLNS_NAMESPACE,
 } from './utils.ts';
 
 /**
@@ -62,6 +64,29 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   /**
+   * The part of the {@link tagName} before the colon, or `null` if the element has no namespace or no prefix.
+   *
+   * @see [Element.prefix](https://developer.mozilla.org/en-US/docs/Web/API/Element/prefix) on MDN
+   */
+  get prefix(): string | null {
+    const index = this.namespaceURI === null ? -1 : this.tagName.indexOf(':');
+
+    return index === -1 ? null : this.tagName.substring(0, index);
+  }
+
+  /**
+   * The part of the {@link tagName} after the colon, or the whole {@link tagName} if the element has no namespace or
+   * no prefix.
+   *
+   * @see [Element.localName](https://developer.mozilla.org/en-US/docs/Web/API/Element/localName) on MDN
+   */
+  get localName(): string {
+    const index = this.namespaceURI === null ? -1 : this.tagName.indexOf(':');
+
+    return index === -1 ? this.tagName : this.tagName.substring(index + 1);
+  }
+
+  /**
    * @see [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) on MDN
    */
   get classList(): DOMTokenList {
@@ -85,6 +110,8 @@ export class Element extends ParentNode(ChildNode()) {
    * @param tagName The tag name of the element.
    * @param attributes The attributes of the element. The object isn't copied, to avoid an allocation per element, so
    * the element owns it, and it must not be passed to other elements.
+   * @param namespaceURI The namespace of the element. The element doesn't read it from `xmlns` attributes, since the
+   * namespace of a DOM element doesn't change when the element is moved or its attributes are changed.
    */
   constructor(
     /**
@@ -94,7 +121,12 @@ export class Element extends ParentNode(ChildNode()) {
     /**
      * @see [Element.attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes) on MDN
      */
-    readonly attributes: Record<string, string> = {}
+    readonly attributes: Record<string, string> = {},
+    /**
+     * @see [Element.namespaceURI](https://developer.mozilla.org/en-US/docs/Web/API/Element/namespaceURI) on MDN
+     * @default null
+     */
+    readonly namespaceURI: string | null = null
   ) {
     super();
   }
@@ -168,6 +200,88 @@ export class Element extends ParentNode(ChildNode()) {
   }
 
   /**
+   * Sets the attribute with the given namespace and local name.
+   *
+   * The namespace of an attribute isn't stored: it is the namespace that the attribute prefix is bound to. So if the
+   * prefix of the qualified name isn't bound yet, it is declared on this element with an `xmlns:*` attribute.
+   *
+   * @param namespaceURI The namespace of the attribute.
+   * @param qualifiedName The name of the attribute with an optional prefix.
+   * @param value The value of the attribute.
+   * @see [Element.setAttributeNS](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttributeNS) on MDN
+   */
+  setAttributeNS(
+    namespaceURI: string | null | undefined,
+    qualifiedName: string,
+    value: string | null | undefined
+  ): this {
+    const index = qualifiedName.indexOf(':');
+    const name = getAttributeNameNS(
+      this,
+      namespaceURI,
+      index === -1 ? qualifiedName : qualifiedName.substring(index + 1)
+    );
+
+    if (name !== null) {
+      // The attribute exists, maybe with another prefix that is kept
+      return this.setAttribute(name, value);
+    }
+
+    if (namespaceURI === null || namespaceURI === undefined || namespaceURI === '') {
+      if (index !== -1) {
+        throw new Error('qualifiedName must not have a prefix if namespaceURI is null');
+      }
+      return this.setAttribute(qualifiedName, value);
+    }
+
+    if (index === -1) {
+      if (namespaceURI !== XMLNS_NAMESPACE || qualifiedName !== 'xmlns') {
+        throw new Error('qualifiedName must have a prefix if namespaceURI is not null');
+      }
+      return this.setAttribute(qualifiedName, value);
+    }
+
+    const prefix = qualifiedName.substring(0, index);
+    const prefixNamespaceURI = lookupNamespaceURI(this, prefix);
+
+    if (prefixNamespaceURI === null) {
+      this.setAttribute('xmlns:' + prefix, namespaceURI);
+    } else if (prefixNamespaceURI !== namespaceURI) {
+      throw new Error("The prefix '" + prefix + "' is bound to a different namespace");
+    }
+
+    return this.setAttribute(qualifiedName, value);
+  }
+
+  /**
+   * @see [Element.getAttributeNS](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNS) on MDN
+   */
+  getAttributeNS(namespaceURI: string | null | undefined, localName: string): string | null {
+    const name = getAttributeNameNS(this, namespaceURI, localName);
+
+    return name !== null ? this.attributes[name] : null;
+  }
+
+  /**
+   * @see [Element.hasAttributeNS](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttributeNS) on MDN
+   */
+  hasAttributeNS(namespaceURI: string | null | undefined, localName: string): boolean {
+    return getAttributeNameNS(this, namespaceURI, localName) !== null;
+  }
+
+  /**
+   * @see [Element.removeAttributeNS](https://developer.mozilla.org/en-US/docs/Web/API/Element/removeAttributeNS) on MDN
+   */
+  removeAttributeNS(namespaceURI: string | null | undefined, localName: string): this {
+    const name = getAttributeNameNS(this, namespaceURI, localName);
+
+    if (name !== null) {
+      delete this.attributes[name];
+    }
+    return this;
+  }
+
+  /**
    * @see [Element.insertAdjacentElement](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement) on MDN
    */
   insertAdjacentElement(position: InsertPosition, element: Element): Element | null {
@@ -185,6 +299,7 @@ export class Element extends ParentNode(ChildNode()) {
     return (
       isEqualConstructor(this, otherNode) &&
       this.tagName === otherNode.tagName &&
+      this.namespaceURI === otherNode.namespaceURI &&
       isEqualAttributes(this.attributes, otherNode.attributes) &&
       isEqualChildNodes(this, otherNode)
     );
@@ -192,7 +307,7 @@ export class Element extends ParentNode(ChildNode()) {
 
   cloneNode(deep?: boolean): Element {
     // The constructor doesn't copy attributes, so the clone would share them otherwise
-    const node = new (this.constructor as typeof Element)(this.tagName, { ...this.attributes });
+    const node = new (this.constructor as typeof Element)(this.tagName, { ...this.attributes }, this.namespaceURI);
 
     if (deep) {
       uncheckedCloneChildren(this, node);
@@ -225,7 +340,7 @@ class ClassAttributeAccessor implements ValueAccessor {
 
 /**
  * Returns `true` if both objects have the same attributes. Both objects are enumerated the same way, so the result
- * doesn't depend on the order of arguments. Doesn't allocate.
+ * doesn't depend on the order of arguments.
  */
 function isEqualAttributes(attributes: Record<string, string>, otherAttributes: Record<string, string>): boolean {
   let count = 0;
@@ -242,6 +357,52 @@ function isEqualAttributes(attributes: Record<string, string>, otherAttributes: 
   }
 
   return count === 0;
+}
+
+/**
+ * Returns the name of the attribute with the given namespace and local name, or `null` if the element has no such
+ * attribute.
+ *
+ * Attributes are stored by qualified names, and their namespaces aren't stored. The namespace of an attribute is the
+ * namespace that its prefix is bound to, and an attribute without a prefix has no namespace, since the default
+ * namespace doesn't apply to attributes.
+ */
+function getAttributeNameNS(
+  element: Element,
+  namespaceURI: string | null | undefined,
+  localName: string
+): string | null {
+  const { attributes } = element;
+
+  if (namespaceURI === null || namespaceURI === undefined || namespaceURI === '') {
+    if (localName === 'xmlns' || !hasOwnProperty(attributes, localName)) {
+      return null;
+    }
+
+    const index = localName.indexOf(':');
+
+    // A prefix that isn't bound is a part of the local name, the same as for elements
+    return index === -1 || lookupNamespaceURI(element, localName.substring(0, index)) === null ? localName : null;
+  }
+
+  if (namespaceURI === XMLNS_NAMESPACE && localName === 'xmlns') {
+    return hasOwnProperty(attributes, localName) ? localName : null;
+  }
+
+  for (const name in attributes) {
+    const index = name.length - localName.length - 1;
+
+    if (
+      index > 0 &&
+      name.indexOf(':') === index &&
+      name.endsWith(localName) &&
+      lookupNamespaceURI(element, name.substring(0, index)) === namespaceURI
+    ) {
+      return name;
+    }
+  }
+
+  return null;
 }
 
 function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {

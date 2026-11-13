@@ -13,6 +13,20 @@ export const DOCUMENT_NODE = 9;
 export const DOCUMENT_TYPE_NODE = 10;
 export const DOCUMENT_FRAGMENT_NODE = 11;
 
+/**
+ * The namespace that the `xml` prefix is always bound to.
+ *
+ * @group Other
+ */
+export const XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
+
+/**
+ * The namespace of `xmlns` and `xmlns:*` attributes.
+ *
+ * @group Other
+ */
+export const XMLNS_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
+
 const objectHasOwnProperty = Object.prototype.hasOwnProperty;
 
 export function hasOwnProperty(object: object, key: PropertyKey): boolean {

@@ -42,7 +42,7 @@ export function getElementsByClassName(root: Node, className: string): Element[]
 }
 
 /**
- * Returns `true` if the whitespace-separated value contains the token. Doesn't allocate.
+ * Returns `true` if the whitespace-separated value contains the token.
  */
 function hasToken(value: string, token: string): boolean {
   for (let index = value.indexOf(token); index !== -1; index = value.indexOf(token, index + 1)) {

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import type { InsertPosition } from '../main/Element.ts';
-import { Comment, DOMTokenList, Element, Node, Text } from '../main/index.ts';
+import { Comment, DOMTokenList, Element, Node, Text, XMLNS_NAMESPACE } from '../main/index.ts';
 
 test('creates an element without children', () => {
   const node = new Element('aaa');
@@ -455,4 +455,122 @@ test('setting nodeValue does nothing', () => {
 
   expect(element.nodeValue).toBeNull();
   expect(element.firstChild).toBeNull();
+});
+
+test('has no namespace by default', () => {
+  const element = new Element('xxx:aaa');
+
+  expect(element.namespaceURI).toBeNull();
+  expect(element.prefix).toBeNull();
+  expect(element.localName).toBe('xxx:aaa');
+});
+
+test('splits the tag name of an element with a namespace into a prefix and a local name', () => {
+  const element = new Element('xxx:aaa', {}, 'urn:111');
+
+  expect(element.namespaceURI).toBe('urn:111');
+  expect(element.prefix).toBe('xxx');
+  expect(element.localName).toBe('aaa');
+});
+
+test('an element in the default namespace has no prefix', () => {
+  const element = new Element('aaa', {}, 'urn:111');
+
+  expect(element.prefix).toBeNull();
+  expect(element.localName).toBe('aaa');
+});
+
+test('elements are equal if namespaces are equal', () => {
+  expect(new Element('aaa', {}, 'urn:111').isEqualNode(new Element('aaa', {}, 'urn:111'))).toBe(true);
+  expect(new Element('aaa', {}, 'urn:111').isEqualNode(new Element('aaa', {}, 'urn:222'))).toBe(false);
+});
+
+test('clones the namespace', () => {
+  expect(new Element('aaa', {}, 'urn:111').cloneNode().namespaceURI).toBe('urn:111');
+});
+
+test('returns an attribute whose prefix an ancestor binds to the namespace', () => {
+  const parent = new Element('aaa', { 'xmlns:xxx': 'urn:111' });
+  const child = new Element('bbb', { 'xxx:ccc': 'ddd' });
+
+  parent.append(child);
+
+  expect(child.getAttributeNS('urn:111', 'ccc')).toBe('ddd');
+  expect(child.hasAttributeNS('urn:111', 'ccc')).toBe(true);
+});
+
+test('does not return an attribute whose prefix is bound to another namespace', () => {
+  const element = new Element('aaa', { 'xmlns:xxx': 'urn:111', 'xxx:bbb': 'ccc' });
+
+  expect(element.getAttributeNS('urn:222', 'bbb')).toBeNull();
+});
+
+test('the default namespace does not apply to attributes', () => {
+  const element = new Element('aaa', { xmlns: 'urn:111', bbb: 'ccc' }, 'urn:111');
+
+  expect(element.getAttributeNS('urn:111', 'bbb')).toBeNull();
+  expect(element.getAttributeNS(null, 'bbb')).toBe('ccc');
+});
+
+test('a prefix that is not bound is a part of the local name of an attribute', () => {
+  const element = new Element('aaa', { 'xxx:bbb': 'ccc' });
+
+  expect(element.getAttributeNS(null, 'xxx:bbb')).toBe('ccc');
+});
+
+test('returns xmlns attributes', () => {
+  const element = new Element('aaa', { xmlns: 'urn:111', 'xmlns:xxx': 'urn:222' });
+
+  expect(element.getAttributeNS(XMLNS_NAMESPACE, 'xmlns')).toBe('urn:111');
+  expect(element.getAttributeNS(XMLNS_NAMESPACE, 'xxx')).toBe('urn:222');
+  expect(element.getAttributeNS(null, 'xmlns')).toBeNull();
+});
+
+test('sets an attribute and declares its prefix if the prefix is not bound', () => {
+  const element = new Element('aaa');
+
+  element.setAttributeNS('urn:111', 'xxx:bbb', 'ccc');
+
+  expect(element.attributes).toStrictEqual({ 'xmlns:xxx': 'urn:111', 'xxx:bbb': 'ccc' });
+});
+
+test('sets an attribute without a declaration if the prefix is bound to the namespace', () => {
+  const parent = new Element('aaa', { 'xmlns:xxx': 'urn:111' });
+  const child = new Element('bbb');
+
+  parent.append(child);
+  child.setAttributeNS('urn:111', 'xxx:ccc', 'ddd');
+
+  expect(child.attributes).toStrictEqual({ 'xxx:ccc': 'ddd' });
+});
+
+test('updates an attribute that has the same namespace and local name, and keeps its prefix', () => {
+  const element = new Element('aaa', { 'xmlns:xxx': 'urn:111', 'xmlns:yyy': 'urn:111', 'xxx:bbb': 'ccc' });
+
+  element.setAttributeNS('urn:111', 'yyy:bbb', 'ddd');
+
+  expect(element.getAttributeNames()).toStrictEqual(['xmlns:xxx', 'xmlns:yyy', 'xxx:bbb']);
+  expect(element.getAttribute('xxx:bbb')).toBe('ddd');
+});
+
+test('throws if the prefix is bound to a different namespace', () => {
+  const element = new Element('aaa', { 'xmlns:xxx': 'urn:111' });
+
+  expect(() => element.setAttributeNS('urn:222', 'xxx:bbb', 'ccc')).toThrow(
+    "The prefix 'xxx' is bound to a different namespace"
+  );
+});
+
+test('throws if a qualified name has no prefix and the namespace is not null', () => {
+  expect(() => new Element('aaa').setAttributeNS('urn:111', 'bbb', 'ccc')).toThrow(
+    'qualifiedName must have a prefix if namespaceURI is not null'
+  );
+});
+
+test('removes an attribute with the given namespace and local name', () => {
+  const element = new Element('aaa', { 'xmlns:xxx': 'urn:111', 'xxx:bbb': 'ccc' });
+
+  element.removeAttributeNS('urn:111', 'bbb');
+
+  expect(element.attributes).toStrictEqual({ 'xmlns:xxx': 'urn:111' });
 });

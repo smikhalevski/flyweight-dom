@@ -38,3 +38,7 @@ export { getElementById } from './getElementById.ts';
 export { getElementsByClassName } from './getElementsByClassName.ts';
 export { getElementsByName } from './getElementsByName.ts';
 export { getElementsByTagName } from './getElementsByTagName.ts';
+export { getElementsByTagNameNS } from './getElementsByTagNameNS.ts';
+export { lookupNamespaceURI } from './lookupNamespaceURI.ts';
+export { lookupPrefix } from './lookupPrefix.ts';
+export { XML_NAMESPACE, XMLNS_NAMESPACE } from './utils.ts';

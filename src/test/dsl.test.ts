@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { f } from '../main/dsl.ts';
+import { createElementFactories, f } from '../main/dsl.ts';
 import { CDATASection, Comment, Document, Element, ProcessingInstruction, Text } from '../main/index.ts';
 
 test('creates a document with a doctype and the children of a fragment', () => {
@@ -61,4 +61,13 @@ test('does not move children out of their parents if a child cannot be appended'
   expect(() => f.f(text, new Document())).toThrow('Node cannot be a child');
   expect(() => f.doc(text, new Document())).toThrow('Node cannot be a child');
   expect(text.parentNode).toBe(parent);
+});
+
+test('creates elements with a namespace', () => {
+  const s = createElementFactories('urn:111');
+  const element = s.aaa({ bbb: 'ccc' }, s.ddd());
+
+  expect(element.namespaceURI).toBe('urn:111');
+  expect(element.getAttribute('bbb')).toBe('ccc');
+  expect(element.firstElementChild!.namespaceURI).toBe('urn:111');
 });

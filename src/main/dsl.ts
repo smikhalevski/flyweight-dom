@@ -96,31 +96,57 @@ const nodeFactories: NodeFactories = {
   },
 };
 
-const elementFactoryMap = new Map<string, ElementFactory>();
+/**
+ * Creates factories of elements that have the given namespace.
+ *
+ * ```ts
+ * const s = createElementFactories('http://www.w3.org/2000/svg');
+ *
+ * s.svg(s.circle({ r: '10' })).firstElementChild.namespaceURI;
+ * // ⮕ 'http://www.w3.org/2000/svg'
+ * ```
+ *
+ * @param namespaceURI The namespace of created elements.
+ * @group DSL
+ */
+export function createElementFactories(namespaceURI: string | null): ElementFactories {
+  const elementFactoryMap = new Map<string, ElementFactory>();
 
-function getElementFactory(tagName: string): ElementFactory {
-  let elementFactory = elementFactoryMap.get(tagName);
+  return new Proxy<ElementFactories>(
+    {},
+    {
+      get(_target, key) {
+        if (typeof key !== 'string') {
+          return undefined;
+        }
 
-  if (elementFactory === undefined) {
-    elementFactory = createElementFactory(tagName);
-    elementFactoryMap.set(tagName, elementFactory);
-  }
-  return elementFactory;
+        let elementFactory = elementFactoryMap.get(key);
+
+        if (elementFactory === undefined) {
+          elementFactory = createElementFactory(key, namespaceURI);
+          elementFactoryMap.set(key, elementFactory);
+        }
+        return elementFactory;
+      },
+    }
+  );
 }
 
-function createElementFactory(tagName: string): ElementFactory {
+function createElementFactory(tagName: string, namespaceURI: string | null): ElementFactory {
   return (...args: unknown[]) => {
     const attributes = args[0];
 
     // The first argument holds attributes if it's an object that isn't a node, otherwise it's a child
     if (typeof attributes !== 'object' || attributes === null || attributes instanceof Node) {
-      return appendChildren(new Element(tagName), args);
+      return appendChildren(new Element(tagName, undefined, namespaceURI), args);
     }
 
     // Element owns its attributes object, so copy the caller's object, which may be reused or frozen
-    return appendChildren(new Element(tagName, { ...attributes }), args, 1);
+    return appendChildren(new Element(tagName, { ...attributes }, namespaceURI), args, 1);
   };
 }
+
+const elementFactories = createElementFactories(null);
 
 /**
  * Appends children to the parent and returns the parent.
@@ -159,7 +185,7 @@ function appendChildren<T extends ParentNode>(parent: T, children: unknown[], st
 export const f = new Proxy(nodeFactories, {
   get(target, key) {
     if (typeof key === 'string' && !hasOwnProperty(target, key)) {
-      return getElementFactory(key);
+      return elementFactories[key];
     }
     return Reflect.get(target, key);
   },

@@ -125,3 +125,22 @@ test('returns descendants with the given namespace and local name', () => {
 
   expect(document.getElementsByTagNameNS('urn:111', 'aaa')).toStrictEqual([element]);
 });
+
+test('creates an element without a namespace', () => {
+  const element = new Document().createElement('aaa');
+
+  expect(element).toBeInstanceOf(Element);
+  expect(element.tagName).toBe('aaa');
+  expect(element.namespaceURI).toBeNull();
+});
+
+test('creates an element with a namespace', () => {
+  const element = new Document().createElementNS('urn:111', 'xxx:aaa');
+
+  expect(element.tagName).toBe('xxx:aaa');
+  expect(element.namespaceURI).toBe('urn:111');
+});
+
+test('creates an element without a namespace if the namespace is empty', () => {
+  expect(new Document().createElementNS('', 'aaa').namespaceURI).toBeNull();
+});

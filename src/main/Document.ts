@@ -1,5 +1,5 @@
 import type { DocumentType } from './DocumentType.ts';
-import type { Element } from './Element.ts';
+import { Element } from './Element.ts';
 import { getElementById } from './getElementById.ts';
 import { getElementsByClassName } from './getElementsByClassName.ts';
 import { getElementsByName } from './getElementsByName.ts';
@@ -26,6 +26,30 @@ export class Document extends ParentNode() {
    */
   get documentElement(): Element | null {
     return getNextSiblingOrSelf(this.firstChild, ELEMENT_NODE) as Element | null;
+  }
+
+  /**
+   * Creates an element that has no namespace. The element isn't bound to the document, the same as an element created
+   * with the constructor.
+   *
+   * @see [Document.createElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement) on MDN
+   */
+  createElement(tagName: string): Element {
+    return new Element(tagName);
+  }
+
+  /**
+   * Creates an element that has the given namespace. The element isn't bound to the document, the same as an element
+   * created with the constructor.
+   *
+   * @see [Document.createElementNS](https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS) on MDN
+   */
+  createElementNS(namespaceURI: string | null | undefined, qualifiedName: string): Element {
+    return new Element(
+      qualifiedName,
+      undefined,
+      namespaceURI === undefined || namespaceURI === '' ? null : namespaceURI
+    );
   }
 
   /**

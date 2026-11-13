@@ -38,6 +38,25 @@ const flyweightFactory: TestFactory<flyweightDom.Element, flyweightDom.Text> = {
   },
 };
 
+/**
+ * The namespace of elements that namespace factories create with the "xxx" prefix.
+ */
+const ELEMENT_NAMESPACE = 'urn:aaa';
+
+/**
+ * The namespace that {@link makeTestNamespaceBranch} binds to the "yyy" prefix.
+ */
+const ATTRIBUTE_NAMESPACE = 'urn:bbb';
+
+const flyweightNamespaceFactory: TestFactory<flyweightDom.Element, flyweightDom.Text> = {
+  createElement(tagName, attributes) {
+    return new flyweightDom.Element('xxx:' + tagName, attributes, ELEMENT_NAMESPACE);
+  },
+
+  createText: flyweightFactory.createText,
+  appendChild: flyweightFactory.appendChild,
+};
+
 const domhandlerFactory: TestFactory<domhandler.Element, domhandler.Text> = {
   createElement(tagName, attributes) {
     return new domhandler.Element(tagName, attributes);
@@ -80,7 +99,21 @@ async function makeTestJsdom() {
     },
   };
 
-  return { window, document, factory };
+  const namespaceFactory: TestFactory<any, any> = {
+    createElement(tagName, attributes) {
+      const element = document.createElementNS(ELEMENT_NAMESPACE, 'xxx:' + tagName);
+
+      for (const name in attributes) {
+        element.setAttribute(name, attributes[name]);
+      }
+      return element;
+    },
+
+    createText: factory.createText,
+    appendChild: factory.appendChild,
+  };
+
+  return { window, document, factory, namespaceFactory };
 }
 
 /**
@@ -121,6 +154,28 @@ function makeTestTree<TElement, TText>(factory: TestFactory<TElement, TText>): T
   }
 
   return createElement(0);
+}
+
+/**
+ * Returns the element at the end of a branch of 5 nested elements. The first element of the branch binds the "yyy"
+ * prefix to {@link ATTRIBUTE_NAMESPACE}, and the returned element has the "yyy:ccc" attribute, so its namespace is
+ * looked up through the whole branch.
+ */
+function makeTestNamespaceBranch(factory: TestFactory<any, any>): any {
+  let element = factory.createElement('div', {});
+
+  element.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:yyy', ATTRIBUTE_NAMESPACE);
+
+  for (let i = 0; i < 4; ++i) {
+    const child = factory.createElement('div', {});
+
+    factory.appendChild(element, child);
+    element = child;
+  }
+
+  element.setAttributeNS(ATTRIBUTE_NAMESPACE, 'yyy:ccc', 'ddd');
+
+  return element;
 }
 
 /**
@@ -1201,5 +1256,132 @@ describe('getElementsByName', () => {
     document.body.append(makeTestTree(factory));
 
     measure(() => document.getElementsByName('ccc').length);
+  });
+});
+
+describe('Document.createElementNS', () => {
+  test('flyweight-dom', () => {
+    const document = new flyweightDom.Document();
+
+    measure(() => document.createElementNS(ELEMENT_NAMESPACE, 'xxx:div'));
+  });
+
+  test('jsdom', async () => {
+    const { document } = await makeTestJsdom();
+
+    measure(() => document.createElementNS(ELEMENT_NAMESPACE, 'xxx:div'));
+  });
+});
+
+describe('Element.localName', () => {
+  test('flyweight-dom', () => {
+    const element = flyweightNamespaceFactory.createElement('div', {});
+
+    measure(() => element.localName);
+  });
+
+  test('jsdom', async () => {
+    const { namespaceFactory } = await makeTestJsdom();
+    const element = namespaceFactory.createElement('div', {});
+
+    measure(() => element.localName);
+  });
+});
+
+describe('Element.getAttributeNS', () => {
+  test('flyweight-dom', () => {
+    const element = makeTestNamespaceBranch(flyweightNamespaceFactory);
+
+    measure(() => element.getAttributeNS(ATTRIBUTE_NAMESPACE, 'ccc'));
+  });
+
+  test('jsdom', async () => {
+    const { namespaceFactory } = await makeTestJsdom();
+    const element = makeTestNamespaceBranch(namespaceFactory);
+
+    measure(() => element.getAttributeNS(ATTRIBUTE_NAMESPACE, 'ccc'));
+  });
+});
+
+describe('Element.hasAttributeNS', () => {
+  test('flyweight-dom', () => {
+    const element = makeTestNamespaceBranch(flyweightNamespaceFactory);
+
+    measure(() => element.hasAttributeNS(ATTRIBUTE_NAMESPACE, 'ccc'));
+  });
+
+  test('jsdom', async () => {
+    const { namespaceFactory } = await makeTestJsdom();
+    const element = makeTestNamespaceBranch(namespaceFactory);
+
+    measure(() => element.hasAttributeNS(ATTRIBUTE_NAMESPACE, 'ccc'));
+  });
+});
+
+describe('Element.setAttributeNS', () => {
+  test('flyweight-dom', () => {
+    const element = makeTestNamespaceBranch(flyweightNamespaceFactory);
+
+    measure(() => element.setAttributeNS(ATTRIBUTE_NAMESPACE, 'yyy:ccc', 'eee'));
+  });
+
+  test('jsdom', async () => {
+    const { namespaceFactory } = await makeTestJsdom();
+    const element = makeTestNamespaceBranch(namespaceFactory);
+
+    measure(() => element.setAttributeNS(ATTRIBUTE_NAMESPACE, 'yyy:ccc', 'eee'));
+  });
+});
+
+describe('Node.lookupNamespaceURI', () => {
+  test('flyweight-dom', () => {
+    const element = makeTestNamespaceBranch(flyweightNamespaceFactory);
+
+    measure(() => element.lookupNamespaceURI('yyy'));
+  });
+
+  test('jsdom', async () => {
+    const { namespaceFactory } = await makeTestJsdom();
+    const element = makeTestNamespaceBranch(namespaceFactory);
+
+    measure(() => element.lookupNamespaceURI('yyy'));
+  });
+});
+
+describe('Node.lookupPrefix', () => {
+  test('flyweight-dom', () => {
+    const element = makeTestNamespaceBranch(flyweightNamespaceFactory);
+
+    measure(() => element.lookupPrefix(ATTRIBUTE_NAMESPACE));
+  });
+
+  test('jsdom', async () => {
+    const { namespaceFactory } = await makeTestJsdom();
+    const element = makeTestNamespaceBranch(namespaceFactory);
+
+    measure(() => element.lookupPrefix(ATTRIBUTE_NAMESPACE));
+  });
+});
+
+describe('getElementsByTagNameNS', () => {
+  test('flyweight-dom', () => {
+    const tree = makeTestTree(flyweightNamespaceFactory);
+
+    measure(() => tree.getElementsByTagNameNS(ELEMENT_NAMESPACE, 'span'));
+  });
+
+  test('jsdom', async () => {
+    const { namespaceFactory } = await makeTestJsdom();
+    const tree = makeTestTree(namespaceFactory);
+
+    measure(
+      {
+        // jsdom caches live collections until the tree changes, so the tree is changed before each call
+        beforeIteration() {
+          tree.toggleAttribute('aaa');
+        },
+      },
+      () => tree.getElementsByTagNameNS(ELEMENT_NAMESPACE, 'span').length
+    );
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { createElementFactory, h } from '../main/dsl.ts';
-import { Comment, Document, Element, Text } from '../main/index.ts';
+import { ChildNode, Comment, Document, Element, ParentNode, Text } from '../main/index.ts';
 import { $, NodeQuery } from '../main/query.ts';
 
 const n = createElementFactory('urn:111');
@@ -94,6 +94,20 @@ describe('NodeQuery.descendants', () => {
       root.childNodes[1].firstChild,
     ]);
   });
+
+  test('selects an element once if a nested node goes before the node that contains it', () => {
+    const element = h('ddd');
+    const root = h('aaa', h('bbb', h('ccc', element)));
+    const query = $(root).descendants('ccc').union($(root).children('bbb'));
+
+    expect(query.descendants().nodes).toStrictEqual([root.firstChild!.firstChild, element]);
+  });
+
+  test('selects descendants of a node if other nodes have no children', () => {
+    const root = h('aaa', h('bbb'), h('ccc', h('ddd')), h('eee'));
+
+    expect($(root).children().descendants().nodes).toStrictEqual([root.childNodes[1].firstChild]);
+  });
 });
 
 describe('NodeQuery.hasAttribute', () => {
@@ -135,6 +149,17 @@ describe('NodeQuery.hasAttribute', () => {
 
   test('does not select nodes that are not elements', () => {
     expect($(new Document()).hasAttribute('xxx').nodes).toStrictEqual([]);
+  });
+
+  test('does not select elements by names of inherited properties', () => {
+    expect($(h('aaa')).hasAttribute('constructor').nodes).toStrictEqual([]);
+    expect($(h('aaa')).hasAttribute('__proto__').nodes).toStrictEqual([]);
+  });
+
+  test('selects an element that has an attribute with the name of an inherited property', () => {
+    const element = h('aaa').setAttribute('__proto__', 'xxx');
+
+    expect($(element).hasAttribute('__proto__', 'xxx').nodes).toStrictEqual([element]);
   });
 });
 
@@ -260,6 +285,43 @@ describe('NodeQuery.nthChild', () => {
 
   test('does not select nodes that are not elements', () => {
     expect($(new Text()).nthChild(0).nodes).toStrictEqual([]);
+    expect($(new Text()).nthChild(1).nodes).toStrictEqual([]);
+  });
+
+  test('selects elements in a long run of siblings', () => {
+    const root = h('aaa', h('bbb'), 'xxx', h('ccc'), h('ddd'), 'xxx', h('eee'), h('fff'), h('ggg'));
+
+    expect($(root).children().nthChild(4).nodes).toStrictEqual([root.childNodes[6]]);
+    expect($(root).children().nthChild(-5).nodes).toStrictEqual([root.childNodes[2]]);
+  });
+
+  test('does not select siblings that follow a sibling whose index is too big', () => {
+    const root = h('aaa', h('bbb'), h('ccc'), h('ddd'), h('eee'), h('fff'), h('ggg'));
+    const query = $(root)
+      .children()
+      .filter((_element, index) => index >= 3);
+
+    expect(query.nthChild(1).nodes).toStrictEqual([]);
+    expect(query.nthChild(4).nodes).toStrictEqual([root.childNodes[4]]);
+  });
+
+  test('does not select siblings that precede a sibling whose negative index is too big', () => {
+    const root = h('aaa', h('bbb'), h('ccc'), h('ddd'), h('eee'), h('fff'), h('ggg'));
+    const query = $(root)
+      .children()
+      .filter((_element, index) => index < 3);
+
+    expect(query.nthChild(-2).nodes).toStrictEqual([]);
+    expect(query.nthChild(-5).nodes).toStrictEqual([root.childNodes[1]]);
+  });
+
+  test('selects elements of different parents that are not in the document order', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd'), h('eee')), h('fff', h('ggg'), h('hhh')));
+    const elements = $(root).descendants().nodes;
+    const query = new NodeQuery([elements[6], elements[3], elements[4], elements[1], elements[5], elements[2]]);
+
+    expect(query.nthChild(1).nodes).toStrictEqual([elements[6], elements[4], elements[2]]);
+    expect(query.nthChild(-2).nodes).toStrictEqual([elements[5], elements[2]]);
   });
 });
 
@@ -298,6 +360,32 @@ describe('NodeQuery.union', () => {
       root.childNodes[2],
     ]);
   });
+
+  test('selects nodes of both queries once if both have many nodes', () => {
+    const root = h('aaa');
+
+    for (let i = 0; i < 40; ++i) {
+      root.append(h('bbb'));
+    }
+
+    const { nodes } = $(root).children();
+    const query1 = new NodeQuery(nodes.slice(0, 30));
+    const query2 = new NodeQuery(nodes.slice(10));
+    const unionNodes = query1.union(query2).nodes;
+
+    // Nodes are compared by reference, since a deep comparison of many siblings is slow
+    expect(unionNodes.length).toBe(40);
+    expect(unionNodes.every((node, index) => node === nodes[index])).toBe(true);
+  });
+
+  test('selects nodes of a query if the other query has no nodes', () => {
+    const root = h('aaa', h('bbb'));
+    const query = $(root).children();
+    const emptyQuery = query.children();
+
+    expect(query.union(emptyQuery).nodes).toStrictEqual([root.firstChild]);
+    expect(emptyQuery.union(query).nodes).toStrictEqual([root.firstChild]);
+  });
 });
 
 describe('NodeQuery.hasText', () => {
@@ -321,6 +409,64 @@ describe('NodeQuery.hasText', () => {
 
   test('does not select a node without text content', () => {
     expect($(new Document()).hasText(() => true).nodes).toStrictEqual([]);
+  });
+
+  test('does not select nodes whose text content only starts with the string, or is the start of the string', () => {
+    const root = h('aaa', h('bbb', 'xxx', h('ccc', 'yyy')));
+
+    expect($(root).children().hasText('xxx').nodes).toStrictEqual([]);
+    expect($(root).children().hasText('xxxyyyzzz').nodes).toStrictEqual([]);
+  });
+
+  test('reads text and CDATA sections of descendants, and ignores comments', () => {
+    const root = h('aaa', h('bbb', 'xxx', h.comment('zzz'), h('ccc', h.cdata('yyy'))), h('ddd', h.comment('zzz')));
+
+    expect($(root).children().hasText('xxxyyy').nodes).toStrictEqual([root.childNodes[0]]);
+    expect($(root).children().hasText().nodes).toStrictEqual([root.childNodes[0]]);
+    expect($(root).children().hasText('').nodes).toStrictEqual([root.childNodes[1]]);
+  });
+
+  test('ignores text nodes without data', () => {
+    const element = h('aaa', new Text(), 'xxx', new Text());
+
+    expect($(element).hasText('xxx').nodes).toStrictEqual([element]);
+  });
+
+  test('selects a fragment and a text node by their text content', () => {
+    const fragment = h.fragment('xxx', h('aaa', 'yyy'));
+    const text = new Text('xxx');
+
+    expect($(fragment).hasText('xxxyyy').nodes).toStrictEqual([fragment]);
+    expect($(text).hasText('xxx').nodes).toStrictEqual([text]);
+    expect($(text).hasText('yyy').nodes).toStrictEqual([]);
+  });
+
+  test('does not read text of a custom node, the same as the text content of an element', () => {
+    class MockParentNode extends ParentNode(ChildNode()) {
+      readonly nodeName = '';
+      readonly nodeType = -1;
+    }
+
+    const element = h('aaa', new MockParentNode().append('xxx'));
+
+    expect(element.textContent).toBe('');
+    expect($(element).hasText().nodes).toStrictEqual([]);
+    expect($(element).hasText('xxx').nodes).toStrictEqual([]);
+  });
+
+  test('reads the text content that a subclass of an element defines', () => {
+    class MockElement extends Element {
+      get textContent(): string | null {
+        return 'xxx';
+      }
+
+      set textContent(_value: string | null | undefined) {}
+    }
+
+    const element = new MockElement('aaa');
+
+    expect($(element).hasText('xxx').nodes).toStrictEqual([element]);
+    expect($(element).hasText().nodes).toStrictEqual([element]);
   });
 });
 
@@ -397,6 +543,14 @@ describe('NodeQuery.parent', () => {
   test('selects nothing if the node has no parent', () => {
     expect($(h('aaa')).parent().nodes).toStrictEqual([]);
   });
+
+  test('selects the parent element once if its children are not in a row', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd')), h('eee', h('fff')));
+    const elements = $(root).descendants().nodes;
+    const query = new NodeQuery([elements[1], elements[4], elements[2]]);
+
+    expect(query.parent().nodes).toStrictEqual([root.childNodes[0], root.childNodes[1]]);
+  });
 });
 
 describe('NodeQuery.ancestors', () => {
@@ -425,6 +579,12 @@ describe('NodeQuery.ancestors', () => {
 
   test('does not select the node itself', () => {
     expect($(h('aaa')).ancestors('aaa').nodes).toStrictEqual([]);
+  });
+
+  test('selects ancestors of siblings once', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd')));
+
+    expect($(root.firstChild!).children().ancestors().nodes).toStrictEqual([root.firstChild, root]);
   });
 });
 
@@ -458,6 +618,13 @@ describe('NodeQuery.closest', () => {
         .closest('ccc').nodes
     ).toStrictEqual([]);
   });
+
+  test('selects an element once if it matches itself and is the closest one for its descendants', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('bbb'), h('ddd')));
+    const element = root.firstChild!;
+
+    expect($(root).descendants().closest('bbb').nodes).toStrictEqual([element, element.childNodes[1]]);
+  });
 });
 
 describe('NodeQuery.siblings', () => {
@@ -481,6 +648,19 @@ describe('NodeQuery.siblings', () => {
 
   test('selects nothing if the node has no parent', () => {
     expect($(h('aaa')).siblings().nodes).toStrictEqual([]);
+  });
+
+  test('selects nothing if several nodes have no parents', () => {
+    expect(new NodeQuery([h('aaa'), h('bbb')]).siblings().nodes).toStrictEqual([]);
+  });
+
+  test('selects siblings of nodes that have different parents', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd')), h('eee', h('ccc'), h('fff')));
+
+    expect($(root).descendants('ccc').siblings().nodes).toStrictEqual([
+      root.childNodes[0].childNodes[1],
+      root.childNodes[1].childNodes[1],
+    ]);
   });
 });
 
@@ -514,45 +694,61 @@ describe('NodeQuery.previous', () => {
   });
 });
 
-describe('NodeQuery.nextAll', () => {
+describe('NodeQuery.following', () => {
   test('selects sibling elements that follow the node', () => {
     const root = h('aaa', h('bbb'), h('ccc'), 'xxx', h('ddd'), h('eee'));
 
-    expect($(root.childNodes[1]).nextAll().nodes).toStrictEqual([root.childNodes[3], root.childNodes[4]]);
+    expect($(root.childNodes[1]).following().nodes).toStrictEqual([root.childNodes[3], root.childNodes[4]]);
   });
 
   test('selects following sibling elements with the given local name and namespace', () => {
     const root = h('aaa', h('bbb'), h('ccc'), n('ccc'), h('ddd'));
 
-    expect($(root.childNodes[0]).nextAll('ccc').nodes).toStrictEqual([root.childNodes[1], root.childNodes[2]]);
-    expect($(root.childNodes[0]).nextAll('ccc', 'urn:111').nodes).toStrictEqual([root.childNodes[2]]);
+    expect($(root.childNodes[0]).following('ccc').nodes).toStrictEqual([root.childNodes[1], root.childNodes[2]]);
+    expect($(root.childNodes[0]).following('ccc', 'urn:111').nodes).toStrictEqual([root.childNodes[2]]);
   });
 
   test('selects an element once if it follows several nodes', () => {
     const root = h('aaa', h('bbb'), h('ccc'), h('ddd'));
 
-    expect($(root).children().nextAll().nodes).toStrictEqual([root.childNodes[1], root.childNodes[2]]);
+    expect($(root).children().following().nodes).toStrictEqual([root.childNodes[1], root.childNodes[2]]);
+  });
+
+  test('selects following siblings of nodes that are not in the document order', () => {
+    const root = h('aaa', h('bbb'), 'xxx', h('ccc'), h('ddd'), 'xxx', h('eee'));
+    const elements = $(root).children().nodes;
+    const query = new NodeQuery([elements[2], elements[0], elements[1]]);
+
+    expect(query.following().nodes).toStrictEqual([elements[3], elements[1], elements[2]]);
   });
 });
 
-describe('NodeQuery.previousAll', () => {
+describe('NodeQuery.preceding', () => {
   test('selects sibling elements that precede the node, from the closest one to the farthest one', () => {
     const root = h('aaa', h('bbb'), h('ccc'), 'xxx', h('ddd'), h('eee'));
 
-    expect($(root.childNodes[3]).previousAll().nodes).toStrictEqual([root.childNodes[1], root.childNodes[0]]);
+    expect($(root.childNodes[3]).preceding().nodes).toStrictEqual([root.childNodes[1], root.childNodes[0]]);
   });
 
   test('selects preceding sibling elements with the given local name and namespace', () => {
     const root = h('aaa', h('bbb'), n('ccc'), h('ccc'), h('ddd'));
 
-    expect($(root.childNodes[3]).previousAll('ccc').nodes).toStrictEqual([root.childNodes[2], root.childNodes[1]]);
-    expect($(root.childNodes[3]).previousAll('ccc', 'urn:111').nodes).toStrictEqual([root.childNodes[1]]);
+    expect($(root.childNodes[3]).preceding('ccc').nodes).toStrictEqual([root.childNodes[2], root.childNodes[1]]);
+    expect($(root.childNodes[3]).preceding('ccc', 'urn:111').nodes).toStrictEqual([root.childNodes[1]]);
   });
 
   test('selects an element once if it precedes several nodes', () => {
     const root = h('aaa', h('bbb'), h('ccc'), h('ddd'));
 
-    expect($(root).children().previousAll().nodes).toStrictEqual([root.childNodes[0], root.childNodes[1]]);
+    expect($(root).children().preceding().nodes).toStrictEqual([root.childNodes[0], root.childNodes[1]]);
+  });
+
+  test('selects preceding siblings of nodes that are not in the document order', () => {
+    const root = h('aaa', h('bbb'), 'xxx', h('ccc'), h('ddd'), 'xxx', h('eee'));
+    const elements = $(root).children().nodes;
+    const query = new NodeQuery([elements[1], elements[3], elements[2]]);
+
+    expect(query.preceding().nodes).toStrictEqual([elements[0], elements[2], elements[1]]);
   });
 });
 

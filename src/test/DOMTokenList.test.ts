@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, expectTypeOf, test, vi } from 'vitest';
 import { DOMTokenList, type ValueAccessor } from '../main/index.ts';
 
 let valueMock: string | null = '';
@@ -292,6 +292,17 @@ describe('Symbol.iterator', () => {
     valueMock = 'aaa bbb';
 
     expect(Array.from(tokenList)).toEqual(['aaa', 'bbb']);
+  });
+
+  test('returns an iterator object', () => {
+    valueMock = 'aaa';
+
+    const iterator = new DOMTokenList(valueAccessorMock)[Symbol.iterator]();
+
+    expectTypeOf(iterator).toEqualTypeOf<IteratorObject<string>>();
+
+    // @ts-expect-error Iterator helpers aren't in the ES2020 lib
+    expect(iterator.toArray()).toStrictEqual(['aaa']);
   });
 });
 

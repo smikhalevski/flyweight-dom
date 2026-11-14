@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, expectTypeOf, test } from 'vitest';
 import { createElementFactory, h } from '../main/dsl.ts';
 import { ChildNode, Comment, Document, Element, ParentNode, Text } from '../main/index.ts';
 import { $, NodeQuery } from '../main/query.ts';
@@ -891,6 +891,24 @@ describe('NodeQuery.getAttributeNS', () => {
   });
 });
 
+describe('NodeQuery.length', () => {
+  test('returns the number of nodes', () => {
+    expect($(h('aaa', h('bbb'), h('ccc'))).children().length).toBe(2);
+  });
+});
+
+describe('NodeQuery.node', () => {
+  test('returns the first node', () => {
+    const element = h('bbb');
+
+    expect($(h('aaa', element, h('ccc'))).children().node).toBe(element);
+  });
+
+  test('returns null if there are no nodes', () => {
+    expect($(h('aaa')).children().node).toBeNull();
+  });
+});
+
 describe('NodeQuery.text', () => {
   test('returns the concatenated text content of nodes', () => {
     const root = h('aaa', h('bbb', 'xxx', h('ccc', 'yyy')), h('ddd', 'zzz'));
@@ -899,7 +917,7 @@ describe('NodeQuery.text', () => {
   });
 
   test('returns an empty string for a node without text content', () => {
-    expect($(new Document()).text).toBe('');
+    expect($(new Document()).text).toBeNull();
   });
 });
 
@@ -962,6 +980,10 @@ describe('NodeQuery.queries', () => {
     // @ts-expect-error Iterator helpers aren't in the ES2020 lib
     expect($(element).queries().toArray()[0].nodes).toStrictEqual([element]);
   });
+
+  test('returns an iterator object', () => {
+    expectTypeOf($(h('aaa')).queries()).toEqualTypeOf<IteratorObject<NodeQuery<Element>>>();
+  });
 });
 
 describe('NodeQuery[Symbol.iterator]', () => {
@@ -969,5 +991,15 @@ describe('NodeQuery[Symbol.iterator]', () => {
     const element = new Element('aaa');
 
     expect(Array.from($(element))).toStrictEqual([element]);
+  });
+
+  test('returns an iterator object', () => {
+    const element = new Element('aaa');
+    const iterator = $(element)[Symbol.iterator]();
+
+    expectTypeOf(iterator).toEqualTypeOf<IteratorObject<Element>>();
+
+    // @ts-expect-error Iterator helpers aren't in the ES2020 lib
+    expect(iterator.toArray()).toStrictEqual([element]);
   });
 });

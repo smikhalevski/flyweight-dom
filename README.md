@@ -225,6 +225,12 @@ const $links = $(document).descendants('a');
 // The selected nodes
 $links.nodes;
 
+// The first node, or null if there are no nodes
+$links.node;
+
+// The number of selected nodes
+$links.length;
+
 // Queries are iterable
 for (const link of $links) {
   // Process the link

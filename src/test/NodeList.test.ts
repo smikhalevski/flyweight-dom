@@ -1,6 +1,6 @@
 /// <reference lib="es2021.weakref" />
-import { describe, expect, test } from 'vitest';
-import { DocumentFragment, Element, Text } from '../main/index.ts';
+import { describe, expect, expectTypeOf, test } from 'vitest';
+import { type ChildNode, DocumentFragment, Element, Text } from '../main/index.ts';
 import { EmptyNodeList, ChildNodeIterator, ChildNodeList } from '../main/NodeList.ts';
 import { isElement, isText } from '../main/utils.ts';
 import { collectGarbage } from './test-utils.ts';
@@ -238,6 +238,18 @@ describe('ChildNodeList', () => {
       expect(new ChildNodeList(new Element('aaa').append(new Text(), new Text())).item(0.5)).toBeNull();
     });
   });
+
+  describe('values', () => {
+    test('returns an iterator object', () => {
+      const text = new Text();
+      const iterator = new ChildNodeList(new Element('aaa').append(text)).values();
+
+      expectTypeOf(iterator).toEqualTypeOf<IteratorObject<ChildNode>>();
+
+      // @ts-expect-error Iterator helpers aren't in the ES2020 lib
+      expect(iterator.toArray()).toStrictEqual([text]);
+    });
+  });
 });
 
 describe('EmptyNodeList', () => {
@@ -248,6 +260,17 @@ describe('EmptyNodeList', () => {
     expect(nodeList.item(0)).toBeNull();
     expect(nodeList[0]).toBeUndefined();
     expect(Array.from(nodeList)).toStrictEqual([]);
+  });
+
+  describe('values', () => {
+    test('returns an iterator object', () => {
+      const iterator = new EmptyNodeList().values();
+
+      expectTypeOf(iterator).toEqualTypeOf<IteratorObject<ChildNode>>();
+
+      // @ts-expect-error Iterator helpers aren't in the ES2020 lib
+      expect(iterator.toArray()).toStrictEqual([]);
+    });
   });
 });
 

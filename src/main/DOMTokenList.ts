@@ -189,11 +189,11 @@ export class DOMTokenList {
   /**
    * @see [DOMTokenList.values](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/values) on MDN
    */
-  values(): IterableIterator<string> {
+  values(): IteratorObject<string> {
     return getTokens(this).values();
   }
 
-  [Symbol.iterator](): IterableIterator<string> {
+  [Symbol.iterator](): IteratorObject<string> {
     return this.values();
   }
 

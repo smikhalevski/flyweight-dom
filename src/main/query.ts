@@ -98,13 +98,33 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   ) {}
 
   /**
-   * Returns the concatenated text content of {@link nodes}.
+   * Returns the number of {@link nodes}.
    */
-  get text(): string {
-    let text = '';
+  get length(): number {
+    return this.nodes.length;
+  }
+
+  /**
+   * Returns the first of {@link nodes}, or `null` if there are no nodes.
+   */
+  get node(): TNode | null {
+    return this.nodes.length === 0 ? null : this.nodes[0];
+  }
+
+  /**
+   * Returns the concatenated text content of {@link nodes}, or `null` if none of them has text content, such as when
+   * the query is empty or selects only documents and doctypes.
+   */
+  get text(): string | null {
+    let text: string | null = null;
 
     for (const node of this.nodes) {
-      text += node.textContent ?? '';
+      const { textContent } = node;
+
+      if (textContent === null) {
+        continue;
+      }
+      text = text === null ? textContent : text + textContent;
     }
 
     return text;
@@ -790,11 +810,11 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    *
    * Queries are created as the iterator reaches them, so a loop that stops early doesn't create the rest.
    */
-  queries(): IterableIterator<NodeQuery<TNode>> {
+  queries(): IteratorObject<NodeQuery<TNode>> {
     return new NodeQueryIterator(this.nodes);
   }
 
-  [Symbol.iterator](): IterableIterator<TNode> {
+  [Symbol.iterator](): IteratorObject<TNode> {
     return this.nodes[Symbol.iterator]();
   }
 }
@@ -840,7 +860,7 @@ const getAttributeAnyNS = (element: Element, localName: string): string | null =
 /**
  * The iterator over queries that hold one node each, which {@link NodeQuery.queries} returns.
  */
-class NodeQueryIterator<TNode extends Node> implements IterableIterator<NodeQuery<TNode>> {
+class NodeQueryIterator<TNode extends Node> {
   private _nodes;
   private _index = 0;
 
@@ -862,6 +882,11 @@ class NodeQueryIterator<TNode extends Node> implements IterableIterator<NodeQuer
 }
 
 Object.setPrototypeOf(NodeQueryIterator.prototype, iteratorPrototype);
+
+/**
+ * Declares the members that {@link NodeQueryIterator} inherits from the iterator prototype.
+ */
+interface NodeQueryIterator<TNode extends Node> extends IteratorObject<NodeQuery<TNode>> {}
 
 retainHiddenClasses(new NodeQuery([]), new NodeQueryIterator([]));
 

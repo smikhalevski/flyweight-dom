@@ -27,9 +27,9 @@ export abstract class NodeList<T extends ChildNode = ChildNode> implements Itera
   /**
    * @see [NodeList.values](https://developer.mozilla.org/en-US/docs/Web/API/NodeList/values) on MDN
    */
-  abstract values(): IterableIterator<T>;
+  abstract values(): IteratorObject<T>;
 
-  [Symbol.iterator](): IterableIterator<T> {
+  [Symbol.iterator](): IteratorObject<T> {
     return this.values();
   }
 }
@@ -49,7 +49,7 @@ export class EmptyNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
     return null;
   }
 
-  values(): IterableIterator<T> {
+  values(): IteratorObject<T> {
     // An array iterator is faster to create and iterate than a generator
     return noNodes.values();
   }
@@ -140,7 +140,7 @@ export class ChildNodeList<T extends ChildNode = ChildNode> extends NodeList<T> 
     return node as T | null;
   }
 
-  values(): IterableIterator<T> {
+  values(): IteratorObject<T> {
     const target = this._target;
 
     return new ChildNodeIterator(target._parent, target._filter);
@@ -253,7 +253,7 @@ const getChildrenVersion = (parent: Node): number => {
  * A class rather than a generator, since V8 inlines {@link next} into `for…of` loops, which makes iterating about
  * twice as fast.
  */
-export class ChildNodeIterator<T extends ChildNode = ChildNode> implements IterableIterator<T> {
+export class ChildNodeIterator<T extends ChildNode = ChildNode> {
   private _parent;
   private _filter;
 
@@ -328,6 +328,11 @@ export class ChildNodeIterator<T extends ChildNode = ChildNode> implements Itera
 }
 
 Object.setPrototypeOf(ChildNodeIterator.prototype, iteratorPrototype);
+
+/**
+ * Declares the members that {@link ChildNodeIterator} inherits from the iterator prototype.
+ */
+export interface ChildNodeIterator<T extends ChildNode = ChildNode> extends IteratorObject<T> {}
 
 /**
  * Returns the child at the index, counting only children that pass the filter, or `null` if there's no such child.

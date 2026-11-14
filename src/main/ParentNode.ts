@@ -83,7 +83,7 @@ export interface ParentNode extends Node, Iterable<ChildNode> {
    * node before the current child returns the current child again. Iterate over a copy, like `Array.from(parent)`, if
    * the loop changes children.
    */
-  [Symbol.iterator](): IterableIterator<ChildNode>;
+  [Symbol.iterator](): IteratorObject<ChildNode>;
 }
 
 const parentConstructorMap = new WeakMap();
@@ -262,7 +262,7 @@ export function ParentNode(constructor: new () => Node = Node) {
       return super.cloneNode(deep) as ParentNode;
     }
 
-    [Symbol.iterator](): IterableIterator<ChildNode> {
+    [Symbol.iterator](): IteratorObject<ChildNode> {
       return new ChildNodeIterator(this, undefined);
     }
   };

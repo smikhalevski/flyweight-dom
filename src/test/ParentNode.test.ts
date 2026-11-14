@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, expectTypeOf, test } from 'vitest';
 import { ChildNode, Document, Element, Node, NodeList, ParentNode, Text } from '../main/index.ts';
 import { getChildNodes } from './test-utils.ts';
 
@@ -427,6 +427,16 @@ describe('Symbol.iterator', () => {
     const node = new Element('aaa').append('text1', 'text2');
 
     expect(Array.from(node)).toEqual([node.childNodes[0], node.childNodes[1]]);
+  });
+
+  test('returns an iterator object', () => {
+    const text = new Text();
+    const iterator = new Element('aaa').append(text)[Symbol.iterator]();
+
+    expectTypeOf(iterator).toEqualTypeOf<IteratorObject<ChildNode>>();
+
+    // @ts-expect-error Iterator helpers aren't in the ES2020 lib
+    expect(iterator.toArray()).toStrictEqual([text]);
   });
 
   test('does not yield children of another parent if a child is moved during iteration', () => {

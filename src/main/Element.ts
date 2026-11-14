@@ -3,20 +3,29 @@ import { DOMTokenList, type ValueAccessor } from './DOMTokenList.ts';
 import { getElementsByClassName } from './getElementsByClassName.ts';
 import { getElementsByTagName } from './getElementsByTagName.ts';
 import { getElementsByTagNameNS } from './getElementsByTagNameNS.ts';
-import { lookupNamespaceURI } from './lookupNamespaceURI.ts';
+import { lookupNamespaceURI as importedLookupNamespaceURI } from './lookupNamespaceURI.ts';
 import type { Node } from './Node.ts';
 import { ParentNode } from './ParentNode.ts';
 import { getTextContent, setTextContent, Text } from './Text.ts';
-import { uncheckedCloneChildren } from './uncheckedCloneChildren.ts';
+import { uncheckedCloneChildren as importedUncheckedCloneChildren } from './uncheckedCloneChildren.ts';
 import {
-  coerceToString,
+  coerceToString as importedCoerceToString,
   defineNodeType,
   ELEMENT_NODE,
-  hasOwnProperty,
-  isEqualChildNodes,
-  isEqualConstructor,
+  hasOwnProperty as importedHasOwnProperty,
+  isEqualChildNodes as importedIsEqualChildNodes,
+  isEqualConstructor as importedIsEqualConstructor,
+  retainHiddenClasses,
   XMLNS_NAMESPACE,
 } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const lookupNamespaceURI = importedLookupNamespaceURI;
+const uncheckedCloneChildren = importedUncheckedCloneChildren;
+const coerceToString = importedCoerceToString;
+const hasOwnProperty = importedHasOwnProperty;
+const isEqualChildNodes = importedIsEqualChildNodes;
+const isEqualConstructor = importedIsEqualConstructor;
 
 /**
  * The position is case-insensitive.
@@ -377,7 +386,7 @@ class ClassAttributeAccessor implements ValueAccessor {
  * Returns `true` if both objects have the same attributes. Both objects are enumerated the same way, so the result
  * doesn't depend on the order of arguments.
  */
-function isEqualAttributes(attributes: Record<string, string>, otherAttributes: Record<string, string>): boolean {
+const isEqualAttributes = (attributes: Record<string, string>, otherAttributes: Record<string, string>): boolean => {
   let count = 0;
 
   for (const name in attributes) {
@@ -392,7 +401,7 @@ function isEqualAttributes(attributes: Record<string, string>, otherAttributes: 
   }
 
   return count === 0;
-}
+};
 
 /**
  * Returns the name of the attribute with the given namespace and local name, or `null` if the element has no such
@@ -402,11 +411,11 @@ function isEqualAttributes(attributes: Record<string, string>, otherAttributes: 
  * namespace that its prefix is bound to, and an attribute without a prefix has no namespace, since the default
  * namespace doesn't apply to attributes.
  */
-function getAttributeNameNS(
+const getAttributeNameNS = (
   element: Element,
   namespaceURI: string | null | undefined,
   localName: string
-): string | null {
+): string | null => {
   const { attributes } = element;
 
   if (namespaceURI === null || namespaceURI === undefined || namespaceURI === '') {
@@ -438,9 +447,9 @@ function getAttributeNameNS(
   }
 
   return null;
-}
+};
 
-function insertAdjacentNode<T extends Node>(element: Element, position: InsertPosition, node: T): T | null {
+const insertAdjacentNode = <T extends Node>(element: Element, position: InsertPosition, node: T): T | null => {
   switch (position.toLowerCase()) {
     case 'beforebegin':
       if (element.parentNode === null) {
@@ -471,4 +480,12 @@ function insertAdjacentNode<T extends Node>(element: Element, position: InsertPo
   }
 
   return node;
-}
+};
+
+// Also keeps classes of objects that an element creates on first use: its class list, list of children, caches of the
+// list, and iterator. Reading a child creates the list and its caches, even if there's no child
+const retainedElement = new Element('');
+
+retainedElement.children.item(0);
+
+retainHiddenClasses(retainedElement, retainedElement.classList, retainedElement[Symbol.iterator]());

@@ -1,7 +1,7 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { ParentNode } from './ParentNode.ts';
 
-export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void {
+export const uncheckedAppendChild = (parent: ParentNode, node: ChildNode): void => {
   const { lastChild } = parent;
 
   parent['_notifyChildrenChanged']();
@@ -15,4 +15,4 @@ export function uncheckedAppendChild(parent: ParentNode, node: ChildNode): void 
   } else {
     parent.firstChild = node;
   }
-}
+};

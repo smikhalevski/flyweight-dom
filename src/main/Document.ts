@@ -7,7 +7,14 @@ import { getElementsByTagName } from './getElementsByTagName.ts';
 import { getElementsByTagNameNS } from './getElementsByTagNameNS.ts';
 import { ParentNode } from './ParentNode.ts';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.ts';
-import { defineNodeType, DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ELEMENT_NODE, getNextSiblingOrSelf } from './utils.ts';
+import {
+  defineNodeType,
+  DOCUMENT_NODE,
+  DOCUMENT_TYPE_NODE,
+  ELEMENT_NODE,
+  getNextSiblingOrSelf,
+  retainHiddenClasses,
+} from './utils.ts';
 
 /**
  * @see [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document) on MDN
@@ -98,3 +105,5 @@ export class Document extends ParentNode() {
 }
 
 defineNodeType(Document, DOCUMENT_NODE, '#document');
+
+retainHiddenClasses(new Document());

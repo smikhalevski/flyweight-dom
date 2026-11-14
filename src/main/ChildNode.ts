@@ -1,9 +1,20 @@
 import type { Element } from './Element.ts';
 import { Node } from './Node.ts';
-import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
-import { assertInsertable } from './uncheckedToInsertableNode.ts';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf } from './utils.ts';
+import { uncheckedInsertNodeAfter as importedUncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
+import { uncheckedRemoveChild as importedUncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { assertInsertable as importedAssertInsertable } from './uncheckedToInsertableNode.ts';
+import {
+  ELEMENT_NODE,
+  getNextSiblingOrSelf as importedGetNextSiblingOrSelf,
+  getPreviousSiblingOrSelf as importedGetPreviousSiblingOrSelf,
+} from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const uncheckedInsertNodeAfter = importedUncheckedInsertNodeAfter;
+const uncheckedRemoveChild = importedUncheckedRemoveChild;
+const assertInsertable = importedAssertInsertable;
+const getNextSiblingOrSelf = importedGetNextSiblingOrSelf;
+const getPreviousSiblingOrSelf = importedGetPreviousSiblingOrSelf;
 
 /**
  * The node that can be a child of another node.

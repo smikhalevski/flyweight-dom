@@ -3,7 +3,7 @@ import { getElementById } from './getElementById.ts';
 import { ParentNode } from './ParentNode.ts';
 import { getTextContent, setTextContent } from './Text.ts';
 import { uncheckedCloneChildren } from './uncheckedCloneChildren.ts';
-import { defineNodeType, DOCUMENT_FRAGMENT_NODE } from './utils.ts';
+import { defineNodeType, DOCUMENT_FRAGMENT_NODE, retainHiddenClasses } from './utils.ts';
 
 /**
  * @see [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) on MDN
@@ -36,3 +36,5 @@ export class DocumentFragment extends ParentNode() {
 }
 
 defineNodeType(DocumentFragment, DOCUMENT_FRAGMENT_NODE, '#document-fragment');
+
+retainHiddenClasses(new DocumentFragment());

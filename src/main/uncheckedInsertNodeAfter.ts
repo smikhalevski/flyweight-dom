@@ -1,9 +1,15 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { ParentNode } from './ParentNode.ts';
-import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.ts';
-import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.ts';
-import { uncheckedToInsertableNode } from './uncheckedToInsertableNode.ts';
-import { isDocumentFragment } from './utils.ts';
+import { uncheckedRemoveAndAppendChild as importedUncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.ts';
+import { uncheckedRemoveAndInsertBefore as importedUncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.ts';
+import { uncheckedToInsertableNode as importedUncheckedToInsertableNode } from './uncheckedToInsertableNode.ts';
+import { isDocumentFragment as importedIsDocumentFragment } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const uncheckedRemoveAndAppendChild = importedUncheckedRemoveAndAppendChild;
+const uncheckedRemoveAndInsertBefore = importedUncheckedRemoveAndInsertBefore;
+const uncheckedToInsertableNode = importedUncheckedToInsertableNode;
+const isDocumentFragment = importedIsDocumentFragment;
 
 /**
  * Inserts the value after the anchor, or as the first child if the anchor is `null`, and returns the anchor for the
@@ -14,11 +20,11 @@ import { isDocumentFragment } from './utils.ts';
  * before that end up in front of it. So the result is the same as inserting a fragment of all values, see
  * [converting nodes into a node](https://dom.spec.whatwg.org/#converting-nodes-into-a-node).
  */
-export function uncheckedInsertNodeAfter(
+export const uncheckedInsertNodeAfter = (
   parent: ParentNode,
   value: unknown,
   anchor: ChildNode | null
-): ChildNode | null {
+): ChildNode | null => {
   const node = uncheckedToInsertableNode(value);
 
   if (node === null) {
@@ -41,4 +47,4 @@ export function uncheckedInsertNodeAfter(
     uncheckedRemoveAndAppendChild(parent, node);
   }
   return nextAnchor;
-}
+};

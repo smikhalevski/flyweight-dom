@@ -3,8 +3,12 @@ import type { DocumentFragment } from './DocumentFragment.ts';
 import type { Node } from './Node.ts';
 import type { ParentNode } from './ParentNode.ts';
 import { Text } from './Text.ts';
-import { uncheckedContains } from './uncheckedContains.ts';
-import { ATTRIBUTE_NODE, coerceToString, DOCUMENT_NODE } from './utils.ts';
+import { uncheckedContains as importedUncheckedContains } from './uncheckedContains.ts';
+import { ATTRIBUTE_NODE, coerceToString as importedCoerceToString, DOCUMENT_NODE } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const uncheckedContains = importedUncheckedContains;
+const coerceToString = importedCoerceToString;
 
 export type InsertableNode = DocumentFragment | ChildNode;
 
@@ -23,7 +27,7 @@ export function assertInsertableNode(parent: ParentNode, node: Node): asserts no
 /**
  * Throws if the value can't be inserted into the parent. Primitives can be inserted, since they are converted to text.
  */
-export function assertInsertable(parent: ParentNode, value: unknown): void {
+export const assertInsertable = (parent: ParentNode, value: unknown): void => {
   if (typeof value === 'function') {
     throw new Error('The value must be a Node or a primitive');
   }
@@ -37,7 +41,7 @@ export function assertInsertable(parent: ParentNode, value: unknown): void {
   }
 
   assertInsertableNode(parent, value as Node);
-}
+};
 
 /**
  * Returns the node, or a text node with the stringified value, or `null` if the value is `null` or `undefined`, so it
@@ -45,9 +49,9 @@ export function assertInsertable(parent: ParentNode, value: unknown): void {
  *
  * **Note:** The value must be checked by {@link assertInsertable}, so an object is always a node.
  */
-export function uncheckedToInsertableNode(value: unknown): InsertableNode | null {
+export const uncheckedToInsertableNode = (value: unknown): InsertableNode | null => {
   if (typeof value === 'object' && value !== null) {
     return value as InsertableNode;
   }
   return value === null || value === undefined ? null : new Text(coerceToString(value));
-}
+};

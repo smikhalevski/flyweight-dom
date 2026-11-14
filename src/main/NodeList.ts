@@ -191,7 +191,7 @@ export class ChildrenCache {
 /**
  * Returns the cache of a list of children of the parent that pass the filter, and creates it if there's none.
  */
-function getChildrenCache(parent: Node, filter: ChildFilter | undefined): ChildrenCache {
+const getChildrenCache = (parent: Node, filter: ChildFilter | undefined): ChildrenCache => {
   let cache = parent['_childrenCache'];
 
   // Not an object if children changed, if only iterators read them since then, or if the parent is a leaf node
@@ -211,7 +211,7 @@ function getChildrenCache(parent: Node, filter: ChildFilter | undefined): Childr
     filteredCache = cache.filteredCache = new ChildrenCache(cache.version, filter);
   }
   return filteredCache;
-}
+};
 
 /**
  * The version that {@link nextChildrenVersion} returned last.
@@ -221,16 +221,16 @@ let lastChildrenVersion = 0;
 /**
  * Returns a version that no parent had before.
  */
-function nextChildrenVersion(): number {
+const nextChildrenVersion = (): number => {
   // Masked to stay a small integer, which V8 stores without allocating
   return (lastChildrenVersion = (lastChildrenVersion + 1) & 0x3fffffff);
-}
+};
 
 /**
  * Returns the version of children of the parent, which changes each time children change. The version is assigned on
  * read rather than on change, so changing children costs a single store.
  */
-function getChildrenVersion(parent: Node): number {
+const getChildrenVersion = (parent: Node): number => {
   const childrenCache = parent['_childrenCache'];
 
   if (typeof childrenCache === 'number') {
@@ -241,7 +241,7 @@ function getChildrenVersion(parent: Node): number {
   }
   // Children changed, or the parent is a leaf node
   return (parent['_childrenCache'] = nextChildrenVersion());
-}
+};
 
 /**
  * Iterates over children of a parent that pass the filter.
@@ -332,20 +332,20 @@ Object.setPrototypeOf(ChildNodeIterator.prototype, iteratorPrototype);
 /**
  * Returns the child at the index, counting only children that pass the filter, or `null` if there's no such child.
  */
-function getChildAt(parent: Node, index: number, filter: ChildFilter | undefined): ChildNode | null {
+const getChildAt = (parent: Node, index: number, filter: ChildFilter | undefined): ChildNode | null => {
   return getSiblingAt(getNextFilteredSiblingOrSelf(parent.firstChild, filter), 0, index, filter);
-}
+};
 
 /**
  * Walks siblings from the node at the given index to the node at the target index, counting only nodes that pass the
  * filter. Returns `null` if there's no node at the target index.
  */
-function getSiblingAt(
+const getSiblingAt = (
   node: ChildNode | null,
   nodeIndex: number,
   targetIndex: number,
   filter: ChildFilter | undefined
-): ChildNode | null {
+): ChildNode | null => {
   while (node !== null && nodeIndex < targetIndex) {
     node = getNextFilteredSiblingOrSelf(node.nextSibling, filter);
     ++nodeIndex;
@@ -357,32 +357,35 @@ function getSiblingAt(
   }
 
   return node;
-}
+};
 
 /**
  * Returns the node or its first following sibling that passes the filter.
  */
-function getNextFilteredSiblingOrSelf(node: ChildNode | null, filter: ChildFilter | undefined): ChildNode | null {
+const getNextFilteredSiblingOrSelf = (node: ChildNode | null, filter: ChildFilter | undefined): ChildNode | null => {
   while (node !== null && filter !== undefined && !filter(node)) {
     node = node.nextSibling;
   }
   return node;
-}
+};
 
 /**
  * Returns the node or its first preceding sibling that passes the filter.
  */
-function getPreviousFilteredSiblingOrSelf(node: ChildNode | null, filter: ChildFilter | undefined): ChildNode | null {
+const getPreviousFilteredSiblingOrSelf = (
+  node: ChildNode | null,
+  filter: ChildFilter | undefined
+): ChildNode | null => {
   while (node !== null && filter !== undefined && !filter(node)) {
     node = node.previousSibling;
   }
   return node;
-}
+};
 
 /**
  * Returns the array index that the key represents, or -1 if the key isn't an array index.
  */
-function parseArrayIndex(key: string | symbol): number {
+const parseArrayIndex = (key: string | symbol): number => {
   if (typeof key !== 'string' || key.length === 0) {
     return -1;
   }
@@ -407,7 +410,7 @@ function parseArrayIndex(key: string | symbol): number {
   }
 
   return index;
-}
+};
 
 const proxyHandler: ProxyHandler<ChildNodeList> = {
   get(target, key) {

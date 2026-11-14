@@ -27,6 +27,19 @@ export const XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
  */
 export const XMLNS_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 
+const retainedInstances: object[] = [];
+
+/**
+ * Keeps instances alive while the module is loaded, one per class.
+ *
+ * A major garbage collection that finds no instance of a class drops its hidden class, which discards optimized code
+ * that inlines methods or constructors of the class, so the next few calls are slow. A kept instance keeps the hidden
+ * class.
+ */
+export const retainHiddenClasses = (...instances: object[]): void => {
+  retainedInstances.push(...instances);
+};
+
 /**
  * The prototype of built-in iterators, which adds helpers like map() and toArray() in newer runtimes. Set it as the
  * prototype of a custom iterator class, so its instances get the helpers too.
@@ -35,9 +48,9 @@ export const iteratorPrototype: object = Object.getPrototypeOf(Object.getPrototy
 
 const objectHasOwnProperty = Object.prototype.hasOwnProperty;
 
-export function hasOwnProperty(object: object, key: PropertyKey): boolean {
+export const hasOwnProperty = (object: object, key: PropertyKey): boolean => {
   return objectHasOwnProperty.call(object, key);
-}
+};
 
 /**
  * Defines {@link Node.nodeType} and {@link Node.nodeName} on the prototype of a node class, so nodes don't spend memory
@@ -50,11 +63,11 @@ export function hasOwnProperty(object: object, key: PropertyKey): boolean {
  * @param nodeName The node name of class instances, or a callback that derives it from a node.
  * @template TNode The node class instance.
  */
-export function defineNodeType<TNode extends Node>(
+export const defineNodeType = <TNode extends Node>(
   constructor: { prototype: TNode },
   nodeType: number,
   nodeName: string | ((node: TNode) => string)
-): void {
+): void => {
   const { prototype } = constructor;
 
   Object.defineProperty(prototype, 'nodeType', { value: nodeType, writable: true, configurable: true });
@@ -76,47 +89,47 @@ export function defineNodeType<TNode extends Node>(
       Object.defineProperty(this, 'nodeName', { value, writable: true, enumerable: true, configurable: true });
     },
   });
-}
+};
 
-export function isElement(node: Node): node is Element {
+export const isElement = (node: Node): node is Element => {
   return node.nodeType === ELEMENT_NODE;
-}
+};
 
-export function isDocumentFragment(node: Node): node is DocumentFragment {
+export const isDocumentFragment = (node: Node): node is DocumentFragment => {
   return node.nodeType === DOCUMENT_FRAGMENT_NODE;
-}
+};
 
-export function getPreviousSiblingOrSelf(node: Node | null, nodeType: number): Node | null {
+export const getPreviousSiblingOrSelf = (node: Node | null, nodeType: number): Node | null => {
   while (node !== null && node.nodeType !== nodeType) {
     node = node.previousSibling;
   }
   return node;
-}
+};
 
-export function getNextSiblingOrSelf(node: Node | null, nodeType: number): Node | null {
+export const getNextSiblingOrSelf = (node: Node | null, nodeType: number): Node | null => {
   while (node !== null && node.nodeType !== nodeType) {
     node = node.nextSibling;
   }
   return node;
-}
+};
 
-export function isText(node: Node): node is Text {
+export const isText = (node: Node): node is Text => {
   return node.nodeType === TEXT_NODE || node.nodeType === CDATA_SECTION_NODE;
-}
+};
 
 /**
  * Truncates the value to an integer, or returns 0 if the value is negative or NaN.
  */
-export function coerceToNonNegativeInteger(value: number): number {
+export const coerceToNonNegativeInteger = (value: number): number => {
   return value > 0 ? Math.trunc(value) : 0;
-}
+};
 
-export function coerceToString(value: unknown): string {
+export const coerceToString = (value: unknown): string => {
   return typeof value === 'string' ? value : value === null || value === undefined ? '' : String(value);
-}
+};
 
 // https://infra.spec.whatwg.org/#ascii-whitespace
-export function isSpaceChar(charCode: number): boolean {
+export const isSpaceChar = (charCode: number): boolean => {
   return (
     charCode === /* \s */ 32 ||
     charCode === /* \n */ 10 ||
@@ -124,13 +137,13 @@ export function isSpaceChar(charCode: number): boolean {
     charCode === /* \r */ 13 ||
     charCode === /* \f */ 12
   );
-}
+};
 
-export function isEqualConstructor<T extends Node>(node: T, otherNode: Node | null | undefined): otherNode is T {
+export const isEqualConstructor = <T extends Node>(node: T, otherNode: Node | null | undefined): otherNode is T => {
   return otherNode !== null && otherNode !== undefined && otherNode.constructor === node.constructor;
-}
+};
 
-export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
+export const isEqualChildNodes = (node: Node, otherNode: Node): boolean => {
   let child = node.firstChild;
   let otherChild = otherNode.firstChild;
 
@@ -140,4 +153,4 @@ export function isEqualChildNodes(node: Node, otherNode: Node): boolean {
   }
 
   return child === null && otherChild === null;
-}
+};

@@ -1,10 +1,15 @@
 import type { ParentNode } from './ParentNode.ts';
-import { uncheckedAppendChild } from './uncheckedAppendChild.ts';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { uncheckedAppendChild as importedUncheckedAppendChild } from './uncheckedAppendChild.ts';
+import { uncheckedRemoveChild as importedUncheckedRemoveChild } from './uncheckedRemoveChild.ts';
 import type { InsertableNode } from './uncheckedToInsertableNode.ts';
-import { isDocumentFragment } from './utils.ts';
+import { isDocumentFragment as importedIsDocumentFragment } from './utils.ts';
 
-export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: InsertableNode): void {
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const uncheckedAppendChild = importedUncheckedAppendChild;
+const uncheckedRemoveChild = importedUncheckedRemoveChild;
+const isDocumentFragment = importedIsDocumentFragment;
+
+export const uncheckedRemoveAndAppendChild = (parent: ParentNode, node: InsertableNode): void => {
   if (isDocumentFragment(node)) {
     node['_notifyChildrenChanged']();
 
@@ -28,4 +33,4 @@ export function uncheckedRemoveAndAppendChild(parent: ParentNode, node: Insertab
   }
 
   uncheckedAppendChild(parent, node);
-}
+};

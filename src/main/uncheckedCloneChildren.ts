@@ -1,7 +1,7 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { ParentNode } from './ParentNode.ts';
 
-export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: ParentNode): void {
+export const uncheckedCloneChildren = (sourceParent: ParentNode, targetParent: ParentNode): void => {
   const { firstChild } = sourceParent;
 
   if (firstChild === null || sourceParent === targetParent) {
@@ -28,4 +28,4 @@ export function uncheckedCloneChildren(sourceParent: ParentNode, targetParent: P
   }
 
   targetParent.lastChild = lastChild;
-}
+};

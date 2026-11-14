@@ -2,17 +2,26 @@ import { CharacterData } from './CharacterData.ts';
 import type { ChildNode } from './ChildNode.ts';
 import type { Node } from './Node.ts';
 import type { ParentNode } from './ParentNode.ts';
-import { uncheckedAppendChild } from './uncheckedAppendChild.ts';
-import { uncheckedInsertBefore } from './uncheckedInsertBefore.ts';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { uncheckedAppendChild as importedUncheckedAppendChild } from './uncheckedAppendChild.ts';
+import { uncheckedInsertBefore as importedUncheckedInsertBefore } from './uncheckedInsertBefore.ts';
+import { uncheckedRemoveChild as importedUncheckedRemoveChild } from './uncheckedRemoveChild.ts';
 import {
+  coerceToNonNegativeInteger as importedCoerceToNonNegativeInteger,
+  coerceToString as importedCoerceToString,
   defineNodeType,
   ELEMENT_NODE,
-  isText,
+  isText as importedIsText,
+  retainHiddenClasses,
   TEXT_NODE,
-  coerceToString,
-  coerceToNonNegativeInteger,
 } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const uncheckedAppendChild = importedUncheckedAppendChild;
+const uncheckedInsertBefore = importedUncheckedInsertBefore;
+const uncheckedRemoveChild = importedUncheckedRemoveChild;
+const isText = importedIsText;
+const coerceToString = importedCoerceToString;
+const coerceToNonNegativeInteger = importedCoerceToNonNegativeInteger;
 
 /**
  * @see [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) on MDN
@@ -67,7 +76,9 @@ export class Text extends CharacterData {
 
 defineNodeType(Text, TEXT_NODE, '#text');
 
-export function setTextContent(node: ParentNode, value: string | null | undefined): void {
+retainHiddenClasses(new Text());
+
+export const setTextContent = (node: ParentNode, value: string | null | undefined): void => {
   // Converted before children are removed, so a value that can't be converted doesn't leave the node without children
   const data = coerceToString(value);
 
@@ -78,12 +89,12 @@ export function setTextContent(node: ParentNode, value: string | null | undefine
   if (data.length !== 0) {
     uncheckedAppendChild(node, new Text(data));
   }
-}
+};
 
 /**
  * Returns the concatenated data of all text descendants, ignoring comments, processing instructions and doctypes.
  */
-export function getTextContent(node: Node): string {
+export const getTextContent = (node: Node): string => {
   let textContent = '';
 
   for (let child = node.firstChild; child !== null; child = child.nextSibling) {
@@ -95,4 +106,4 @@ export function getTextContent(node: Node): string {
   }
 
   return textContent;
-}
+};

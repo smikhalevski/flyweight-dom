@@ -1,7 +1,11 @@
 import type { Element } from './Element.ts';
-import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
+import { getNextDescendantInDocumentOrder as importedGetNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { coerceToString, isElement } from './utils.ts';
+import { coerceToString, isElement as importedIsElement } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const getNextDescendantInDocumentOrder = importedGetNextDescendantInDocumentOrder;
+const isElement = importedIsElement;
 
 /**
  * Returns an array of elements with the given namespace and local name.
@@ -11,11 +15,11 @@ import { coerceToString, isElement } from './utils.ts';
  * @param localName The local name of the elements. The special string `*` represents all elements.
  * @see [getElementsByTagNameNS](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByTagNameNS) on MDN
  */
-export function getElementsByTagNameNS(
+export const getElementsByTagNameNS = (
   root: Node,
   namespaceURI: string | null | undefined,
   localName: string
-): Element[] {
+): Element[] => {
   if (namespaceURI === undefined || namespaceURI === '') {
     namespaceURI = null;
   }
@@ -31,7 +35,7 @@ export function getElementsByTagNameNS(
   }
 
   return elements;
-}
+};
 
 /**
  * Returns `true` if the element has the given namespace and local name.
@@ -40,17 +44,17 @@ export function getElementsByTagNameNS(
  * @param namespaceURI The namespace of the element. The special string `*` represents all namespaces.
  * @param localName The local name of the element. The special string `*` represents all elements.
  */
-export function isMatchingName(element: Element, namespaceURI: string | null, localName: string): boolean {
+export const isMatchingName = (element: Element, namespaceURI: string | null, localName: string): boolean => {
   return (
     (namespaceURI === '*' || element.namespaceURI === namespaceURI) &&
     (localName === '*' || isEqualLocalName(element, localName))
   );
-}
+};
 
 /**
  * Returns `true` if the element has the given local name.
  */
-function isEqualLocalName(element: Element, localName: string): boolean {
+const isEqualLocalName = (element: Element, localName: string): boolean => {
   const { tagName } = element;
 
   if (element.namespaceURI === null) {
@@ -58,4 +62,4 @@ function isEqualLocalName(element: Element, localName: string): boolean {
   }
 
   return tagName.length - tagName.indexOf(':') - 1 === localName.length && tagName.endsWith(localName);
-}
+};

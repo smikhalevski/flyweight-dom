@@ -18,9 +18,9 @@
 
 import type { ChildNode } from './ChildNode.ts';
 import { splitTokens } from './DOMTokenList.ts';
-import { hasClassNames } from './getElementsByClassName.ts';
-import { isMatchingName } from './getElementsByTagNameNS.ts';
-import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
+import { hasClassNames as importedHasClassNames } from './getElementsByClassName.ts';
+import { isMatchingName as importedIsMatchingName } from './getElementsByTagNameNS.ts';
+import { getNextDescendantInDocumentOrder as importedGetNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 // Classes are imported from the main entry point, since modules of node classes depend on each other, and they must be
 // evaluated in the order that the main entry point imports them in. Otherwise, the import of this module fails if it
 // goes before the import of the main entry point
@@ -28,13 +28,24 @@ import { DocumentFragment, Element } from './index.ts';
 import type { Node } from './Node.ts';
 import {
   ELEMENT_NODE,
-  getNextSiblingOrSelf,
-  getPreviousSiblingOrSelf,
-  hasOwnProperty,
-  isElement,
-  isText,
+  getNextSiblingOrSelf as importedGetNextSiblingOrSelf,
+  getPreviousSiblingOrSelf as importedGetPreviousSiblingOrSelf,
+  hasOwnProperty as importedHasOwnProperty,
+  isElement as importedIsElement,
+  isText as importedIsText,
   iteratorPrototype,
+  retainHiddenClasses,
 } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const hasClassNames = importedHasClassNames;
+const isMatchingName = importedIsMatchingName;
+const getNextDescendantInDocumentOrder = importedGetNextDescendantInDocumentOrder;
+const getNextSiblingOrSelf = importedGetNextSiblingOrSelf;
+const getPreviousSiblingOrSelf = importedGetPreviousSiblingOrSelf;
+const hasOwnProperty = importedHasOwnProperty;
+const isElement = importedIsElement;
+const isText = importedIsText;
 
 /**
  * Creates a query that holds the given node, so its children and descendants can be selected.
@@ -792,7 +803,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
  * Returns the value of the attribute with the given local name in any namespace or in no namespace, or `null` if the
  * element has no such attribute. If several attributes match, the value of the first one is returned.
  */
-function getAttributeAnyNS(element: Element, localName: string): string | null {
+const getAttributeAnyNS = (element: Element, localName: string): string | null => {
   const { attributes } = element;
 
   for (const name in attributes) {
@@ -824,7 +835,7 @@ function getAttributeAnyNS(element: Element, localName: string): string | null {
   }
 
   return null;
-}
+};
 
 /**
  * The iterator over queries that hold one node each, which {@link NodeQuery.queries} returns.
@@ -852,10 +863,12 @@ class NodeQueryIterator<TNode extends Node> implements IterableIterator<NodeQuer
 
 Object.setPrototypeOf(NodeQueryIterator.prototype, iteratorPrototype);
 
+retainHiddenClasses(new NodeQuery([]), new NodeQueryIterator([]));
+
 /**
  * Returns `true` if the string meets the predicate.
  */
-function isMatchingString(value: string, predicate: StringPredicate | undefined): boolean {
+const isMatchingString = (value: string, predicate: StringPredicate | undefined): boolean => {
   if (predicate === undefined) {
     return true;
   }
@@ -868,25 +881,25 @@ function isMatchingString(value: string, predicate: StringPredicate | undefined)
 
   // Unlike RegExp.test, the search doesn't depend on lastIndex of a global expression, and doesn't change it
   return value.search(predicate) !== -1;
-}
+};
 
 /**
  * Returns `true` if the node has neither child elements nor text with data. Comments and processing instructions
  * don't count, the same as for the `:empty` selector in CSS.
  */
-function hasNoContent(node: Node): boolean {
+const hasNoContent = (node: Node): boolean => {
   for (let child = node.firstChild; child !== null; child = child.nextSibling) {
     if (isElement(child) || (isText(child) && child.data.length !== 0)) {
       return false;
     }
   }
   return true;
-}
+};
 
 /**
  * Returns `true` if the text content of the node meets the predicate.
  */
-function hasMatchingTextContent(node: Node, predicate: StringPredicate | undefined): boolean {
+const hasMatchingTextContent = (node: Node, predicate: StringPredicate | undefined): boolean => {
   // The text content of an element is the text of its descendants, and it is slow to concatenate. So descendants are
   // read first to tell whether there's any text, or whether the text can be equal to the string. Subclasses may have
   // their own text content, so their getter is always called
@@ -906,19 +919,19 @@ function hasMatchingTextContent(node: Node, predicate: StringPredicate | undefin
     textContent !== null &&
     (predicate !== undefined ? isMatchingString(textContent, predicate) : textContent.length !== 0)
   );
-}
+};
 
 /**
  * Returns `true` if the text content of the node isn't empty. Reads the same descendants as {@link getTextContent} does.
  */
-function hasTextContent(node: Node): boolean {
+const hasTextContent = (node: Node): boolean => {
   for (let child = node.firstChild; child !== null; child = child.nextSibling) {
     if (isText(child) ? child.data.length !== 0 : isElement(child) && hasTextContent(child)) {
       return true;
     }
   }
   return false;
-}
+};
 
 /**
  * Quickly checks whether the text content of the node can equal the expected text, without concatenating it.
@@ -931,7 +944,7 @@ function hasTextContent(node: Node): boolean {
  * @param startIndex The index in the expected text where the text content of the node starts.
  * @returns The index in the expected text where the text content of the node ends, or -1 if they can't be equal.
  */
-function getTextContentEndIndex(node: Node, expectedText: string, startIndex: number): number {
+const getTextContentEndIndex = (node: Node, expectedText: string, startIndex: number): number => {
   for (let child = node.firstChild; child !== null; child = child.nextSibling) {
     if (isText(child)) {
       const { data } = child;
@@ -957,25 +970,25 @@ function getTextContentEndIndex(node: Node, expectedText: string, startIndex: nu
   }
 
   return startIndex;
-}
+};
 
 /**
  * Returns the next sibling of the node, or the previous one if the walk is reversed.
  */
-function getSibling(node: Node, isReversed: boolean): ChildNode | null {
+const getSibling = (node: Node, isReversed: boolean): ChildNode | null => {
   return isReversed ? node.previousSibling : node.nextSibling;
-}
+};
 
 /**
  * Returns sibling elements with the given namespace and local name that follow nodes, or precede them if the walk is
  * reversed.
  */
-function getSiblingElements(
+const getSiblingElements = (
   nodes: readonly Node[],
   isReversed: boolean,
   namespaceURI: string | null,
   localName: string
-): Element[] {
+): Element[] => {
   // Sibling elements that were read already, so the walk from a node stops at a sibling that a walk from a previous
   // node has read
   const nodeSet = createSet(nodes);
@@ -999,7 +1012,7 @@ function getSiblingElements(
   }
 
   return elements;
-}
+};
 
 /**
  * Returns the number of sibling elements that precede the element.
@@ -1010,12 +1023,12 @@ function getSiblingElements(
  * @param lastElement The element whose count is reused if the walk reaches it, so a run of siblings is read once.
  * @param lastCount The count that was returned for the last element.
  */
-function getPrecedingElementCount(
+const getPrecedingElementCount = (
   element: Element,
   maxCount: number,
   lastElement: Element | null,
   lastCount: number
-): number {
+): number => {
   let count = 0;
 
   for (let sibling = element.previousSibling; sibling !== null; sibling = sibling.previousSibling) {
@@ -1027,18 +1040,18 @@ function getPrecedingElementCount(
     }
   }
   return count;
-}
+};
 
 /**
  * Returns the number of sibling elements that follow the element. Does the same as {@link getPrecedingElementCount},
  * but in the other direction.
  */
-function getFollowingElementCount(
+const getFollowingElementCount = (
   element: Element,
   maxCount: number,
   lastElement: Element | null,
   lastCount: number
-): number {
+): number => {
   let count = 0;
 
   for (let sibling = element.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
@@ -1050,56 +1063,61 @@ function getFollowingElementCount(
     }
   }
   return count;
-}
+};
 
 /**
  * Returns the closest element with the given namespace and local name, which is the node itself or its ancestor, or
  * `null` if there's no such element.
  */
-function getClosestElement(node: Node, namespaceURI: string | null, localName: string): Element | null {
+const getClosestElement = (node: Node, namespaceURI: string | null, localName: string): Element | null => {
   for (let ancestor: Node | null = node; ancestor !== null; ancestor = ancestor.parentNode) {
     if (isElement(ancestor) && isMatchingName(ancestor, namespaceURI, localName)) {
       return ancestor;
     }
   }
   return null;
-}
+};
 
 /**
  * Returns `true` if the root has a descendant that is an element with the given namespace and local name.
  */
-function hasDescendantElement(root: Node, namespaceURI: string | null, localName: string): boolean {
+const hasDescendantElement = (root: Node, namespaceURI: string | null, localName: string): boolean => {
   for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
     if (isElement(node) && isMatchingName(node, namespaceURI, localName)) {
       return true;
     }
   }
   return false;
-}
+};
 
 /**
  * Returns `true` if an ancestor of the node is in the set.
  */
-function hasAncestor(node: Node, nodeSet: Set<Node>): boolean {
+const hasAncestor = (node: Node, nodeSet: Set<Node>): boolean => {
   for (let ancestor = node.parentNode; ancestor !== null; ancestor = ancestor.parentNode) {
     if (nodeSet.has(ancestor)) {
       return true;
     }
   }
   return false;
-}
+};
 
 /**
  * Appends descendants of the root that are elements with the given namespace and local name. The loop is in a function
  * of its own, since it is slower inside a function that has more variables.
  */
-function pushDescendantElements(root: Node, namespaceURI: string | null, localName: string, elements: Element[]): void {
+const pushDescendantElements = (
+  root: Node,
+  namespaceURI: string | null,
+  localName: string,
+  elements: Element[]
+): void => {
   for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
     if (isElement(node) && isMatchingName(node, namespaceURI, localName)) {
       elements.push(node);
     }
   }
-}
+};
 
 /**
  * Appends children of the parent that are elements with the given namespace and local name.
@@ -1110,32 +1128,32 @@ function pushDescendantElements(root: Node, namespaceURI: string | null, localNa
  * @param localName The local name of elements.
  * @param elements The array to append elements to.
  */
-function pushSiblingElements(
+const pushSiblingElements = (
   parent: Node,
   excludedChild: Node | null,
   namespaceURI: string | null,
   localName: string,
   elements: Element[]
-): void {
+): void => {
   for (let child = parent.firstChild; child !== null; child = child.nextSibling) {
     if (child !== excludedChild && isElement(child) && isMatchingName(child, namespaceURI, localName)) {
       elements.push(child);
     }
   }
-}
+};
 
 /**
  * Returns a new set if there are several nodes, or `null` if there's a single node. A single node has no other node to
  * share parents, ancestors or siblings with, so a set that tells which of them were read already isn't needed.
  */
-function createSet(nodes: readonly Node[]): Set<Node> | null {
+const createSet = (nodes: readonly Node[]): Set<Node> | null => {
   return nodes.length > 1 ? new Set() : null;
-}
+};
 
 /**
  * Adds the node to the set, and returns `true` if the set didn't have it, or if there's no set. Reads the set once,
  * unlike a check that is followed by an addition.
  */
-function addUnique(nodeSet: Set<Node> | null, node: Node): boolean {
+const addUnique = (nodeSet: Set<Node> | null, node: Node): boolean => {
   return nodeSet === null || nodeSet.size !== nodeSet.add(node).size;
-}
+};

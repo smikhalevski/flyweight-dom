@@ -1,7 +1,11 @@
 import type { Element } from './Element.ts';
-import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
+import { getNextDescendantInDocumentOrder as importedGetNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { coerceToString, isElement } from './utils.ts';
+import { coerceToString, isElement as importedIsElement } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const getNextDescendantInDocumentOrder = importedGetNextDescendantInDocumentOrder;
+const isElement = importedIsElement;
 
 /**
  * Returns an element whose `id` property matches the specified string.
@@ -10,7 +14,7 @@ import { coerceToString, isElement } from './utils.ts';
  * @param id The ID of the element to locate.
  * @see [getElementById](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById) on MDN
  */
-export function getElementById(root: Node, id: string): Element | null {
+export const getElementById = (root: Node, id: string): Element | null => {
   id = coerceToString(id);
 
   // An element with an empty id attribute has no ID, and an element without the attribute must not match either
@@ -25,4 +29,4 @@ export function getElementById(root: Node, id: string): Element | null {
   }
 
   return null;
-}
+};

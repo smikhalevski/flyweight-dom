@@ -14,7 +14,7 @@ import type { Node } from './Node.ts';
  * @param descendant The descendant of the root to start from.
  * @param root The node whose descendants are visited. The walk doesn't leave it.
  */
-export function getNextDescendantInDocumentOrder(descendant: Node, root: Node): ChildNode | null {
+export const getNextDescendantInDocumentOrder = (descendant: Node, root: Node): ChildNode | null => {
   let nextNode = descendant.firstChild;
 
   // The node has no children, so the next node is the closest sibling that follows the node or its ancestor
@@ -23,4 +23,4 @@ export function getNextDescendantInDocumentOrder(descendant: Node, root: Node): 
   }
 
   return nextNode;
-}
+};

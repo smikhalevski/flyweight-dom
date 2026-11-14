@@ -26,7 +26,10 @@ import { Node } from './Node.ts';
 import type { ParentNode } from './ParentNode.ts';
 import { ProcessingInstruction } from './ProcessingInstruction.ts';
 import { Text } from './Text.ts';
-import { assertInsertable } from './uncheckedToInsertableNode.ts';
+import { assertInsertable as importedAssertInsertable } from './uncheckedToInsertableNode.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const assertInsertable = importedAssertInsertable;
 
 /**
  * A child of a node created by the DSL. Strings, numbers and bigints become text nodes, while `null`, `undefined` and
@@ -159,7 +162,7 @@ export const h = Object.assign<ElementFactory, NodeFactories>(createElementFacto
  * @param startIndex The index of the first child in children, so attributes that precede children are skipped
  * without copying the array.
  */
-function appendChildren<T extends ParentNode>(parent: T, children: unknown[], startIndex = 0): T {
+const appendChildren = <T extends ParentNode>(parent: T, children: unknown[], startIndex = 0): T => {
   for (let i = startIndex; i < children.length; ++i) {
     assertInsertable(parent, children[i]);
   }
@@ -175,4 +178,4 @@ function appendChildren<T extends ParentNode>(parent: T, children: unknown[], st
     parent.appendChild(typeof child === 'object' ? child : new Text(String(child)));
   }
   return parent;
-}
+};

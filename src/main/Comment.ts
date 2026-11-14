@@ -1,5 +1,5 @@
 import { CharacterData } from './CharacterData.ts';
-import { COMMENT_NODE, defineNodeType } from './utils.ts';
+import { COMMENT_NODE, defineNodeType, retainHiddenClasses } from './utils.ts';
 
 /**
  * @see [Comment](https://developer.mozilla.org/en-US/docs/Web/API/Comment) on MDN
@@ -8,3 +8,5 @@ import { COMMENT_NODE, defineNodeType } from './utils.ts';
 export class Comment extends CharacterData {}
 
 defineNodeType(Comment, COMMENT_NODE, '#comment');
+
+retainHiddenClasses(new Comment());

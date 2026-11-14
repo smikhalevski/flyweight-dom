@@ -1,7 +1,10 @@
 import type { Document } from './Document.ts';
 import type { Element } from './Element.ts';
 import type { Node } from './Node.ts';
-import { DOCUMENT_NODE, isElement, XML_NAMESPACE, XMLNS_NAMESPACE } from './utils.ts';
+import { DOCUMENT_NODE, isElement as importedIsElement, XML_NAMESPACE, XMLNS_NAMESPACE } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const isElement = importedIsElement;
 
 /**
  * Returns the namespace that the prefix is bound to at the given node, or `null` if the prefix isn't bound.
@@ -14,7 +17,7 @@ import { DOCUMENT_NODE, isElement, XML_NAMESPACE, XMLNS_NAMESPACE } from './util
  * @param prefix The prefix to look up, or `null` to look up the default namespace.
  * @see [Node.lookupNamespaceURI](https://developer.mozilla.org/en-US/docs/Web/API/Node/lookupNamespaceURI) on MDN
  */
-export function lookupNamespaceURI(node: Node, prefix: string | null | undefined): string | null {
+export const lookupNamespaceURI = (node: Node, prefix: string | null | undefined): string | null => {
   if (prefix === undefined || prefix === '') {
     prefix = null;
   }
@@ -43,12 +46,12 @@ export function lookupNamespaceURI(node: Node, prefix: string | null | undefined
   }
 
   return null;
-}
+};
 
 /**
  * Returns the closest element whose namespace declarations are in scope at the node.
  */
-export function getNamespaceScope(node: Node): Element | null {
+export const getNamespaceScope = (node: Node): Element | null => {
   if (isElement(node)) {
     return node;
   }
@@ -56,13 +59,13 @@ export function getNamespaceScope(node: Node): Element | null {
     return (node as Document).documentElement;
   }
   return node.parentElement;
-}
+};
 
 /**
  * Returns `true` if the qualified name has the given prefix.
  */
-function hasPrefix(qualifiedName: string, prefix: string | null): boolean {
+const hasPrefix = (qualifiedName: string, prefix: string | null): boolean => {
   const index = qualifiedName.indexOf(':');
 
   return prefix === null ? index === -1 : index === prefix.length && qualifiedName.startsWith(prefix);
-}
+};

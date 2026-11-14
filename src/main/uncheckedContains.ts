@@ -3,7 +3,7 @@ import type { Node } from './Node.ts';
 /**
  * Returns `true` if the other node is the node itself or its descendant.
  */
-export function uncheckedContains(node: Node, otherNode: Node): boolean {
+export const uncheckedContains = (node: Node, otherNode: Node): boolean => {
   if (node.firstChild === null) {
     return node === otherNode;
   }
@@ -15,4 +15,4 @@ export function uncheckedContains(node: Node, otherNode: Node): boolean {
   }
 
   return node === otherNode;
-}
+};

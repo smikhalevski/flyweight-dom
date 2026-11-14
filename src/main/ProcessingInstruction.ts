@@ -1,6 +1,14 @@
 import { CharacterData } from './CharacterData.ts';
 import { Node } from './Node.ts';
-import { defineNodeType, isEqualConstructor, PROCESSING_INSTRUCTION_NODE } from './utils.ts';
+import {
+  defineNodeType,
+  isEqualConstructor as importedIsEqualConstructor,
+  PROCESSING_INSTRUCTION_NODE,
+  retainHiddenClasses,
+} from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const isEqualConstructor = importedIsEqualConstructor;
 
 /**
  * @see [ProcessingInstruction](https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction) on MDN
@@ -27,3 +35,5 @@ export class ProcessingInstruction extends CharacterData {
 }
 
 defineNodeType(ProcessingInstruction, PROCESSING_INSTRUCTION_NODE, node => node.target);
+
+retainHiddenClasses(new ProcessingInstruction(''));

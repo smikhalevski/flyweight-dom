@@ -1,7 +1,7 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { ParentNode } from './ParentNode.ts';
 
-export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, referenceChild: ChildNode): void {
+export const uncheckedInsertBefore = (parent: ParentNode, node: ChildNode, referenceChild: ChildNode): void => {
   const { previousSibling } = referenceChild;
 
   parent['_notifyChildrenChanged']();
@@ -17,4 +17,4 @@ export function uncheckedInsertBefore(parent: ParentNode, node: ChildNode, refer
   } else {
     parent.firstChild = node;
   }
-}
+};

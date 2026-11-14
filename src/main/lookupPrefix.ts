@@ -8,7 +8,7 @@ import type { Node } from './Node.ts';
  * @param namespaceURI The namespace to look up.
  * @see [Node.lookupPrefix](https://developer.mozilla.org/en-US/docs/Web/API/Node/lookupPrefix) on MDN
  */
-export function lookupPrefix(node: Node, namespaceURI: string | null | undefined): string | null {
+export const lookupPrefix = (node: Node, namespaceURI: string | null | undefined): string | null => {
   if (namespaceURI === null || namespaceURI === undefined || namespaceURI === '') {
     return null;
   }
@@ -28,4 +28,4 @@ export function lookupPrefix(node: Node, namespaceURI: string | null | undefined
   }
 
   return null;
-}
+};

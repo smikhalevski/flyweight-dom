@@ -1,6 +1,14 @@
 import { ChildNode } from './ChildNode.ts';
 import type { Node } from './Node.ts';
-import { coerceToNonNegativeInteger, coerceToString, isEqualConstructor } from './utils.ts';
+import {
+  coerceToNonNegativeInteger,
+  coerceToString as importedCoerceToString,
+  isEqualConstructor as importedIsEqualConstructor,
+} from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const coerceToString = importedCoerceToString;
+const isEqualConstructor = importedIsEqualConstructor;
 
 /**
  * @see [CharacterData](https://developer.mozilla.org/en-US/docs/Web/API/CharacterData) on MDN

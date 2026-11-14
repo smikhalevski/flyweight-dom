@@ -1,7 +1,11 @@
 import type { Element } from './Element.ts';
-import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
+import { getNextDescendantInDocumentOrder as importedGetNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { coerceToString, isElement } from './utils.ts';
+import { coerceToString, isElement as importedIsElement } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const getNextDescendantInDocumentOrder = importedGetNextDescendantInDocumentOrder;
+const isElement = importedIsElement;
 
 /**
  * Returns an array elements which `name` property matches the specified string.
@@ -10,7 +14,7 @@ import { coerceToString, isElement } from './utils.ts';
  * @param name The value of the `name` attribute of the element(s) we are looking for.
  * @see [getElementsByName](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByName) on MDN
  */
-export function getElementsByName(root: Node, name: string): Element[] {
+export const getElementsByName = (root: Node, name: string): Element[] => {
   name = coerceToString(name);
 
   const elements: Element[] = [];
@@ -22,4 +26,4 @@ export function getElementsByName(root: Node, name: string): Element[] {
   }
 
   return elements;
-}
+};

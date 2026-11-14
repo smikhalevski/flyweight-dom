@@ -1,5 +1,6 @@
 import { Node } from './Node.ts';
 import type { NodeFilter } from './NodeFilter.ts';
+import { retainHiddenClasses } from './utils.ts';
 
 // Declared here rather than imported from NodeFilter.ts, since reading imported constants makes nextNode() about 25%
 // slower in V8
@@ -312,7 +313,7 @@ export class TreeWalker {
   }
 }
 
-export function filterNode(treeWalker: TreeWalker, node: Node): number {
+export const filterNode = (treeWalker: TreeWalker, node: Node): number => {
   const { filter } = treeWalker;
 
   if ((((1 << node.nodeType) >> 1) & treeWalker.whatToShow) === 0) {
@@ -328,4 +329,6 @@ export function filterNode(treeWalker: TreeWalker, node: Node): number {
   // Same conversion to unsigned short as in browsers: true becomes FILTER_ACCEPT, while false and undefined become 0,
   // which traversal methods don't accept
   return result & 0xffff;
-}
+};
+
+retainHiddenClasses(new TreeWalker(new Node()));

@@ -1,7 +1,7 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { ParentNode } from './ParentNode.ts';
 
-export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void {
+export const uncheckedRemoveChild = (parent: ParentNode, child: ChildNode): void => {
   const { previousSibling, nextSibling } = child;
 
   parent['_notifyChildrenChanged']();
@@ -21,4 +21,4 @@ export function uncheckedRemoveChild(parent: ParentNode, child: ChildNode): void
   } else {
     parent.lastChild = previousSibling;
   }
-}
+};

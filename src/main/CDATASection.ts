@@ -1,5 +1,5 @@
 import { Text } from './Text.ts';
-import { CDATA_SECTION_NODE, defineNodeType } from './utils.ts';
+import { CDATA_SECTION_NODE, defineNodeType, retainHiddenClasses } from './utils.ts';
 
 /**
  * @see [CDATASection](https://developer.mozilla.org/en-US/docs/Web/API/CDATASection) on MDN
@@ -8,3 +8,5 @@ import { CDATA_SECTION_NODE, defineNodeType } from './utils.ts';
 export class CDATASection extends Text {}
 
 defineNodeType(CDATASection, CDATA_SECTION_NODE, '#cdata-section');
+
+retainHiddenClasses(new CDATASection());

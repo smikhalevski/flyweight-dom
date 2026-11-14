@@ -1,15 +1,20 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { ParentNode } from './ParentNode.ts';
-import { uncheckedInsertBefore } from './uncheckedInsertBefore.ts';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import { uncheckedInsertBefore as importedUncheckedInsertBefore } from './uncheckedInsertBefore.ts';
+import { uncheckedRemoveChild as importedUncheckedRemoveChild } from './uncheckedRemoveChild.ts';
 import type { InsertableNode } from './uncheckedToInsertableNode.ts';
-import { isDocumentFragment } from './utils.ts';
+import { isDocumentFragment as importedIsDocumentFragment } from './utils.ts';
 
-export function uncheckedRemoveAndInsertBefore(
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const uncheckedInsertBefore = importedUncheckedInsertBefore;
+const uncheckedRemoveChild = importedUncheckedRemoveChild;
+const isDocumentFragment = importedIsDocumentFragment;
+
+export const uncheckedRemoveAndInsertBefore = (
   parent: ParentNode,
   node: InsertableNode,
   referenceChild: ChildNode
-): void {
+): void => {
   if (isDocumentFragment(node)) {
     node['_notifyChildrenChanged']();
 
@@ -33,4 +38,4 @@ export function uncheckedRemoveAndInsertBefore(
   }
 
   uncheckedInsertBefore(parent, node, referenceChild);
-}
+};

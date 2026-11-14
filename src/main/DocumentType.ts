@@ -1,6 +1,14 @@
 import { ChildNode } from './ChildNode.ts';
 import type { Node } from './Node.ts';
-import { defineNodeType, DOCUMENT_TYPE_NODE, isEqualConstructor } from './utils.ts';
+import {
+  defineNodeType,
+  DOCUMENT_TYPE_NODE,
+  isEqualConstructor as importedIsEqualConstructor,
+  retainHiddenClasses,
+} from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const isEqualConstructor = importedIsEqualConstructor;
 
 /**
  * @see [DocumentType](https://developer.mozilla.org/en-US/docs/Web/API/DocumentType) on MDN
@@ -42,3 +50,5 @@ export class DocumentType extends ChildNode() {
 }
 
 defineNodeType(DocumentType, DOCUMENT_TYPE_NODE, node => node.name);
+
+retainHiddenClasses(new DocumentType(''));

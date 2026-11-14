@@ -1,4 +1,7 @@
-import { isSpaceChar } from './utils.ts';
+import { isSpaceChar as importedIsSpaceChar } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const isSpaceChar = importedIsSpaceChar;
 
 const SEPARATOR = ' ';
 
@@ -205,7 +208,7 @@ export class DOMTokenList {
 /**
  * Splits the value into unique tokens separated by ASCII whitespace.
  */
-export function splitTokens(value: string): string[] {
+export const splitTokens = (value: string): string[] => {
   const tokens: string[] = [];
 
   let tokenStartIndex = 0;
@@ -227,9 +230,9 @@ export function splitTokens(value: string): string[] {
   }
 
   return tokens;
-}
+};
 
-function getTokens(tokenList: DOMTokenList): string[] {
+const getTokens = (tokenList: DOMTokenList): string[] => {
   const value = tokenList.value;
 
   if (value === tokenList['_tokenizedValue'] && tokenList['_tokens'] !== undefined) {
@@ -242,9 +245,9 @@ function getTokens(tokenList: DOMTokenList): string[] {
   tokenList['_tokens'] = tokens;
 
   return tokens;
-}
+};
 
-function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
+const setTokens = (tokenList: DOMTokenList, tokens: string[]): void => {
   const valueAccessor = tokenList['_valueAccessor'];
 
   // https://dom.spec.whatwg.org/#concept-dtl-update
@@ -257,9 +260,9 @@ function setTokens(tokenList: DOMTokenList, tokens: string[]): void {
   valueAccessor.set(value);
   tokenList['_tokenizedValue'] = value;
   tokenList['_tokens'] = tokens;
-}
+};
 
-function assertToken(token: string): void {
+const assertToken = (token: string): void => {
   if (token.length === 0) {
     throw new Error('The token provided must not be empty');
   }
@@ -271,4 +274,4 @@ function assertToken(token: string): void {
       );
     }
   }
-}
+};

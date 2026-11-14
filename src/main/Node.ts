@@ -5,7 +5,17 @@ import { lookupPrefix } from './lookupPrefix.ts';
 import { EmptyNodeList, type ChildrenCache, type NodeList } from './NodeList.ts';
 import type { ParentNode } from './ParentNode.ts';
 import { uncheckedContains } from './uncheckedContains.ts';
-import { isElement, isEqualChildNodes, isEqualConstructor } from './utils.ts';
+import {
+  isElement as importedIsElement,
+  isEqualChildNodes as importedIsEqualChildNodes,
+  isEqualConstructor as importedIsEqualConstructor,
+  retainHiddenClasses,
+} from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const isElement = importedIsElement;
+const isEqualChildNodes = importedIsEqualChildNodes;
+const isEqualConstructor = importedIsEqualConstructor;
 
 /**
  * @see [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) on MDN
@@ -242,6 +252,8 @@ export class Node {
 }
 
 Object.defineProperty(Node.prototype, '_isParentNode', { value: false });
+
+retainHiddenClasses(new Node());
 
 /**
  * {@link Node.childNodes} of all nodes that can't have children. The list has no state, so all nodes share it, and it

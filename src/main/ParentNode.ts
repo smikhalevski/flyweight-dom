@@ -2,12 +2,33 @@ import { ChildNode } from './ChildNode.ts';
 import type { Element } from './Element.ts';
 import { Node } from './Node.ts';
 import { ChildNodeIterator, ChildNodeList, type NodeList } from './NodeList.ts';
-import { uncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
-import { uncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.ts';
-import { uncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.ts';
-import { uncheckedRemoveChild } from './uncheckedRemoveChild.ts';
-import { assertInsertable, assertInsertableNode, uncheckedToInsertableNode } from './uncheckedToInsertableNode.ts';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement } from './utils.ts';
+import { uncheckedInsertNodeAfter as importedUncheckedInsertNodeAfter } from './uncheckedInsertNodeAfter.ts';
+import { uncheckedRemoveAndAppendChild as importedUncheckedRemoveAndAppendChild } from './uncheckedRemoveAndAppendChild.ts';
+import { uncheckedRemoveAndInsertBefore as importedUncheckedRemoveAndInsertBefore } from './uncheckedRemoveAndInsertBefore.ts';
+import { uncheckedRemoveChild as importedUncheckedRemoveChild } from './uncheckedRemoveChild.ts';
+import {
+  assertInsertable as importedAssertInsertable,
+  assertInsertableNode as importedAssertInsertableNode,
+  uncheckedToInsertableNode as importedUncheckedToInsertableNode,
+} from './uncheckedToInsertableNode.ts';
+import {
+  ELEMENT_NODE,
+  getNextSiblingOrSelf as importedGetNextSiblingOrSelf,
+  getPreviousSiblingOrSelf as importedGetPreviousSiblingOrSelf,
+  isElement as importedIsElement,
+} from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const uncheckedInsertNodeAfter = importedUncheckedInsertNodeAfter;
+const uncheckedRemoveAndAppendChild = importedUncheckedRemoveAndAppendChild;
+const uncheckedRemoveAndInsertBefore = importedUncheckedRemoveAndInsertBefore;
+const uncheckedRemoveChild = importedUncheckedRemoveChild;
+const assertInsertable = importedAssertInsertable;
+const assertInsertableNode: typeof importedAssertInsertableNode = importedAssertInsertableNode;
+const uncheckedToInsertableNode = importedUncheckedToInsertableNode;
+const getNextSiblingOrSelf = importedGetNextSiblingOrSelf;
+const getPreviousSiblingOrSelf = importedGetPreviousSiblingOrSelf;
+const isElement = importedIsElement;
 
 /**
  * The node that can be a parent of another node.

@@ -1,8 +1,13 @@
 import { splitTokens } from './DOMTokenList.ts';
 import type { Element } from './Element.ts';
-import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
+import { getNextDescendantInDocumentOrder as importedGetNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { coerceToString, isElement, isSpaceChar } from './utils.ts';
+import { coerceToString, isElement as importedIsElement, isSpaceChar as importedIsSpaceChar } from './utils.ts';
+
+// V8 checks an imported function at every call, but inlines a local constant without a check
+const getNextDescendantInDocumentOrder = importedGetNextDescendantInDocumentOrder;
+const isElement = importedIsElement;
+const isSpaceChar = importedIsSpaceChar;
 
 /**
  * Returns an array elements which have all of the given class name(s).
@@ -11,7 +16,7 @@ import { coerceToString, isElement, isSpaceChar } from './utils.ts';
  * @param className A string representing the class name(s) to match; multiple class names are separated by whitespace.
  * @see [getElementsByClassName](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByClassName) on MDN
  */
-export function getElementsByClassName(root: Node, className: string): Element[] {
+export const getElementsByClassName = (root: Node, className: string): Element[] => {
   className = coerceToString(className);
 
   const classNames = splitTokens(className);
@@ -29,12 +34,12 @@ export function getElementsByClassName(root: Node, className: string): Element[]
   }
 
   return elements;
-}
+};
 
 /**
  * Returns `true` if the element has all of the given class names.
  */
-export function hasClassNames(element: Element, classNames: string[]): boolean {
+export const hasClassNames = (element: Element, classNames: string[]): boolean => {
   // Not element.classList, since it would permanently attach a DOMTokenList to every checked element
   const elementClassName = element.className;
 
@@ -44,12 +49,12 @@ export function hasClassNames(element: Element, classNames: string[]): boolean {
     }
   }
   return true;
-}
+};
 
 /**
  * Returns `true` if the whitespace-separated value contains the token.
  */
-function hasToken(value: string, token: string): boolean {
+const hasToken = (value: string, token: string): boolean => {
   for (let index = value.indexOf(token); index !== -1; index = value.indexOf(token, index + 1)) {
     const endIndex = index + token.length;
 
@@ -61,4 +66,4 @@ function hasToken(value: string, token: string): boolean {
     }
   }
   return false;
-}
+};

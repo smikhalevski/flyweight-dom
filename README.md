@@ -124,54 +124,137 @@ Lookup methods return arrays, not live collections.
 
 # Queries
 
-Use [`$`](https://smikhalevski.github.io/flyweight-dom/functions/flyweight-dom_query._.html) to select elements in a
-jQuery style:
+Use [`$`](https://smikhalevski.github.io/flyweight-dom/functions/flyweight-dom_query._.html) to query a tree in a jQuery
+style. Each method returns a new
+[`NodeQuery`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html), so queries can
+be chained and reused:
 
 ```ts
 import { $ } from 'flyweight-dom/query';
 
-const query = $(document).descendants('ul').children('li').hasAttribute('class', 'item');
+const $items = $(document).descendants('ul').children('li');
 
-query.nodes.length;
+$items.hasClass('done').nodes.length;
 // ⮕ 2
 ```
 
-Each method returns a new
-[`NodeQuery`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html). See its API docs
-for all methods.
+## Selecting elements
 
-Elements are matched by a local name and a namespace. Both are `*` by default, which matches any value:
+These methods move from the selected nodes to other elements:
+
+| Method                                                                                                                                                                                                                             | Selects                                          | CSS     |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------- | :------ |
+| [`children`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#children)                                                                                                                     | Child elements                                   | `A > B` |
+| [`descendants`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#descendants)                                                                                                               | Descendant elements                              | `A B`   |
+| [`parent`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#parent)                                                                                                                         | Parent elements                                  |         |
+| [`ancestors`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#ancestors)                                                                                                                   | Ancestor elements, closest first                 |         |
+| [`closest`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#closest)                                                                                                                       | The node itself or its closest matching ancestor |         |
+| [`siblings`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#siblings)                                                                                                                     | Sibling elements                                 |         |
+| [`next`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#next), [`previous`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#previous)             | The adjacent sibling element                     | `A + B` |
+| [`following`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#following), [`preceding`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#preceding) | All following or preceding sibling elements      | `A ~ B` |
+
+They take a local name and a namespace. Both are `*` by default, which matches anything, and the `null` namespace
+matches elements without one:
 
 ```ts
-// All <circle> elements in the SVG namespace
-$(document).descendants('circle', 'http://www.w3.org/2000/svg');
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+// <circle> elements in the SVG namespace
+$(document).descendants('circle', SVG_NAMESPACE);
 
 // All elements in the SVG namespace
-$(document).descendants('*', 'http://www.w3.org/2000/svg');
+$(document).descendants('*', SVG_NAMESPACE);
+
+// The closest <section> of each <h2>
+$(document).descendants('h2').closest('section');
 ```
 
-[`hasAttribute`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasattribute)
-and
-[`hasAttributeNS`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasattributens)
-check the attribute value with a string, a regular expression or a callback:
+Each element is selected once, even if several nodes lead to it.
+
+## Filtering
+
+These methods keep only some of the selected nodes:
+
+| Method                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Keeps                               | CSS                    |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------- | :--------------------- |
+| [`hasAttribute`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasattribute), [`hasAttributeNS`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasattributens)                                                                                                                                                                                                                     | Elements with the attribute         | `[name]`, `[ns\|name]` |
+| [`hasClass`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasclass)                                                                                                                                                                                                                                                                                                                                                         | Elements with all given classes     | `.a.b`                 |
+| [`hasText`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hastext)                                                                                                                                                                                                                                                                                                                                                           | Nodes by their text content         |                        |
+| [`has`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#has)                                                                                                                                                                                                                                                                                                                                                                   | Nodes with a matching descendant    | `:has(B)`              |
+| [`nthChild`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#nthchild), [`firstChild`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#firstchild), [`lastChild`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#lastchild), [`onlyChild`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#onlychild) | Elements by position among siblings | `:nth-child()`         |
+| [`hasNoContent`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#hasnocontent)                                                                                                                                                                                                                                                                                                                                                 | Nodes without elements and text     | `:empty`               |
+| [`filter`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#filter), [`not`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#not)                                                                                                                                                                                                                                                       | Nodes that pass a predicate         | `:not()`               |
+
+Attribute values and text are checked with a string, a regular expression or a callback:
 
 ```ts
-$(document).descendants().hasAttribute('class', /^it/);
+$(document)
+  .descendants('a')
+  .hasAttribute('href', /^https:/);
 
 $(document)
-  .descendants()
-  .hasAttributeNS('http://www.w3.org/1999/xlink', 'href', value => value.startsWith('#'));
+  .descendants('p')
+  .hasText(text => text.length > 100);
+
+// Attributes in any namespace, the same as [*|href]
+$(document).descendants().hasAttributeNS('*', 'href');
 ```
 
-Read results from
-[`nodes`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#nodes), or iterate
-over the query:
+`nthChild` counts from 0, and a negative index counts from the last child:
 
 ```ts
-for (const element of $(document).descendants('li')) {
-  // Process the element
+// The second item of each list
+$(document).descendants('ul').children('li').nthChild(1);
+```
+
+A predicate of `filter` and `not` can return a query, which passes if it isn't empty:
+
+```ts
+// Paragraphs outside of <aside> elements
+$(document)
+  .descendants('p')
+  .not(element => $(element).ancestors('aside'));
+```
+
+## Reading results
+
+```ts
+const $links = $(document).descendants('a');
+
+// The selected nodes
+$links.nodes;
+
+// Queries are iterable
+for (const link of $links) {
+  // Process the link
+}
+
+// The attribute of the first node
+$links.getAttribute('href');
+
+// The text content of all nodes
+$links.text;
+
+// Narrow down to one node
+$links.first().closest('nav');
+```
+
+Use [`queries`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#queries) to
+iterate over queries that hold one node each:
+
+```ts
+for (const $item of $(document).descendants('item').queries()) {
+  $item.children('title').text;
 }
 ```
+
+Use [`at`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#at),
+[`first`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#first) and
+[`last`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#last) to pick a node by
+its index, [`union`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#union) to
+merge queries, and
+[`remove`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#remove) to remove
+nodes from their parents.
 
 # Traversal
 

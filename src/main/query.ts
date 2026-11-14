@@ -4,12 +4,12 @@
  * ```ts
  * import { $ } from 'flyweight-dom/query';
  *
- * const query = $(document)
+ * const $titles = $(document)
  *   .descendants('item')
  *   .children('title')
  *   .hasAttribute('lang', 'en');
  *
- * query.nodes;
+ * $titles.nodes;
  * // ⮕ [Element, Element]
  * ```
  *
@@ -766,6 +766,21 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     return this;
   }
 
+  /**
+   * Returns an iterator over queries that hold one of {@link nodes} each, so a loop can query from each node:
+   *
+   * ```ts
+   * for (const $item of $(document).descendants('item').queries()) {
+   *   $item.children('title').text;
+   * }
+   * ```
+   *
+   * Queries are created as the iterator reaches them, so a loop that stops early doesn't create the rest.
+   */
+  queries(): IterableIterator<NodeQuery<TNode>> {
+    return new NodeQueryIterator(this.nodes);
+  }
+
   [Symbol.iterator](): IterableIterator<TNode> {
     return this.nodes[Symbol.iterator]();
   }
@@ -808,6 +823,33 @@ function getAttributeAnyNS(element: Element, localName: string): string | null {
 
   return null;
 }
+
+/**
+ * The iterator over queries that hold one node each, which {@link NodeQuery.queries} returns.
+ */
+class NodeQueryIterator<TNode extends Node> implements IterableIterator<NodeQuery<TNode>> {
+  private _nodes;
+  private _index = 0;
+
+  constructor(nodes: readonly TNode[]) {
+    this._nodes = nodes;
+  }
+
+  next(): IteratorResult<NodeQuery<TNode>, undefined> {
+    if (this._index < this._nodes.length) {
+      return { value: new NodeQuery([this._nodes[this._index++]]), done: false };
+    }
+
+    return { value: undefined, done: true };
+  }
+
+  [Symbol.iterator](): this {
+    return this;
+  }
+}
+
+// The prototype of built-in iterators, which adds helpers like map() and toArray() in newer runtimes
+Object.setPrototypeOf(NodeQueryIterator.prototype, Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]())));
 
 /**
  * Returns `true` if the string meets the predicate.

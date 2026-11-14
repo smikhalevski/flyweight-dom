@@ -46,14 +46,14 @@ export function getElementsByTagNameNS(
 export function isMatchingName(element: Element, namespaceURI: string | null, localName: string): boolean {
   return (
     (namespaceURI === '*' || element.namespaceURI === namespaceURI) &&
-    (localName === '*' || isLocalNameEqual(element, localName))
+    (localName === '*' || isEqualLocalName(element, localName))
   );
 }
 
 /**
  * Returns `true` if the element has the given local name.
  */
-function isLocalNameEqual(element: Element, localName: string): boolean {
+function isEqualLocalName(element: Element, localName: string): boolean {
   const { tagName } = element;
 
   if (element.namespaceURI === null) {

@@ -374,6 +374,18 @@ describe('NodeQuery.text', () => {
   });
 });
 
+describe('NodeQuery.queries', () => {
+  test('flyweight-dom', () => {
+    const query = makeTestQuery();
+
+    measure(() => {
+      for (const item of query.queries()) {
+        item.nodes;
+      }
+    });
+  });
+});
+
 describe('NodeQuery.remove', () => {
   test('flyweight-dom', () => {
     const parent = makeTestParent(flyweightFactory, CHILD_COUNT);

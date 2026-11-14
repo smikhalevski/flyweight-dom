@@ -1,5 +1,6 @@
 import type { ChildNode } from './ChildNode.ts';
 import type { Node } from './Node.ts';
+import { iteratorPrototype } from './utils.ts';
 
 /**
  * The callback that returns `true` for children that a list contains.
@@ -325,11 +326,6 @@ export class ChildNodeIterator<T extends ChildNode = ChildNode> implements Itera
     return this;
   }
 }
-
-/**
- * The prototype of built-in iterators, which adds helpers like map() and toArray() in newer runtimes.
- */
-const iteratorPrototype = Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()));
 
 Object.setPrototypeOf(ChildNodeIterator.prototype, iteratorPrototype);
 

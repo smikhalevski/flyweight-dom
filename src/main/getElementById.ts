@@ -1,8 +1,7 @@
 import type { Element } from './Element.ts';
+import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { SHOW_ELEMENT } from './NodeFilter.ts';
-import { TreeWalker } from './TreeWalker.ts';
-import { coerceToString } from './utils.ts';
+import { coerceToString, isElement } from './utils.ts';
 
 /**
  * Returns an element whose `id` property matches the specified string.
@@ -19,11 +18,9 @@ export function getElementById(root: Node, id: string): Element | null {
     return null;
   }
 
-  const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
-
-  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-    if (element.id === id) {
-      return element;
+  for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
+    if (isElement(node) && node.id === id) {
+      return node;
     }
   }
 

@@ -27,6 +27,12 @@ export const XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
  */
 export const XMLNS_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 
+/**
+ * The prototype of built-in iterators, which adds helpers like map() and toArray() in newer runtimes. Set it as the
+ * prototype of a custom iterator class, so its instances get the helpers too.
+ */
+export const iteratorPrototype: object = Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()));
+
 const objectHasOwnProperty = Object.prototype.hasOwnProperty;
 
 export function hasOwnProperty(object: object, key: PropertyKey): boolean {

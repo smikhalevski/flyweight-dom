@@ -1,8 +1,7 @@
 import type { Element } from './Element.ts';
+import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { SHOW_ELEMENT } from './NodeFilter.ts';
-import { TreeWalker } from './TreeWalker.ts';
-import { coerceToString } from './utils.ts';
+import { coerceToString, isElement } from './utils.ts';
 
 /**
  * Returns an array of elements with the given tag name.
@@ -14,13 +13,11 @@ import { coerceToString } from './utils.ts';
 export function getElementsByTagName(root: Node, tagName: string): Element[] {
   tagName = coerceToString(tagName);
 
-  const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
+  const elements: Element[] = [];
 
-  const elements = [];
-
-  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-    if (tagName === '*' || element.tagName === tagName) {
-      elements.push(element);
+  for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
+    if (isElement(node) && (tagName === '*' || node.tagName === tagName)) {
+      elements.push(node);
     }
   }
 

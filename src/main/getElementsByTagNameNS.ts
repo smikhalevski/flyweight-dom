@@ -1,8 +1,7 @@
 import type { Element } from './Element.ts';
+import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { SHOW_ELEMENT } from './NodeFilter.ts';
-import { TreeWalker } from './TreeWalker.ts';
-import { coerceToString } from './utils.ts';
+import { coerceToString, isElement } from './utils.ts';
 
 /**
  * Returns an array of elements with the given namespace and local name.
@@ -23,13 +22,11 @@ export function getElementsByTagNameNS(
 
   localName = coerceToString(localName);
 
-  const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
+  const elements: Element[] = [];
 
-  const elements = [];
-
-  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-    if (isMatchingName(element, namespaceURI, localName)) {
-      elements.push(element);
+  for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
+    if (isElement(node) && isMatchingName(node, namespaceURI, localName)) {
+      elements.push(node);
     }
   }
 

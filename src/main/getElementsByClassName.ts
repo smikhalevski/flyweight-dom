@@ -1,9 +1,8 @@
 import { splitTokens } from './DOMTokenList.ts';
 import type { Element } from './Element.ts';
+import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 import type { Node } from './Node.ts';
-import { SHOW_ELEMENT } from './NodeFilter.ts';
-import { TreeWalker } from './TreeWalker.ts';
-import { coerceToString, isSpaceChar } from './utils.ts';
+import { coerceToString, isElement, isSpaceChar } from './utils.ts';
 
 /**
  * Returns an array elements which have all of the given class name(s).
@@ -21,12 +20,11 @@ export function getElementsByClassName(root: Node, className: string): Element[]
     return [];
   }
 
-  const treeWalker = new TreeWalker(root, SHOW_ELEMENT);
-  const elements = [];
+  const elements: Element[] = [];
 
-  for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-    if (hasClassNames(element, classNames)) {
-      elements.push(element);
+  for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
+    if (isElement(node) && hasClassNames(node, classNames)) {
+      elements.push(node);
     }
   }
 

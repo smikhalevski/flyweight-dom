@@ -20,6 +20,7 @@ import type { ChildNode } from './ChildNode.ts';
 import { splitTokens } from './DOMTokenList.ts';
 import { hasClassNames } from './getElementsByClassName.ts';
 import { isMatchingName } from './getElementsByTagNameNS.ts';
+import { getNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
 // Classes are imported from the main entry point, since modules of node classes depend on each other, and they must be
 // evaluated in the order that the main entry point imports them in. Otherwise, the import of this module fails if it
 // goes before the import of the main entry point
@@ -32,6 +33,7 @@ import {
   hasOwnProperty,
   isElement,
   isText,
+  iteratorPrototype,
 } from './utils.ts';
 
 /**
@@ -848,8 +850,7 @@ class NodeQueryIterator<TNode extends Node> implements IterableIterator<NodeQuer
   }
 }
 
-// The prototype of built-in iterators, which adds helpers like map() and toArray() in newer runtimes
-Object.setPrototypeOf(NodeQueryIterator.prototype, Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]())));
+Object.setPrototypeOf(NodeQueryIterator.prototype, iteratorPrototype);
 
 /**
  * Returns `true` if the string meets the predicate.
@@ -956,24 +957,6 @@ function getTextContentEndIndex(node: Node, expectedText: string, startIndex: nu
   }
 
   return startIndex;
-}
-
-/**
- * Returns the descendant of the root that follows the given descendant in document order, or `null` if it's the last
- * one. Lets a loop visit all descendants of the root without creating a tree walker.
- *
- * @param descendant The descendant of the root to start from.
- * @param root The node whose descendants are visited. The walk doesn't leave it.
- */
-function getNextDescendantInDocumentOrder(descendant: Node, root: Node): ChildNode | null {
-  let nextNode = descendant.firstChild;
-
-  // The node has no children, so the next node is the closest sibling that follows the node or its ancestor
-  while (nextNode === null && descendant !== root && (nextNode = descendant.nextSibling) === null) {
-    descendant = descendant.parentNode!;
-  }
-
-  return nextNode;
 }
 
 /**

@@ -6,7 +6,7 @@
   </picture></a>
 </p>
 
-The extremely fast DOM implementation.
+[The fastest](#benchmarks) DOM implementation.
 
 - The DOM API you know from browsers: nodes, tree changes, lookups and traversal.
 - [XML namespaces.](#namespaces)
@@ -15,7 +15,7 @@ The extremely fast DOM implementation.
 - [Custom nodes.](#custom-nodes)
 - Low memory consumption, minimal amount of allocations.
 - Zero dependencies.
-- [6 kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
+- [7&#8239;kB gzipped.](https://bundlephobia.com/package/flyweight-dom)
 
 <br>
 
@@ -33,6 +33,7 @@ npm install --save-prod flyweight-dom
 - [Namespaces](#namespaces)
 - [DSL](#dsl)
 - [Custom nodes](#custom-nodes)
+- [Benchmarks](#benchmarks)
 - [Performance considerations](#performance-considerations)
 
 # Nodes
@@ -414,6 +415,22 @@ new MyNode() instanceof ParentNode(ChildNode());
 new MyNode() instanceof ParentNode();
 // ❌ false
 ```
+
+# Benchmarks
+
+Flyweight DOM is 4–70× faster than domhandler and jsdom on common operations, and takes the least memory per element:
+
+|                        |     flyweight-dom | [domhandler](https://github.com/fb55/domhandler)@6.0.1 | [jsdom](https://github.com/jsdom/jsdom)@31.0.0 |
+| :--------------------- | ----------------: | -----------------------------------------------------: | ---------------------------------------------: |
+| `new Element`          | **150&#8239;MHz** |                                           33&#8239;MHz |                                  2.8&#8239;MHz |
+| `appendChild`          | **134&#8239;MHz** |                                           23&#8239;MHz |                                  2.0&#8239;MHz |
+| `cloneNode(true)`      | **125&#8239;kHz** |                                           29&#8239;kHz |                                  1.9&#8239;kHz |
+| `getElementsByTagName` | **413&#8239;kHz** |                                           58&#8239;kHz |                                   57&#8239;kHz |
+| `textContent`          | **216&#8239;kHz** |                                           44&#8239;kHz |                                   58&#8239;kHz |
+| Memory per element     |   **175&#8239;B** |                                            204&#8239;B |                                  1.07&#8239;kB |
+
+Speed is the number of operations per second, higher is better. Memory is the heap that an element takes, lower is
+better. Run `npm run perf` to reproduce, see [`perf.ts`](./src/test/perf.ts) for all benchmarks.
 
 # Performance considerations
 

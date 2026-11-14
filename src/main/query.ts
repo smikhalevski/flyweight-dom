@@ -16,14 +16,23 @@
  * @module flyweight-dom/query
  */
 
+import type { ChildNode } from './ChildNode.ts';
 import { splitTokens } from './DOMTokenList.ts';
-import type { Element } from './Element.ts';
 import { hasClassNames } from './getElementsByClassName.ts';
-import { hasTagNameNS } from './getElementsByTagNameNS.ts';
+import { isMatchingName } from './getElementsByTagNameNS.ts';
+// Classes are imported from the main entry point, since modules of node classes depend on each other, and they must be
+// evaluated in the order that the main entry point imports them in. Otherwise, the import of this module fails if it
+// goes before the import of the main entry point
+import { DocumentFragment, Element } from './index.ts';
 import type { Node } from './Node.ts';
-import { SHOW_ELEMENT } from './NodeFilter.ts';
-import { TreeWalker } from './TreeWalker.ts';
-import { ELEMENT_NODE, getNextSiblingOrSelf, getPreviousSiblingOrSelf, isElement, isText } from './utils.ts';
+import {
+  ELEMENT_NODE,
+  getNextSiblingOrSelf,
+  getPreviousSiblingOrSelf,
+  hasOwnProperty,
+  isElement,
+  isText,
+} from './utils.ts';
 
 /**
  * Creates a query that holds the given node, so its children and descendants can be selected.
@@ -65,6 +74,19 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   ) {}
 
   /**
+   * Returns the concatenated text content of {@link nodes}.
+   */
+  get text(): string {
+    let text = '';
+
+    for (const node of this.nodes) {
+      text += node.textContent ?? '';
+    }
+
+    return text;
+  }
+
+  /**
    * Selects child elements of {@link nodes} that have the given local name and namespace, the same as the `>`
    * combinator in CSS.
    *
@@ -79,7 +101,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
 
     for (const node of this.nodes) {
       for (let child = node.firstChild; child !== null; child = child.nextSibling) {
-        if (isElement(child) && hasTagNameNS(child, namespaceURI, localName)) {
+        if (isElement(child) && isMatchingName(child, namespaceURI, localName)) {
           elements.push(child);
         }
       }
@@ -101,22 +123,23 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   descendants(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
     const { nodes } = this;
 
-    // A single node can't be nested, so the set isn't needed
-    const nodeSet = nodes.length > 1 ? new Set<Node>(nodes) : null;
-    const elements = [];
+    // Nodes that have children, since only they can contain other nodes
+    const nodeSet = createSet(nodes);
+    const elements: Element[] = [];
+
+    if (nodeSet !== null) {
+      for (const node of nodes) {
+        if (node.firstChild !== null) {
+          nodeSet.add(node);
+        }
+      }
+    }
 
     for (const node of nodes) {
-      // Descendants of a nested node are found when its ancestor is searched
-      if (nodeSet !== null && hasAncestor(node, nodeSet)) {
-        continue;
-      }
-
-      const treeWalker = new TreeWalker(node, SHOW_ELEMENT);
-
-      for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-        if (hasTagNameNS(element, namespaceURI, localName)) {
-          elements.push(element);
-        }
+      // A node that has no children, has no descendants. Descendants of a nested node are found when its ancestor is
+      // searched
+      if (node.firstChild !== null && (nodeSet === null || !hasAncestor(node, nodeSet))) {
+        pushDescendantElements(node, namespaceURI, localName, elements);
       }
     }
 
@@ -140,9 +163,12 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
         continue;
       }
 
-      const value = node.getAttribute(name);
+      const { attributes } = node;
+      const value = attributes[name];
 
-      if (value !== null && isMatchingValue(value, predicate)) {
+      // The value is read before the own property check that getAttribute makes, since most elements don't have the
+      // attribute, and reading a missing property is faster than the check
+      if (value !== undefined && hasOwnProperty(attributes, name) && isMatchingString(value, predicate)) {
         elements.push(node);
       }
     }
@@ -170,7 +196,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
 
       const value = node.getAttributeNS(namespaceURI, localName);
 
-      if (value !== null && isMatchingValue(value, predicate)) {
+      if (value !== null && isMatchingString(value, predicate)) {
         elements.push(node);
       }
     }
@@ -214,10 +240,12 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     const classNames = splitTokens(className);
     const elements = [];
 
-    for (const node of this.nodes) {
-      // An element doesn't have a class if no class name is given
-      if (classNames.length !== 0 && isElement(node) && hasClassNames(node, classNames)) {
-        elements.push(node);
+    // An element doesn't have a class if no class name is given
+    if (classNames.length !== 0) {
+      for (const node of this.nodes) {
+        if (isElement(node) && hasClassNames(node, classNames)) {
+          elements.push(node);
+        }
       }
     }
 
@@ -234,12 +262,51 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * child, so -1 is the same as the `:last-child` selector in CSS.
    */
   nthChild(index: number): NodeQuery {
+    const { nodes } = this;
+    const isReversed = index < 0;
+
+    // The number of sibling elements that must precede the element, or follow it if the index is negative
+    const siblingCount = isReversed ? -index - 1 : index;
     const elements = [];
 
-    for (const node of this.nodes) {
-      if (isElement(node) && isNthChild(node, index)) {
+    if (siblingCount === 0) {
+      // The first or the last child has no sibling element on its side, which is the fastest to check
+      for (const node of nodes) {
+        if (isElement(node) && (isReversed ? node.nextElementSibling : node.previousElementSibling) === null) {
+          elements.push(node);
+        }
+      }
+
+      return new NodeQuery(elements);
+    }
+
+    // The count of the last element is reused if a walk from the next element reaches it, so a run of siblings is
+    // read once instead of once per sibling. For a negative index, siblings are counted towards the last child, so
+    // nodes are read from the last one, since then a walk reaches the element that was counted before
+    let lastElement: Element | null = null;
+    let lastCount = 0;
+
+    for (let i = 0; i < nodes.length; ++i) {
+      const node = nodes[isReversed ? nodes.length - i - 1 : i];
+
+      if (!isElement(node)) {
+        continue;
+      }
+
+      const count = isReversed
+        ? getFollowingElementCount(node, siblingCount, lastElement, lastCount)
+        : getPrecedingElementCount(node, siblingCount, lastElement, lastCount);
+
+      lastElement = node;
+      lastCount = count;
+
+      if (count === siblingCount) {
         elements.push(node);
       }
+    }
+
+    if (isReversed) {
+      elements.reverse();
     }
 
     return new NodeQuery(elements);
@@ -288,13 +355,30 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * @template TOtherNode The node of the other query.
    */
   union<TOtherNode extends Node>(query: NodeQuery<TOtherNode>): NodeQuery<TNode | TOtherNode> {
-    const nodeSet = new Set<TNode | TOtherNode>(this.nodes);
+    const { nodes } = this;
 
-    for (const node of query.nodes) {
-      nodeSet.add(node);
+    const otherNodes = query.nodes;
+
+    // Arrays of nodes are never changed, so an array is shared if the other one has nothing to add
+    if (otherNodes.length === 0) {
+      return new NodeQuery<TNode | TOtherNode>(nodes);
+    }
+    if (nodes.length === 0) {
+      return new NodeQuery<TNode | TOtherNode>(otherNodes);
     }
 
-    return new NodeQuery(Array.from(nodeSet));
+    const unionNodes: Array<TNode | TOtherNode> = nodes.slice();
+
+    // A scan of a short array is faster than a lookup in a set, and the set of a long array is slow to create
+    const nodeSet = nodes.length > 16 && otherNodes.length > 16 ? new Set<Node>(nodes) : null;
+
+    for (const node of otherNodes) {
+      if (nodeSet !== null ? !nodeSet.has(node) : (nodes as readonly Node[]).indexOf(node) === -1) {
+        unionNodes.push(node);
+      }
+    }
+
+    return new NodeQuery(unionNodes);
   }
 
   /**
@@ -308,9 +392,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     const nodes = [];
 
     for (const node of this.nodes) {
-      const value = node.textContent;
-
-      if (value !== null && (predicate === undefined ? value.length !== 0 : isMatchingValue(value, predicate))) {
+      if (hasMatchingTextContent(node, predicate)) {
         nodes.push(node);
       }
     }
@@ -356,13 +438,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     const nodes = [];
 
     for (const node of this.nodes) {
-      const treeWalker = new TreeWalker(node, SHOW_ELEMENT);
-
-      for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-        if (hasTagNameNS(element, namespaceURI, localName)) {
-          nodes.push(node);
-          break;
-        }
+      if (hasDescendantElement(node, namespaceURI, localName)) {
+        nodes.push(node);
       }
     }
 
@@ -379,17 +456,31 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * represents all namespaces.
    */
   parent(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    const elementSet = new Set<Element>();
+    const { nodes } = this;
+    const nodeSet = createSet(nodes);
+    const elements = [];
 
-    for (const node of this.nodes) {
+    let lastParent: Node | null = null;
+
+    for (const node of nodes) {
       const parent = node.parentNode;
 
-      if (parent !== null && isElement(parent) && hasTagNameNS(parent, namespaceURI, localName)) {
-        elementSet.add(parent);
+      // Siblings usually go in a row, so the parent of the last node is checked before the set, and the set is read
+      // only if the parent matches, since the check is faster
+      if (
+        parent !== null &&
+        parent !== lastParent &&
+        isElement(parent) &&
+        isMatchingName(parent, namespaceURI, localName) &&
+        addUnique(nodeSet, parent)
+      ) {
+        elements.push(parent);
       }
+
+      lastParent = parent;
     }
 
-    return new NodeQuery(Array.from(elementSet));
+    return new NodeQuery(elements);
   }
 
   /**
@@ -403,19 +494,29 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * represents all namespaces.
    */
   ancestors(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
+    const { nodes } = this;
+
     // Ancestors that were read already, so the walk up from a node stops at an ancestor it shares with previous nodes
-    const ancestorSet = new Set<Node>();
+    const nodeSet = createSet(nodes);
     const elements = [];
 
-    for (const node of this.nodes) {
+    let lastParent: Node | null = null;
+
+    for (const node of nodes) {
+      // Siblings usually go in a row, and ancestors of the last node were read already
+      if (node.parentNode === lastParent) {
+        continue;
+      }
+
+      lastParent = node.parentNode;
+
+      // The set is checked for null here, since it is measurably faster in this loop than the check in addUnique
       for (
-        let ancestor = node.parentNode;
-        ancestor !== null && !ancestorSet.has(ancestor);
+        let ancestor = lastParent;
+        ancestor !== null && (nodeSet === null || addUnique(nodeSet, ancestor));
         ancestor = ancestor.parentNode
       ) {
-        ancestorSet.add(ancestor);
-
-        if (isElement(ancestor) && hasTagNameNS(ancestor, namespaceURI, localName)) {
+        if (isElement(ancestor) && isMatchingName(ancestor, namespaceURI, localName)) {
           elements.push(ancestor);
         }
       }
@@ -435,18 +536,29 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * represents all namespaces.
    */
   closest(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    const elementSet = new Set<Element>();
+    const { nodes } = this;
+    const nodeSet = createSet(nodes);
+    const elements = [];
 
-    for (const node of this.nodes) {
-      for (let ancestor: Node | null = node; ancestor !== null; ancestor = ancestor.parentNode) {
-        if (isElement(ancestor) && hasTagNameNS(ancestor, namespaceURI, localName)) {
-          elementSet.add(ancestor);
-          break;
-        }
+    let lastElement: Element | null = null;
+
+    for (const node of nodes) {
+      const element = getClosestElement(node, namespaceURI, localName);
+
+      // Nodes that have the same closest element usually go in a row, so the last one is checked before the set. And
+      // a node that has no children isn't an ancestor, so it is the closest element only for itself
+      if (
+        element !== null &&
+        element !== lastElement &&
+        ((element === (node as Node) && node.firstChild === null) || addUnique(nodeSet, element))
+      ) {
+        elements.push(element);
       }
+
+      lastElement = element;
     }
 
-    return new NodeQuery(Array.from(elementSet));
+    return new NodeQuery(elements);
   }
 
   /**
@@ -458,25 +570,41 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * represents all namespaces.
    */
   siblings(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
+    const { nodes } = this;
+    const elements: Element[] = [];
+
+    if (nodes.length === 1) {
+      // A single node has no other node to share the parent with, so the map isn't needed
+      const node = nodes[0];
+
+      if (node.parentNode !== null) {
+        pushSiblingElements(node.parentNode, node, namespaceURI, localName, elements);
+      }
+      return new NodeQuery(elements);
+    }
+
     // For each parent, the only child that is among nodes, or null if there are several, so each parent is read once
     const childMap = new Map<Node, Node | null>();
 
-    for (const node of this.nodes) {
+    for (const node of nodes) {
       const parent = node.parentNode;
 
-      if (parent !== null) {
-        childMap.set(parent, childMap.has(parent) ? null : node);
+      if (parent === null) {
+        continue;
+      }
+
+      const child = childMap.get(parent);
+
+      // The map is written only if the value changes, since reading it is faster
+      if (child === undefined) {
+        childMap.set(parent, node);
+      } else if (child !== null) {
+        childMap.set(parent, null);
       }
     }
 
-    const elements = [];
-
     for (const [parent, excludedChild] of childMap) {
-      for (let child = parent.firstChild; child !== null; child = child.nextSibling) {
-        if (child !== excludedChild && isElement(child) && hasTagNameNS(child, namespaceURI, localName)) {
-          elements.push(child);
-        }
-      }
+      pushSiblingElements(parent, excludedChild, namespaceURI, localName, elements);
     }
 
     return new NodeQuery(elements);
@@ -496,7 +624,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     for (const node of this.nodes) {
       const element = getNextSiblingOrSelf(node.nextSibling, ELEMENT_NODE) as Element | null;
 
-      if (element !== null && hasTagNameNS(element, namespaceURI, localName)) {
+      if (element !== null && isMatchingName(element, namespaceURI, localName)) {
         elements.push(element);
       }
     }
@@ -517,7 +645,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     for (const node of this.nodes) {
       const element = getPreviousSiblingOrSelf(node.previousSibling, ELEMENT_NODE) as Element | null;
 
-      if (element !== null && hasTagNameNS(element, namespaceURI, localName)) {
+      if (element !== null && isMatchingName(element, namespaceURI, localName)) {
         elements.push(element);
       }
     }
@@ -535,26 +663,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
    * represents all namespaces.
    */
-  nextAll(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    // Siblings that were read already, so the walk from a node stops at a sibling that follows a previous node
-    const siblingSet = new Set<Node>();
-    const elements = [];
-
-    for (const node of this.nodes) {
-      for (
-        let sibling = node.nextSibling;
-        sibling !== null && !siblingSet.has(sibling);
-        sibling = sibling.nextSibling
-      ) {
-        siblingSet.add(sibling);
-
-        if (isElement(sibling) && hasTagNameNS(sibling, namespaceURI, localName)) {
-          elements.push(sibling);
-        }
-      }
-    }
-
-    return new NodeQuery(elements);
+  following(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
+    return new NodeQuery(getSiblingElements(this.nodes, false, namespaceURI, localName));
   }
 
   /**
@@ -567,26 +677,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
    * represents all namespaces.
    */
-  previousAll(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    // Siblings that were read already, so the walk from a node stops at a sibling that precedes a previous node
-    const siblingSet = new Set<Node>();
-    const elements = [];
-
-    for (const node of this.nodes) {
-      for (
-        let sibling = node.previousSibling;
-        sibling !== null && !siblingSet.has(sibling);
-        sibling = sibling.previousSibling
-      ) {
-        siblingSet.add(sibling);
-
-        if (isElement(sibling) && hasTagNameNS(sibling, namespaceURI, localName)) {
-          elements.push(sibling);
-        }
-      }
-    }
-
-    return new NodeQuery(elements);
+  preceding(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
+    return new NodeQuery(getSiblingElements(this.nodes, true, namespaceURI, localName));
   }
 
   /**
@@ -596,9 +688,13 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * @param name The qualified name of the attribute.
    */
   getAttribute(name: string): string | null {
+    if (this.nodes.length === 0) {
+      return null;
+    }
+
     const node = this.nodes[0];
 
-    return node !== undefined && isElement(node) ? node.getAttribute(name) : null;
+    return isElement(node) ? node.getAttribute(name) : null;
   }
 
   /**
@@ -609,26 +705,13 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * @param localName The local name of the attribute.
    */
   getAttributeNS(namespaceURI: string | null, localName: string): string | null {
-    const node = this.nodes[0];
-
-    return node !== undefined && isElement(node) ? node.getAttributeNS(namespaceURI, localName) : null;
-  }
-
-  /**
-   * Returns the concatenated text content of {@link nodes}.
-   */
-  text(): string {
-    let text = '';
-
-    for (const node of this.nodes) {
-      const value = node.textContent;
-
-      if (value !== null) {
-        text += value;
-      }
+    if (this.nodes.length === 0) {
+      return null;
     }
 
-    return text;
+    const node = this.nodes[0];
+
+    return isElement(node) ? node.getAttributeNS(namespaceURI, localName) : null;
   }
 
   /**
@@ -636,9 +719,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    */
   remove(): this {
     for (const node of this.nodes) {
-      if (node.parentNode !== null) {
-        node.parentNode.removeChild(node);
-      }
+      node.parentNode?.removeChild(node);
     }
 
     return this;
@@ -652,7 +733,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
 /**
  * Returns `true` if the string meets the predicate.
  */
-function isMatchingValue(value: string, predicate: StringPredicate | undefined): boolean {
+function isMatchingString(value: string, predicate: StringPredicate | undefined): boolean {
   if (predicate === undefined) {
     return true;
   }
@@ -665,29 +746,6 @@ function isMatchingValue(value: string, predicate: StringPredicate | undefined):
 
   // Unlike RegExp.test, the search doesn't depend on lastIndex of a global expression, and doesn't change it
   return value.search(predicate) !== -1;
-}
-
-/**
- * Returns `true` if the element is at the index among its sibling elements. Siblings are counted from the first one for
- * a non-negative index, and from the last one for a negative index.
- */
-function isNthChild(element: Element, index: number): boolean {
-  const isReversed = index < 0;
-
-  // The number of sibling elements that must be on the counted side of the element
-  let siblingCount = isReversed ? -index - 1 : index;
-
-  for (
-    let sibling = isReversed ? element.nextElementSibling : element.previousElementSibling;
-    sibling !== null;
-    sibling = isReversed ? sibling.nextElementSibling : sibling.previousElementSibling
-  ) {
-    if (--siblingCount < 0) {
-      return false;
-    }
-  }
-
-  return siblingCount === 0;
 }
 
 /**
@@ -704,6 +762,218 @@ function hasNoContent(node: Node): boolean {
 }
 
 /**
+ * Returns `true` if the text content of the node meets the predicate.
+ */
+function hasMatchingTextContent(node: Node, predicate: StringPredicate | undefined): boolean {
+  // The text content of an element is the text of its descendants, and it is slow to concatenate. So descendants are
+  // read first to tell whether there's any text, or whether the text can be equal to the string. Subclasses may have
+  // their own text content, so their getter is always called
+  if (node.constructor === Element || node.constructor === DocumentFragment) {
+    if (predicate === undefined) {
+      return hasTextContent(node);
+    }
+
+    if (typeof predicate === 'string' && getTextContentEndIndex(node, predicate, 0) !== predicate.length) {
+      return false;
+    }
+  }
+
+  const { textContent } = node;
+
+  return (
+    textContent !== null &&
+    (predicate !== undefined ? isMatchingString(textContent, predicate) : textContent.length !== 0)
+  );
+}
+
+/**
+ * Returns `true` if the text content of the node isn't empty. Reads the same descendants as {@link getTextContent} does.
+ */
+function hasTextContent(node: Node): boolean {
+  for (let child = node.firstChild; child !== null; child = child.nextSibling) {
+    if (isText(child) ? child.data.length !== 0 : isElement(child) && hasTextContent(child)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Quickly checks whether the text content of the node can equal the expected text, without concatenating it.
+ *
+ * Compares only the length and the first character of each text node, so a passed check still needs a full
+ * comparison.
+ *
+ * @param node The node whose text content is checked.
+ * @param expectedText The text that the text content must equal.
+ * @param startIndex The index in the expected text where the text content of the node starts.
+ * @returns The index in the expected text where the text content of the node ends, or -1 if they can't be equal.
+ */
+function getTextContentEndIndex(node: Node, expectedText: string, startIndex: number): number {
+  for (let child = node.firstChild; child !== null; child = child.nextSibling) {
+    if (isText(child)) {
+      const { data } = child;
+
+      if (data.length === 0) {
+        continue;
+      }
+
+      if (
+        startIndex + data.length > expectedText.length ||
+        data.charCodeAt(0) !== expectedText.charCodeAt(startIndex)
+      ) {
+        return -1;
+      }
+
+      startIndex += data.length;
+      continue;
+    }
+
+    if (isElement(child) && (startIndex = getTextContentEndIndex(child, expectedText, startIndex)) === -1) {
+      return -1;
+    }
+  }
+
+  return startIndex;
+}
+
+/**
+ * Returns the descendant of the root that follows the given descendant in document order, or `null` if it's the last
+ * one. Lets a loop visit all descendants of the root without creating a tree walker.
+ *
+ * @param descendant The descendant of the root to start from.
+ * @param root The node whose descendants are visited. The walk doesn't leave it.
+ */
+function getNextDescendantInDocumentOrder(descendant: Node, root: Node): ChildNode | null {
+  let nextNode = descendant.firstChild;
+
+  // The node has no children, so the next node is the closest sibling that follows the node or its ancestor
+  while (nextNode === null && descendant !== root && (nextNode = descendant.nextSibling) === null) {
+    descendant = descendant.parentNode!;
+  }
+
+  return nextNode;
+}
+
+/**
+ * Returns the next sibling of the node, or the previous one if the walk is reversed.
+ */
+function getSibling(node: Node, isReversed: boolean): ChildNode | null {
+  return isReversed ? node.previousSibling : node.nextSibling;
+}
+
+/**
+ * Returns sibling elements with the given namespace and local name that follow nodes, or precede them if the walk is
+ * reversed.
+ */
+function getSiblingElements(
+  nodes: readonly Node[],
+  isReversed: boolean,
+  namespaceURI: string | null,
+  localName: string
+): Element[] {
+  // Sibling elements that were read already, so the walk from a node stops at a sibling that a walk from a previous
+  // node has read
+  const nodeSet = createSet(nodes);
+  const elements = [];
+
+  for (const node of nodes) {
+    for (let sibling = getSibling(node, isReversed); sibling !== null; sibling = getSibling(sibling, isReversed)) {
+      if (!isElement(sibling)) {
+        continue;
+      }
+
+      // All siblings after a sibling that was read, were read too
+      if (!addUnique(nodeSet, sibling)) {
+        break;
+      }
+
+      if (isMatchingName(sibling, namespaceURI, localName)) {
+        elements.push(sibling);
+      }
+    }
+  }
+
+  return elements;
+}
+
+/**
+ * Returns the number of sibling elements that precede the element.
+ *
+ * @param element The element whose siblings are counted.
+ * @param maxCount The walk stops as soon as there are more siblings. The returned count is then less than the actual
+ * one, but it is still greater than the maximum, and so is the count of an element that reuses it.
+ * @param lastElement The element whose count is reused if the walk reaches it, so a run of siblings is read once.
+ * @param lastCount The count that was returned for the last element.
+ */
+function getPrecedingElementCount(
+  element: Element,
+  maxCount: number,
+  lastElement: Element | null,
+  lastCount: number
+): number {
+  let count = 0;
+
+  for (let sibling = element.previousSibling; sibling !== null; sibling = sibling.previousSibling) {
+    if (sibling === lastElement) {
+      return count + lastCount + 1;
+    }
+    if (isElement(sibling) && ++count > maxCount) {
+      break;
+    }
+  }
+  return count;
+}
+
+/**
+ * Returns the number of sibling elements that follow the element. Does the same as {@link getPrecedingElementCount},
+ * but in the other direction.
+ */
+function getFollowingElementCount(
+  element: Element,
+  maxCount: number,
+  lastElement: Element | null,
+  lastCount: number
+): number {
+  let count = 0;
+
+  for (let sibling = element.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
+    if (sibling === lastElement) {
+      return count + lastCount + 1;
+    }
+    if (isElement(sibling) && ++count > maxCount) {
+      break;
+    }
+  }
+  return count;
+}
+
+/**
+ * Returns the closest element with the given namespace and local name, which is the node itself or its ancestor, or
+ * `null` if there's no such element.
+ */
+function getClosestElement(node: Node, namespaceURI: string | null, localName: string): Element | null {
+  for (let ancestor: Node | null = node; ancestor !== null; ancestor = ancestor.parentNode) {
+    if (isElement(ancestor) && isMatchingName(ancestor, namespaceURI, localName)) {
+      return ancestor;
+    }
+  }
+  return null;
+}
+
+/**
+ * Returns `true` if the root has a descendant that is an element with the given namespace and local name.
+ */
+function hasDescendantElement(root: Node, namespaceURI: string | null, localName: string): boolean {
+  for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
+    if (isElement(node) && isMatchingName(node, namespaceURI, localName)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Returns `true` if an ancestor of the node is in the set.
  */
 function hasAncestor(node: Node, nodeSet: Set<Node>): boolean {
@@ -713,4 +983,55 @@ function hasAncestor(node: Node, nodeSet: Set<Node>): boolean {
     }
   }
   return false;
+}
+
+/**
+ * Appends descendants of the root that are elements with the given namespace and local name. The loop is in a function
+ * of its own, since it is slower inside a function that has more variables.
+ */
+function pushDescendantElements(root: Node, namespaceURI: string | null, localName: string, elements: Element[]): void {
+  for (let node = root.firstChild; node !== null; node = getNextDescendantInDocumentOrder(node, root)) {
+    if (isElement(node) && isMatchingName(node, namespaceURI, localName)) {
+      elements.push(node);
+    }
+  }
+}
+
+/**
+ * Appends children of the parent that are elements with the given namespace and local name.
+ *
+ * @param parent The parent whose children are read.
+ * @param excludedChild The child that isn't appended.
+ * @param namespaceURI The namespace of elements.
+ * @param localName The local name of elements.
+ * @param elements The array to append elements to.
+ */
+function pushSiblingElements(
+  parent: Node,
+  excludedChild: Node | null,
+  namespaceURI: string | null,
+  localName: string,
+  elements: Element[]
+): void {
+  for (let child = parent.firstChild; child !== null; child = child.nextSibling) {
+    if (child !== excludedChild && isElement(child) && isMatchingName(child, namespaceURI, localName)) {
+      elements.push(child);
+    }
+  }
+}
+
+/**
+ * Returns a new set if there are several nodes, or `null` if there's a single node. A single node has no other node to
+ * share parents, ancestors or siblings with, so a set that tells which of them were read already isn't needed.
+ */
+function createSet(nodes: readonly Node[]): Set<Node> | null {
+  return nodes.length > 1 ? new Set() : null;
+}
+
+/**
+ * Adds the node to the set, and returns `true` if the set didn't have it, or if there's no set. Reads the set once,
+ * unlike a check that is followed by an addition.
+ */
+function addUnique(nodeSet: Set<Node> | null, node: Node): boolean {
+  return nodeSet === null || nodeSet.size !== nodeSet.add(node).size;
 }

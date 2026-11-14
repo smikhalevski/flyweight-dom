@@ -28,7 +28,7 @@ export function getElementsByTagNameNS(
   const elements = [];
 
   for (let element: Element | null; (element = treeWalker.nextNode() as Element) !== null;) {
-    if (hasTagNameNS(element, namespaceURI, localName)) {
+    if (isMatchingName(element, namespaceURI, localName)) {
       elements.push(element);
     }
   }
@@ -43,17 +43,17 @@ export function getElementsByTagNameNS(
  * @param namespaceURI The namespace of the element. The special string `*` represents all namespaces.
  * @param localName The local name of the element. The special string `*` represents all elements.
  */
-export function hasTagNameNS(element: Element, namespaceURI: string | null, localName: string): boolean {
+export function isMatchingName(element: Element, namespaceURI: string | null, localName: string): boolean {
   return (
     (namespaceURI === '*' || element.namespaceURI === namespaceURI) &&
-    (localName === '*' || hasLocalName(element, localName))
+    (localName === '*' || isLocalNameEqual(element, localName))
   );
 }
 
 /**
  * Returns `true` if the element has the given local name.
  */
-function hasLocalName(element: Element, localName: string): boolean {
+function isLocalNameEqual(element: Element, localName: string): boolean {
   const { tagName } = element;
 
   if (element.namespaceURI === null) {

@@ -4,5 +4,5 @@
     "maxWarmupBatchIterationCount": 1000,
     "targetRme": 0.05
   },
-  "testFilePatterns": ["./src/test/perf.ts"]
+  "testFilePatterns": ["./src/test/perf.ts", "./src/test/query.perf.ts"]
 }

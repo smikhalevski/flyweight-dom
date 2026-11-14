@@ -189,6 +189,49 @@ describe('NodeQuery.hasAttributeNS', () => {
   test('does not select nodes that are not elements', () => {
     expect($(new Document()).hasAttributeNS('urn:111', 'eee').nodes).toStrictEqual([]);
   });
+
+  test('selects elements that have the attribute in any namespace or without a namespace', () => {
+    const root = h(
+      'aaa',
+      { 'xmlns:xxx': 'urn:111', 'xmlns:yyy': 'urn:222' },
+      h('bbb', { 'xxx:eee': '' }),
+      h('bbb', { 'yyy:eee': '' }),
+      h('bbb', { eee: '' }),
+      h('bbb', { 'zzz:eee': '' }),
+      h('bbb', { fff: '' })
+    );
+
+    expect($(root).children().hasAttributeNS('*', 'eee').nodes).toStrictEqual([
+      root.childNodes[0],
+      root.childNodes[1],
+      root.childNodes[2],
+    ]);
+  });
+
+  test('selects elements by a local name that has a prefix that is not bound', () => {
+    const root = h('aaa', { 'xmlns:xxx': 'urn:111' }, h('bbb', { 'zzz:eee': '' }), h('bbb', { 'xxx:eee': '' }));
+
+    expect($(root).children().hasAttributeNS('*', 'zzz:eee').nodes).toStrictEqual([root.childNodes[0]]);
+    expect($(root).children().hasAttributeNS('*', 'xxx:eee').nodes).toStrictEqual([]);
+  });
+
+  test('splits the name of an attribute at the first colon', () => {
+    const element = h('aaa', { 'xmlns:xxx:yyy': 'urn:111', 'xxx:yyy:eee': '' });
+
+    expect($(element).hasAttributeNS('*', 'eee').nodes).toStrictEqual([]);
+  });
+
+  test('selects elements that declare a prefix in any namespace', () => {
+    const element = h('aaa', { 'xmlns:xxx': 'urn:111' });
+
+    expect($(element).hasAttributeNS('*', 'xxx').nodes).toStrictEqual([element]);
+  });
+
+  test('selects elements whose attribute in any namespace meets the predicate', () => {
+    const root = h('aaa', { 'xmlns:xxx': 'urn:111' }, h('bbb', { 'xxx:eee': '111' }), h('bbb', { eee: '222' }));
+
+    expect($(root).children().hasAttributeNS('*', 'eee', '222').nodes).toStrictEqual([root.childNodes[1]]);
+  });
 });
 
 describe('NodeQuery.at', () => {
@@ -341,6 +384,24 @@ describe('NodeQuery.lastChild', () => {
   });
 });
 
+describe('NodeQuery.onlyChild', () => {
+  test('selects elements that are the only element children of their parents', () => {
+    const root = h('aaa', h('bbb', 'xxx', h('ccc'), 'xxx'), h('ddd', h('eee'), h('fff')));
+
+    expect($(root).descendants().onlyChild().nodes).toStrictEqual([root.childNodes[0].childNodes[1]]);
+  });
+
+  test('selects an element without a parent', () => {
+    const element = h('aaa');
+
+    expect($(element).onlyChild().nodes).toStrictEqual([element]);
+  });
+
+  test('does not select nodes that are not elements', () => {
+    expect($(new Text()).onlyChild().nodes).toStrictEqual([]);
+  });
+});
+
 describe('NodeQuery.hasNoContent', () => {
   test('selects nodes that have neither child elements nor text', () => {
     const root = h('aaa', h('bbb'), h('ccc', h('ddd')), h('eee', 'xxx'), h('fff', new Comment('xxx'), new Text()));
@@ -480,6 +541,27 @@ describe('NodeQuery.filter', () => {
         .filter(element => element.textContent === 'xxx').nodes
     ).toStrictEqual([root.childNodes[0]]);
   });
+
+  test('does not select nodes for which the predicate returns neither true nor a query', () => {
+    const root = h('aaa', h('bbb'), h('ccc'));
+
+    expect(
+      $(root)
+        .children()
+        // @ts-expect-error A predicate returns a boolean or a query
+        .filter(element => (element.tagName === 'bbb' ? 'xxx' : null)).nodes
+    ).toStrictEqual([]);
+  });
+
+  test('selects nodes for which the predicate returns a query that is not empty', () => {
+    const root = h('aaa', h('bbb', h('ccc')), h('bbb'));
+
+    expect(
+      $(root)
+        .children()
+        .filter(element => $(element).children('ccc')).nodes
+    ).toStrictEqual([root.childNodes[0]]);
+  });
 });
 
 describe('NodeQuery.not', () => {
@@ -490,6 +572,27 @@ describe('NodeQuery.not', () => {
       $(root)
         .children()
         .not((element, index) => element.tagName === 'bbb' || index === 2).nodes
+    ).toStrictEqual([root.childNodes[1]]);
+  });
+
+  test('selects nodes for which the predicate returns neither true nor a query', () => {
+    const root = h('aaa', h('bbb'), h('ccc'));
+
+    expect(
+      $(root)
+        .children()
+        // @ts-expect-error A predicate returns a boolean or a query
+        .not(element => (element.tagName === 'bbb' ? 'xxx' : undefined)).nodes
+    ).toStrictEqual(Array.from(root.childNodes));
+  });
+
+  test('selects nodes for which the predicate returns an empty query', () => {
+    const root = h('aaa', { class: 'xxx' }, h('bbb', h('ccc')), h('ccc'));
+
+    expect(
+      $(root)
+        .descendants('ccc')
+        .not(element => $(element).ancestors('bbb')).nodes
     ).toStrictEqual([root.childNodes[1]]);
   });
 });

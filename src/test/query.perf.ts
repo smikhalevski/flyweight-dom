@@ -232,6 +232,14 @@ describe('NodeQuery.hasAttributeNS', () => {
   });
 });
 
+describe('NodeQuery.hasAttributeNS with any namespace', () => {
+  test('flyweight-dom', () => {
+    const query = makeTestNamespaceQuery();
+
+    measure(() => query.hasAttributeNS('*', 'ccc'));
+  });
+});
+
 describe('NodeQuery.hasClass', () => {
   test('flyweight-dom', () => {
     const query = makeTestQuery();
@@ -300,11 +308,27 @@ describe('NodeQuery.firstChild', () => {
   });
 });
 
+describe('NodeQuery.onlyChild', () => {
+  test('flyweight-dom', () => {
+    const query = makeTestQuery();
+
+    measure(() => query.onlyChild());
+  });
+});
+
 describe('NodeQuery.filter', () => {
   test('flyweight-dom', () => {
     const query = makeTestQuery();
 
     measure(() => query.filter((element: { tagName: string }) => element.tagName === 'div'));
+  });
+});
+
+describe('NodeQuery.filter with a query', () => {
+  test('flyweight-dom', () => {
+    const query = makeTestQuery();
+
+    measure(() => query.filter(element => $(element).children('span')));
   });
 });
 

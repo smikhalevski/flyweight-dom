@@ -54,6 +54,17 @@ export function $<TNode extends Node>(node: TNode): NodeQuery<TNode> {
 export type StringPredicate = string | RegExp | ((value: string) => boolean);
 
 /**
+ * Returns `true`, or a query that isn't empty, if the node must be selected. A query lets a predicate test the
+ * surroundings of the node: `element => $(element).ancestors().hasClass('aaa')`.
+ *
+ * @param node The node to test.
+ * @param index The index of the node in the query.
+ * @template TNode The node to test.
+ * @group Query
+ */
+export type NodePredicate<TNode extends Node> = (node: TNode, index: number) => NodeQuery<Node> | boolean;
+
+/**
  * The list of selected nodes. A query isn't changed after it is created: each method returns a new query, so a query
  * can be reused as the start of other queries.
  *
@@ -178,9 +189,10 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
 
   /**
    * Selects elements from {@link nodes} that have the attribute with the given namespace and local name, whatever its
-   * prefix is.
+   * prefix is, the same as the `[ns|name]` selector in CSS.
    *
-   * @param namespaceURI The namespace of the attribute, or `null` for an attribute without a namespace.
+   * @param namespaceURI The namespace of the attribute, or `null` for an attribute without a namespace. The special
+   * string `*` represents all namespaces, including no namespace, the same as `[*|name]` in CSS.
    * @param localName The local name of the attribute.
    * @param predicate The string that the attribute value must be equal to, or the regular expression that it must
    * match, or the callback that returns `true` if the element with the given attribute value must be selected. If
@@ -194,7 +206,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
         continue;
       }
 
-      const value = node.getAttributeNS(namespaceURI, localName);
+      const value =
+        namespaceURI === '*' ? getAttributeAnyNS(node, localName) : node.getAttributeNS(namespaceURI, localName);
 
       if (value !== null && isMatchingString(value, predicate)) {
         elements.push(node);
@@ -333,6 +346,22 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   }
 
   /**
+   * Selects elements from {@link nodes} that are the only element children of their parents, the same as the
+   * `:only-child` selector in CSS.
+   */
+  onlyChild(): NodeQuery {
+    const elements = [];
+
+    for (const node of this.nodes) {
+      if (isElement(node) && node.previousElementSibling === null && node.nextElementSibling === null) {
+        elements.push(node);
+      }
+    }
+
+    return new NodeQuery(elements);
+  }
+
+  /**
    * Selects {@link nodes} that have neither child elements nor text, the same as the `:empty` selector in CSS.
    */
   hasNoContent(): NodeQuery<TNode> {
@@ -403,22 +432,34 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   /**
    * Selects {@link nodes} that pass the predicate.
    *
-   * @param predicate Returns `true` if the node must be selected.
+   * @param predicate Returns `true`, or a query that isn't empty, if the node must be selected.
    */
-  filter(predicate: (node: TNode, index: number) => boolean): NodeQuery<TNode> {
-    return new NodeQuery(this.nodes.filter(predicate));
+  filter(predicate: NodePredicate<TNode>): NodeQuery<TNode> {
+    const nodes = [];
+
+    for (let i = 0; i < this.nodes.length; ++i) {
+      const result: unknown = predicate(this.nodes[i], i);
+
+      if (result === true || (result instanceof NodeQuery && result.nodes.length !== 0)) {
+        nodes.push(this.nodes[i]);
+      }
+    }
+
+    return new NodeQuery(nodes);
   }
 
   /**
    * Selects {@link nodes} that don't pass the predicate, the same as the `:not()` selector in CSS.
    *
-   * @param predicate Returns `true` if the node must not be selected.
+   * @param predicate Returns `true`, or a query that isn't empty, if the node must not be selected.
    */
-  not(predicate: (node: TNode, index: number) => boolean): NodeQuery<TNode> {
+  not(predicate: NodePredicate<TNode>): NodeQuery<TNode> {
     const nodes = [];
 
     for (let i = 0; i < this.nodes.length; ++i) {
-      if (!predicate(this.nodes[i], i)) {
+      const result: unknown = predicate(this.nodes[i], i);
+
+      if (result !== true && !(result instanceof NodeQuery && result.nodes.length !== 0)) {
         nodes.push(this.nodes[i]);
       }
     }
@@ -728,6 +769,44 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   [Symbol.iterator](): IterableIterator<TNode> {
     return this.nodes[Symbol.iterator]();
   }
+}
+
+/**
+ * Returns the value of the attribute with the given local name in any namespace or in no namespace, or `null` if the
+ * element has no such attribute. If several attributes match, the value of the first one is returned.
+ */
+function getAttributeAnyNS(element: Element, localName: string): string | null {
+  const { attributes } = element;
+
+  for (const name in attributes) {
+    // The index of the colon that separates the prefix from the local name
+    const index = name.length - localName.length - 1;
+
+    if (index === -1) {
+      // An attribute without a prefix, or with a prefix that isn't bound, has no namespace, and its local name is the
+      // whole name, the same as in Element.getAttributeNS
+      const colonIndex = name.indexOf(':');
+
+      if (
+        name === localName &&
+        (colonIndex === -1 || element.lookupNamespaceURI(name.substring(0, colonIndex)) === null)
+      ) {
+        return attributes[name];
+      }
+      continue;
+    }
+
+    if (
+      index > 0 &&
+      name.indexOf(':') === index &&
+      name.endsWith(localName) &&
+      element.lookupNamespaceURI(name.substring(0, index)) !== null
+    ) {
+      return attributes[name];
+    }
+  }
+
+  return null;
 }
 
 /**

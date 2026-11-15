@@ -6,7 +6,7 @@
   "disableSources": true,
   "hideGenerator": true,
   "readme": "none",
-  "tsconfig": "./tsconfig.json",
+  "tsconfig": "./tsconfig.build.json",
   "navigation": {
     "includeFolders": false
   },

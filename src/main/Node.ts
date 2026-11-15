@@ -222,7 +222,7 @@ export class Node {
    * Returns bits that tell the position of the other node relative to this node: whether it precedes or follows this
    * node, and whether it contains this node or is contained by it.
    *
-   * Nodes of different trees have no position, so {@link DOCUMENT_POSITION_DISCONNECTED} is returned along with a
+   * Nodes of different trees have no position, so {@link Node.DOCUMENT_POSITION_DISCONNECTED} is returned along with a
    * preceding or following bit that is the same for all nodes of both trees, so nodes can be sorted.
    *
    * @param otherNode The node to compare with.

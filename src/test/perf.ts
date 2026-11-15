@@ -1,9 +1,7 @@
 import * as domhandler from 'domhandler';
 import * as domutils from 'domutils';
 import { describe, measure, test } from 'toofast';
-// @ts-ignore
 import { h } from '../../lib/dsl.js';
-// @ts-ignore
 import * as flyweightDom from '../../lib/index.js';
 import {
   ATTRIBUTE_NAMESPACE,

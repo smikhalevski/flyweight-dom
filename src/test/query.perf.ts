@@ -374,12 +374,12 @@ describe('NodeQuery.text', () => {
   });
 });
 
-describe('NodeQuery.queries', () => {
+describe('NodeQuery.explode', () => {
   test('flyweight-dom', () => {
     const query = makeTestQuery();
 
     measure(() => {
-      for (const item of query.queries()) {
+      for (const item of query.explode()) {
         item.nodes;
       }
     });

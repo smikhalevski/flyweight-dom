@@ -1183,10 +1183,10 @@ describe('NodeQuery.remove', () => {
   });
 });
 
-describe('NodeQuery.queries', () => {
+describe('NodeQuery.explode', () => {
   test('iterates over queries that hold one node each', () => {
     const root = h('aaa', h('bbb'), h('ccc'));
-    const queries = Array.from($(root).children().queries());
+    const queries = Array.from($(root).children().explode());
 
     expect(queries.length).toBe(2);
     expect(queries[0]).toBeInstanceOf(NodeQuery);
@@ -1197,7 +1197,7 @@ describe('NodeQuery.queries', () => {
   test('returns new results', () => {
     const iterator = $(h('aaa', h('bbb'), h('ccc')))
       .children()
-      .queries();
+      .explode();
     const result1 = iterator.next();
     const result2 = iterator.next();
 
@@ -1206,7 +1206,7 @@ describe('NodeQuery.queries', () => {
   });
 
   test('stays done after the last query', () => {
-    const iterator = $(h('aaa')).queries();
+    const iterator = $(h('aaa')).explode();
 
     iterator.next();
 
@@ -1215,7 +1215,7 @@ describe('NodeQuery.queries', () => {
   });
 
   test('is its own iterator', () => {
-    const iterator = $(h('aaa')).queries();
+    const iterator = $(h('aaa')).explode();
 
     expect(iterator[Symbol.iterator]()).toBe(iterator);
   });
@@ -1224,11 +1224,11 @@ describe('NodeQuery.queries', () => {
     const element = h('aaa');
 
     // @ts-expect-error Iterator helpers aren't in the ES2020 lib
-    expect($(element).queries().toArray()[0].nodes).toStrictEqual([element]);
+    expect($(element).explode().toArray()[0].nodes).toStrictEqual([element]);
   });
 
   test('returns an iterator object', () => {
-    expectTypeOf($(h('aaa')).queries()).toEqualTypeOf<IteratorObject<NodeQuery<Element>>>();
+    expectTypeOf($(h('aaa')).explode()).toEqualTypeOf<IteratorObject<NodeQuery<Element>>>();
   });
 });
 

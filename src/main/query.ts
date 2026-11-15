@@ -894,14 +894,14 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * Returns an iterator over queries that hold one of {@link nodes} each, so a loop can query from each node:
    *
    * ```ts
-   * for (const $item of $(document).descendants('item').queries()) {
+   * for (const $item of $(document).descendants('item').explode()) {
    *   $item.children('title').text;
    * }
    * ```
    *
    * Queries are created as the iterator reaches them, so a loop that stops early doesn't create the rest.
    */
-  queries(): IteratorObject<NodeQuery<TNode>> {
+  explode(): IteratorObject<NodeQuery<TNode>> {
     return new NodeQueryIterator(this.nodes);
   }
 
@@ -949,7 +949,7 @@ const getAttributeAnyNS = (element: Element, localName: string): string | null =
 };
 
 /**
- * The iterator over queries that hold one node each, which {@link NodeQuery.queries} returns.
+ * The iterator over queries that hold one node each, which {@link NodeQuery.explode} returns.
  */
 class NodeQueryIterator<TNode extends Node> {
   private _nodes;

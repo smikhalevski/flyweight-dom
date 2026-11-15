@@ -33,3 +33,9 @@ test('a prefix is a part of the local name of an element without a namespace', (
 
   expect(getElementsByTagNameNS(root, null, 'xxx:bbb')).toStrictEqual([root.childNodes[2]]);
 });
+
+test('returns elements without a namespace if the namespace is an empty string', () => {
+  const root = makeTestRoot();
+
+  expect(getElementsByTagNameNS(root, '', 'xxx:bbb')).toStrictEqual([root.childNodes[2]]);
+});

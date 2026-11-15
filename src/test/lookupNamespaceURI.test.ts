@@ -67,3 +67,11 @@ test('starts at the document element of a document', () => {
 
   expect(lookupNamespaceURI(document, 'xxx')).toBe('urn:111');
 });
+
+test('returns the namespace of an element without a prefix as the default namespace', () => {
+  expect(lookupNamespaceURI(new Element('aaa', {}, 'urn:111'), null)).toBe('urn:111');
+});
+
+test('looks up the default namespace if the prefix is an empty string', () => {
+  expect(lookupNamespaceURI(new Element('aaa', { xmlns: 'urn:111' }), '')).toBe('urn:111');
+});

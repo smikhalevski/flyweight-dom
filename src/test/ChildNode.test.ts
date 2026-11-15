@@ -111,6 +111,30 @@ describe('after', () => {
 
     expect(getChildNodes(parent)).toStrictEqual([text1, text3, text2]);
   });
+
+  test('inserts the next value after the last child of a fragment', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const text3 = new Text('ccc');
+    const text4 = new Text('ddd');
+    const text5 = new Text('eee');
+    const parent = new Element('aaa').append(text1, text2);
+
+    text1.after(new DocumentFragment().append(text3, text4), text5);
+
+    expect(getChildNodes(parent)).toStrictEqual([text1, text3, text4, text5, text2]);
+  });
+
+  test('skips null and undefined', () => {
+    const text1 = new Text('aaa');
+    const text2 = new Text('bbb');
+    const parent = new Element('aaa').append(text1);
+
+    // @ts-expect-error null and undefined are outside the declared type, but JS callers pass them
+    text1.after(null, text2, undefined);
+
+    expect(getChildNodes(parent)).toStrictEqual([text1, text2]);
+  });
 });
 
 describe('before', () => {

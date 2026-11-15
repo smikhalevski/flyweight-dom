@@ -324,6 +324,11 @@ describe('append', () => {
 
     expect(parent.childNodes.length).toBe(1);
   });
+
+  test('throws if a value is a function', () => {
+    // @ts-expect-error A function is neither a node nor a primitive
+    expect(() => new Element('aaa').append(() => {})).toThrow('The value must be a Node or a primitive');
+  });
 });
 
 describe('prepend', () => {
@@ -360,6 +365,17 @@ describe('prepend', () => {
     parent.prepend(text2, text1);
 
     expect(getChildNodes(parent)).toEqual([text2, text1]);
+  });
+
+  test('skips null and undefined', () => {
+    const text = new Text('aaa');
+    const parent = new Element('aaa').append(text);
+
+    // @ts-expect-error null and undefined are outside the declared type, but JS callers pass them
+    parent.prepend(null, 'bbb', undefined);
+
+    expect(parent.childNodes.length).toBe(2);
+    expect(parent.lastChild).toBe(text);
   });
 });
 
@@ -419,6 +435,16 @@ describe('replaceChildren', () => {
     parent.replaceChildren(child2, child1);
 
     expect(getChildNodes(parent)).toEqual([child2, child1]);
+  });
+
+  test('skips null and undefined', () => {
+    const parent = new Element('aaa').append('bbb');
+
+    // @ts-expect-error null and undefined are outside the declared type, but JS callers pass them
+    parent.replaceChildren(null, 'ccc', undefined);
+
+    expect(parent.textContent).toBe('ccc');
+    expect(parent.childNodes.length).toBe(1);
   });
 });
 

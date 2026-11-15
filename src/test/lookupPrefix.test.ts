@@ -18,3 +18,7 @@ test('returns the prefix of an element that has the namespace', () => {
 test('returns null if the namespace is the default namespace', () => {
   expect(lookupPrefix(new Element('aaa', { xmlns: 'urn:111' }, 'urn:111'), 'urn:111')).toBeNull();
 });
+
+test('returns null if the namespace is an empty string', () => {
+  expect(lookupPrefix(new Element('aaa', { 'xmlns:xxx': '' }), '')).toBeNull();
+});

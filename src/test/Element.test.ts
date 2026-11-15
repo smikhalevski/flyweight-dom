@@ -518,6 +518,12 @@ test('a prefix that is not bound is a part of the local name of an attribute', (
   expect(element.getAttributeNS(null, 'xxx:bbb')).toBe('ccc');
 });
 
+test('a prefix that is bound is not a part of the local name of an attribute', () => {
+  const element = new Element('aaa', { 'xmlns:xxx': 'urn:111', 'xxx:bbb': 'ccc' });
+
+  expect(element.getAttributeNS(null, 'xxx:bbb')).toBeNull();
+});
+
 test('returns xmlns attributes', () => {
   const element = new Element('aaa', { xmlns: 'urn:111', 'xmlns:xxx': 'urn:222' });
 
@@ -595,6 +601,14 @@ test('removes an attribute with the given namespace and local name', () => {
   element.removeAttributeNS('urn:111', 'bbb');
 
   expect(element.attributes).toStrictEqual({ 'xmlns:xxx': 'urn:111' });
+});
+
+test('does not change attributes if there is no attribute with the given namespace and local name', () => {
+  const element = new Element('aaa', { 'xmlns:xxx': 'urn:111', 'xxx:bbb': 'ccc' });
+
+  element.removeAttributeNS('urn:222', 'bbb');
+
+  expect(element.attributes).toStrictEqual({ 'xmlns:xxx': 'urn:111', 'xxx:bbb': 'ccc' });
 });
 
 test('returns descendants with the given class name, but not the element itself', () => {

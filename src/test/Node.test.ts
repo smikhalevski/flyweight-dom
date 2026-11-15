@@ -213,4 +213,17 @@ describe('Node.compareDocumentPosition', () => {
       position ^ (Node.DOCUMENT_POSITION_PRECEDING | Node.DOCUMENT_POSITION_FOLLOWING)
     );
   });
+
+  test('compares nodes at different depths whose ancestors at the same depth are not siblings', () => {
+    const element1 = new Element('ddd');
+    const element2 = new Element('fff');
+
+    new Element('aaa').append(
+      new Element('bbb').append(new Element('ccc').append(element1)),
+      new Element('eee').append(element2)
+    );
+
+    expect(element1.compareDocumentPosition(element2)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(element2.compareDocumentPosition(element1)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+  });
 });

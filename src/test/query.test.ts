@@ -534,6 +534,13 @@ describe('NodeQuery.union', () => {
 
     expect(new NodeQuery([ddd, bbb]).union(new NodeQuery([ccc, root])).nodes).toStrictEqual([root, bbb, ccc, ddd]);
   });
+
+  test('selects nodes of this query first if they precede nodes of the other query', () => {
+    const root = h('aaa', h('bbb'), h('ccc'), h('ddd'));
+    const [bbb, ccc, ddd] = $(root).children().nodes;
+
+    expect(new NodeQuery([bbb, ccc]).union(new NodeQuery([ddd])).nodes).toStrictEqual([bbb, ccc, ddd]);
+  });
 });
 
 describe('NodeQuery.sort', () => {
@@ -945,6 +952,21 @@ describe('NodeQuery.siblings', () => {
     expect(new NodeQuery([jjj, iii, ddd, hhh]).siblings().nodes).toStrictEqual([bbb, ccc, eee, fff, ggg, kkk]);
     expect(new NodeQuery([jjj, ddd, hhh]).siblings().nodes).toStrictEqual([bbb, eee, ggg, kkk]);
     expect(new NodeQuery([hhh, ddd]).siblings().nodes).toStrictEqual([eee, ggg]);
+  });
+
+  test('selects siblings of nodes of a parent that are not in a row', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd'), h('eee')), h('fff', h('ggg'), h('hhh')));
+    const [, ccc, ddd, eee, , ggg, hhh] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([ccc, ggg, eee]).siblings().nodes).toStrictEqual([ccc, ddd, eee, hhh]);
+    expect(new NodeQuery([ccc, ggg, eee, hhh, ddd]).siblings().nodes).toStrictEqual([ccc, ddd, eee, ggg, hhh]);
+  });
+
+  test('selects siblings of nodes whose parents are neither nested nor siblings', () => {
+    const root = h('aaa', h('bbb', h('ccc', h('ddd'), h('eee'))), h('fff', h('ggg'), h('hhh')));
+    const [, , ddd, eee, , ggg, hhh] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([ddd, hhh]).siblings().nodes).toStrictEqual([eee, ggg]);
   });
 });
 

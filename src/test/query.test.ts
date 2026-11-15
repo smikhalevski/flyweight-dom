@@ -13,6 +13,30 @@ describe('$', () => {
     expect(query).toBeInstanceOf(NodeQuery);
     expect(query.nodes).toStrictEqual([document]);
   });
+
+  test('creates a query that holds a parent node, and not its children', () => {
+    const root = h('aaa', h('bbb'));
+
+    expect($(root).nodes).toStrictEqual([root]);
+
+    expectTypeOf($(root)).toEqualTypeOf<NodeQuery<Element>>();
+  });
+
+  test('creates a query that holds each of nodes once, in their order', () => {
+    const root = h('aaa', h('bbb'), h('ccc'));
+    const nodes = [root.childNodes[1], root.childNodes[0], root.childNodes[1]];
+
+    expect($(nodes).nodes).toStrictEqual([root.childNodes[1], root.childNodes[0]]);
+  });
+
+  test('copies nodes of a live list', () => {
+    const root = h('aaa', h('bbb'));
+    const query = $(root.childNodes);
+
+    root.append(h('ccc'));
+
+    expect(query.nodes).toStrictEqual([root.firstChild]);
+  });
 });
 
 describe('NodeQuery.children', () => {
@@ -53,6 +77,13 @@ describe('NodeQuery.children', () => {
       root.childNodes[0].firstChild,
       root.childNodes[1].firstChild,
     ]);
+  });
+
+  test('selects children in the order of nodes if a node contains another node', () => {
+    const root = h('aaa', h('bbb'), h('ccc', h('ddd')), h('eee'));
+    const [bbb, ccc, ddd, eee] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([root, ccc]).children().nodes).toStrictEqual([bbb, ccc, eee, ddd]);
   });
 });
 
@@ -107,6 +138,13 @@ describe('NodeQuery.descendants', () => {
     const root = h('aaa', h('bbb'), h('ccc', h('ddd')), h('eee'));
 
     expect($(root).children().descendants().nodes).toStrictEqual([root.childNodes[1].firstChild]);
+  });
+
+  test('selects descendants in document order if nodes are not in document order', () => {
+    const root = h('aaa', h('bbb', h('ccc')), h('ddd', h('eee')));
+    const [bbb, ccc, ddd, eee] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([ddd, bbb]).descendants().nodes).toStrictEqual([ccc, eee]);
   });
 });
 
@@ -411,15 +449,34 @@ describe('NodeQuery.hasNoContent', () => {
 });
 
 describe('NodeQuery.union', () => {
-  test('selects nodes of both queries once', () => {
+  test('selects nodes of both queries once, in document order', () => {
     const root = h('aaa', h('bbb'), h('ccc'), h('ddd'));
     const query = $(root).children();
 
-    expect(query.at(1).union(query.at(0)).union(query).nodes).toStrictEqual([
-      root.childNodes[1],
-      root.childNodes[0],
-      root.childNodes[2],
+    expect(query.at(1).union(query.at(0)).union(query).nodes).toStrictEqual(Array.from(root.childNodes));
+  });
+
+  test('selects nodes in document order if the other query is empty', () => {
+    const root = h('aaa', h('bbb'), h('ccc'));
+
+    expect(new NodeQuery([root.childNodes[1], root.childNodes[0]]).union(new NodeQuery([])).nodes).toStrictEqual(
+      Array.from(root.childNodes)
+    );
+  });
+
+  test('selects nodes of a tree in a row, and trees in the order of their first nodes', () => {
+    const root1 = h('aaa', h('bbb'));
+    const root2 = h('ccc', h('ddd'));
+    const query1 = $(root1.firstChild!);
+    const query2 = $(root2.firstChild!);
+
+    expect(query1.union(query2).union($(root2)).union($(root1)).nodes).toStrictEqual([
+      root1,
+      root1.firstChild,
+      root2,
+      root2.firstChild,
     ]);
+    expect(query1.union(query2.union($(root1))).nodes).toStrictEqual([root1, root1.firstChild, root2.firstChild]);
   });
 
   test('selects nodes of both queries once if both have many nodes', () => {
@@ -446,6 +503,82 @@ describe('NodeQuery.union', () => {
 
     expect(query.union(emptyQuery).nodes).toStrictEqual([root.firstChild]);
     expect(emptyQuery.union(query).nodes).toStrictEqual([root.firstChild]);
+  });
+
+  test('selects nodes of queries whose nodes go in turns, in document order', () => {
+    const root = h('aaa', h('bbb'), h('ccc'), h('bbb'), h('ccc'));
+    const [bbb1, ccc1, bbb2, ccc2] = $(root).children().nodes;
+
+    expect($(root).children('ccc').union($(root).children('bbb')).nodes).toStrictEqual([bbb1, ccc1, bbb2, ccc2]);
+    expect($(root).children('bbb').union($(root).children('bbb')).nodes).toStrictEqual([bbb1, bbb2]);
+  });
+
+  test('selects nodes of a tree in a row if the other query ends with nodes of another tree', () => {
+    const root1 = h('aaa', h('bbb'), h('ccc'));
+    const root2 = h('ddd');
+    const [bbb, ccc] = $(root1).children().nodes;
+
+    expect($(ccc).union(new NodeQuery([bbb, root2])).nodes).toStrictEqual([bbb, ccc, root2]);
+  });
+
+  test('selects nodes of the other query first if they precede nodes of this query', () => {
+    const root = h('aaa', h('bbb'), h('ccc'), h('ddd'));
+    const [bbb, ccc, ddd] = $(root).children().nodes;
+
+    expect(new NodeQuery([ccc, ddd]).union(new NodeQuery([bbb])).nodes).toStrictEqual([bbb, ccc, ddd]);
+  });
+
+  test('selects nodes in document order if queries are not in document order', () => {
+    const root = h('aaa', h('bbb', h('ccc')), h('ddd'));
+    const [bbb, ccc, ddd] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([ddd, bbb]).union(new NodeQuery([ccc, root])).nodes).toStrictEqual([root, bbb, ccc, ddd]);
+  });
+});
+
+describe('NodeQuery.sort', () => {
+  test('returns nodes in document order', () => {
+    const root = h('aaa', h('bbb', h('ccc')), h('ddd', h('eee')));
+    const [bbb, ccc, ddd, eee] = $(root).descendants().nodes;
+    const nodes = [eee, ddd, root, ccc, bbb];
+
+    expect(new NodeQuery(nodes).sort().nodes).toStrictEqual([root, bbb, ccc, ddd, eee]);
+    expect(nodes).toStrictEqual([eee, ddd, root, ccc, bbb]);
+  });
+
+  test('keeps the order of trees', () => {
+    const root1 = h('aaa', h('bbb'));
+    const root2 = h('ccc', h('ddd'));
+
+    expect(new NodeQuery([root2.firstChild!, root1, root2]).sort().nodes).toStrictEqual([
+      root2,
+      root2.firstChild,
+      root1,
+    ]);
+  });
+
+  test('returns nodes of a query that is in document order without sorting them', () => {
+    const root = h('aaa', h('bbb', h('ccc')), h('ddd'));
+    const query = $(root).descendants();
+
+    const filteredQuery = query.filter(() => true);
+
+    expect(query.sort().nodes).toBe(query.nodes);
+    expect(filteredQuery.sort().nodes).toBe(filteredQuery.nodes);
+  });
+
+  test('sorts children of nodes that contain each other', () => {
+    const root = h('aaa', h('bbb'), h('ccc', h('ddd')), h('eee'));
+    const [bbb, ccc, ddd, eee] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([root, ccc]).children().sort().nodes).toStrictEqual([bbb, ccc, ddd, eee]);
+  });
+
+  test('sorts nodes that a query was created from', () => {
+    const root = h('aaa', h('bbb'), h('ccc'));
+    const nodes = Array.from(root.childNodes);
+
+    expect(new NodeQuery(nodes).sort().nodes).not.toBe(nodes);
   });
 });
 
@@ -654,6 +787,13 @@ describe('NodeQuery.parent', () => {
 
     expect(query.parent().nodes).toStrictEqual([root.childNodes[0], root.childNodes[1]]);
   });
+
+  test('selects parents in document order', () => {
+    const root = h('aaa', h('bbb', h('ccc')), h('ddd'));
+    const [bbb, ccc, ddd] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([ccc, ddd]).parent().nodes).toStrictEqual([root, bbb]);
+  });
 });
 
 describe('NodeQuery.ancestors', () => {
@@ -677,7 +817,7 @@ describe('NodeQuery.ancestors', () => {
   test('selects an element once if it is an ancestor of several nodes', () => {
     const root = h('aaa', h('bbb', h('ccc')), h('bbb', h('ccc')));
 
-    expect($(root).descendants('ccc').ancestors().nodes).toStrictEqual([root.childNodes[0], root, root.childNodes[1]]);
+    expect($(root).descendants('ccc').ancestors().nodes).toStrictEqual([root.childNodes[1], root.childNodes[0], root]);
   });
 
   test('does not select the node itself', () => {
@@ -688,6 +828,20 @@ describe('NodeQuery.ancestors', () => {
     const root = h('aaa', h('bbb', h('ccc'), h('ddd')));
 
     expect($(root.firstChild!).children().ancestors().nodes).toStrictEqual([root.firstChild, root]);
+  });
+
+  test('selects ancestors of several nodes in reverse document order', () => {
+    const root = h('aaa', h('bbb', h('ccc', h('ddd'))), h('eee', h('fff', h('ddd'))));
+    const [bbb, ccc, , eee, fff] = $(root).descendants().nodes;
+
+    expect($(root).descendants('ddd').ancestors().nodes).toStrictEqual([fff, eee, ccc, bbb, root]);
+    expect(new NodeQuery([fff.firstChild!, ccc.firstChild!]).ancestors().nodes).toStrictEqual([
+      fff,
+      eee,
+      ccc,
+      bbb,
+      root,
+    ]);
   });
 });
 
@@ -728,6 +882,12 @@ describe('NodeQuery.closest', () => {
 
     expect($(root).descendants().closest('bbb').nodes).toStrictEqual([element, element.childNodes[1]]);
   });
+
+  test('selects the closest elements in document order', () => {
+    const root = h('aaa', h('aaa', h('bbb')), h('bbb'));
+
+    expect($(root).descendants('bbb').closest('aaa').nodes).toStrictEqual([root, root.firstChild]);
+  });
 });
 
 describe('NodeQuery.siblings', () => {
@@ -765,6 +925,27 @@ describe('NodeQuery.siblings', () => {
       root.childNodes[1].childNodes[1],
     ]);
   });
+
+  test('selects siblings of nodes of different parents in document order', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd')), h('eee'), h('fff'));
+    const [bbb, ccc, ddd, eee, fff] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([eee, ccc]).siblings().nodes).toStrictEqual([bbb, ddd, fff]);
+  });
+
+  test('selects siblings of nested parents in document order', () => {
+    const root = h(
+      'aaa',
+      h('bbb', h('ccc', h('ddd'), h('eee')), h('fff', h('ggg'), h('hhh')), h('iii')),
+      h('jjj'),
+      h('kkk')
+    );
+    const [bbb, ccc, ddd, eee, fff, ggg, hhh, iii, jjj, kkk] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([jjj, iii, ddd, hhh]).siblings().nodes).toStrictEqual([bbb, ccc, eee, fff, ggg, kkk]);
+    expect(new NodeQuery([jjj, ddd, hhh]).siblings().nodes).toStrictEqual([bbb, eee, ggg, kkk]);
+    expect(new NodeQuery([hhh, ddd]).siblings().nodes).toStrictEqual([eee, ggg]);
+  });
 });
 
 describe('NodeQuery.next', () => {
@@ -780,6 +961,19 @@ describe('NodeQuery.next', () => {
     expect($(root.childNodes[0]).next('ddd').nodes).toStrictEqual([]);
     expect($(root.childNodes[0]).next('ccc', 'urn:111').nodes).toStrictEqual([]);
   });
+
+  test('selects next siblings in the order of nodes', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd')), h('eee'));
+    const [bbb, ccc, ddd, eee] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([bbb, ccc]).next().nodes).toStrictEqual([eee, ddd]);
+  });
+
+  test('selects an element once if it is the next sibling of several nodes', () => {
+    const root = h('aaa', h('bbb'), 'xxx', h('ccc'));
+
+    expect(new NodeQuery([root.childNodes[0], root.childNodes[1]]).next().nodes).toStrictEqual([root.childNodes[2]]);
+  });
 });
 
 describe('NodeQuery.previous', () => {
@@ -794,6 +988,21 @@ describe('NodeQuery.previous', () => {
 
     expect($(root.childNodes[2]).previous('bbb').nodes).toStrictEqual([]);
     expect($(root.childNodes[2]).previous('ccc', 'urn:111').nodes).toStrictEqual([]);
+  });
+
+  test('selects previous siblings in the order of nodes', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd')), h('eee'));
+    const [bbb, ccc, ddd, eee] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([ddd, eee]).previous().nodes).toStrictEqual([ccc, bbb]);
+  });
+
+  test('selects an element once if it is the previous sibling of several nodes', () => {
+    const root = h('aaa', h('bbb'), 'xxx', h('ccc'));
+
+    expect(new NodeQuery([root.childNodes[1], root.childNodes[2]]).previous().nodes).toStrictEqual([
+      root.childNodes[0],
+    ]);
   });
 });
 
@@ -817,12 +1026,19 @@ describe('NodeQuery.following', () => {
     expect($(root).children().following().nodes).toStrictEqual([root.childNodes[1], root.childNodes[2]]);
   });
 
-  test('selects following siblings of nodes that are not in the document order', () => {
+  test('selects following siblings in document order if nodes are not in document order', () => {
     const root = h('aaa', h('bbb'), 'xxx', h('ccc'), h('ddd'), 'xxx', h('eee'));
     const elements = $(root).children().nodes;
     const query = new NodeQuery([elements[2], elements[0], elements[1]]);
 
-    expect(query.following().nodes).toStrictEqual([elements[3], elements[1], elements[2]]);
+    expect(query.following().nodes).toStrictEqual([elements[1], elements[2], elements[3]]);
+  });
+
+  test('selects following siblings of several nodes in document order', () => {
+    const root = h('aaa', h('bbb', h('ccc'), h('ddd')), h('eee'), h('fff'));
+    const [bbb, ccc, ddd, eee, fff] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([bbb, ccc]).following().nodes).toStrictEqual([ddd, eee, fff]);
   });
 });
 
@@ -843,15 +1059,23 @@ describe('NodeQuery.preceding', () => {
   test('selects an element once if it precedes several nodes', () => {
     const root = h('aaa', h('bbb'), h('ccc'), h('ddd'));
 
-    expect($(root).children().preceding().nodes).toStrictEqual([root.childNodes[0], root.childNodes[1]]);
+    expect($(root).children().preceding().nodes).toStrictEqual([root.childNodes[1], root.childNodes[0]]);
   });
 
-  test('selects preceding siblings of nodes that are not in the document order', () => {
+  test('selects preceding siblings in reverse document order if nodes are not in document order', () => {
     const root = h('aaa', h('bbb'), 'xxx', h('ccc'), h('ddd'), 'xxx', h('eee'));
     const elements = $(root).children().nodes;
     const query = new NodeQuery([elements[1], elements[3], elements[2]]);
 
-    expect(query.preceding().nodes).toStrictEqual([elements[0], elements[2], elements[1]]);
+    expect(query.preceding().nodes).toStrictEqual([elements[2], elements[1], elements[0]]);
+  });
+
+  test('selects preceding siblings of several nodes in reverse document order', () => {
+    const root = h('aaa', h('bbb'), h('ccc'), h('ddd', h('eee'), h('fff')));
+    const [bbb, ccc, ddd, eee, fff] = $(root).descendants().nodes;
+
+    expect(new NodeQuery([ddd, fff]).preceding().nodes).toStrictEqual([eee, ccc, bbb]);
+    expect(new NodeQuery([fff, ddd]).preceding().nodes).toStrictEqual([eee, ccc, bbb]);
   });
 });
 

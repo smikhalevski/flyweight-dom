@@ -21,12 +21,14 @@ import { splitTokens } from './DOMTokenList.ts';
 import { hasClassNames as importedHasClassNames } from './getElementsByClassName.ts';
 import { isMatchingName as importedIsMatchingName } from './getElementsByTagNameNS.ts';
 import { getNextDescendantInDocumentOrder as importedGetNextDescendantInDocumentOrder } from './getNextDescendantInDocumentOrder.ts';
-// Classes are imported from the main entry point, since modules of node classes depend on each other, and they must be
-// evaluated in the order that the main entry point imports them in. Otherwise, the import of this module fails if it
-// goes before the import of the main entry point
+// Classes are imported from the main entry point, which evaluates modules of node classes in the order of their
+// dependencies
 import { DocumentFragment, Element } from './index.ts';
 import type { Node } from './Node.ts';
+import { uncheckedCompareDocumentPosition as importedUncheckedCompareDocumentPosition } from './uncheckedCompareDocumentPosition.ts';
 import {
+  DOCUMENT_POSITION_FOLLOWING,
+  DOCUMENT_POSITION_PRECEDING,
   ELEMENT_NODE,
   getNextSiblingOrSelf as importedGetNextSiblingOrSelf,
   getPreviousSiblingOrSelf as importedGetPreviousSiblingOrSelf,
@@ -46,6 +48,7 @@ const getPreviousSiblingOrSelf = importedGetPreviousSiblingOrSelf;
 const hasOwnProperty = importedHasOwnProperty;
 const isElement = importedIsElement;
 const isText = importedIsText;
+const uncheckedCompareDocumentPosition = importedUncheckedCompareDocumentPosition;
 
 /**
  * Creates a query that holds the given node, so its children and descendants can be selected.
@@ -54,9 +57,36 @@ const isText = importedIsText;
  * @template TNode The node where the query starts.
  * @group Query
  */
-export function $<TNode extends Node>(node: TNode): NodeQuery<TNode> {
-  return new NodeQuery([node]);
+export function $<TNode extends Node>(node: TNode): NodeQuery<TNode>;
+
+/**
+ * Creates a query that holds the given nodes, so their children and descendants can be selected.
+ *
+ * Nodes are copied, so the query doesn't change with a live list or an array. Each node is held once, in its order.
+ * Nodes of a tree must go in a row, see {@link NodeQuery}.
+ *
+ * @param nodes The nodes where the query starts.
+ * @template TNode The node where the query starts.
+ * @group Query
+ */
+export function $<TNode extends Node>(nodes: Iterable<TNode>): NodeQuery<TNode>;
+
+// Overloads, since a single signature would infer the type of children of a parent node, which is iterable
+export function $<TNode extends Node>(node: TNode | Iterable<TNode>): NodeQuery<TNode> {
+  // A parent node is iterable too, so a node is told by its type
+  if (isNode(node)) {
+    return new NodeQuery([node]);
+  }
+
+  return new NodeQuery(Array.from(new Set(node)));
 }
+
+/**
+ * Returns `true` if the value is a node.
+ */
+const isNode = (value: unknown): value is Node => {
+  return typeof (value as Node).nodeType === 'number';
+};
 
 /**
  * The condition that an attribute value or a text must meet: the string that it must be equal to, or the regular
@@ -81,6 +111,10 @@ export type NodePredicate<TNode extends Node> = (node: TNode, index: number) => 
  * The list of selected nodes. A query isn't changed after it is created: each method returns a new query, so a query
  * can be reused as the start of other queries.
  *
+ * Nodes are ordered as in jQuery: {@link ancestors} and {@link preceding} return the closest node first,
+ * {@link children}, {@link next} and {@link previous} keep the order of nodes they were selected from, and other
+ * methods return nodes in document order. Use {@link sort} to put nodes in document order.
+ *
  * @template TNode The selected node.
  * @group Query
  */
@@ -88,7 +122,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   /**
    * Creates a new instance of {@link NodeQuery}.
    *
-   * @param nodes The selected nodes. The array isn't copied and must not contain the same node twice.
+   * @param nodes The selected nodes. The array isn't copied and must not contain the same node twice. Nodes of a tree
+   * must go in a row, since a sort keeps the order of trees.
    */
   constructor(
     /**
@@ -96,6 +131,11 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
      */
     readonly nodes: readonly TNode[]
   ) {}
+
+  /**
+   * `true` if {@link nodes} are known to be in document order, so they aren't checked or sorted again.
+   */
+  protected _isSorted = false;
 
   /**
    * Returns the number of {@link nodes}.
@@ -134,7 +174,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    * Selects child elements of {@link nodes} that have the given local name and namespace, the same as the `>`
    * combinator in CSS.
    *
-   * Elements are returned in the order of their parents in {@link nodes}.
+   * Children aren't sorted: they go in the order of {@link nodes}, so children of nested nodes aren't in document
+   * order.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
@@ -151,14 +192,14 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(elements, this.nodes.length === 1);
   }
 
   /**
    * Selects descendant elements of {@link nodes} that have the given local name and namespace, the same as the
    * descendant combinator in CSS.
    *
-   * Each element is returned once, even if several of {@link nodes} contain it.
+   * Each element is returned once, even if several of {@link nodes} contain it. Elements are in document order.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
@@ -179,15 +220,22 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
+    let isSorted = true;
+
     for (const node of nodes) {
-      // A node that has no children, has no descendants. Descendants of a nested node are found when its ancestor is
-      // searched
+      // Descendants of a nested node are read along with its ancestor
       if (node.firstChild !== null && (nodeSet === null || !hasAncestor(node, nodeSet))) {
+        const startIndex = elements.length;
+
         pushDescendantElements(node, namespaceURI, localName, elements);
+
+        // Descendants of a node are sorted, so only the first one is compared with those before it. Descendants of
+        // sorted nodes that don't contain each other are sorted too
+        isSorted = isSorted && (this._isSorted || isTailFollowing(elements, startIndex));
       }
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(isSorted ? elements : elements.sort(compareDocumentOrder), true);
   }
 
   /**
@@ -217,7 +265,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(elements, this._isSorted);
   }
 
   /**
@@ -247,7 +295,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(elements, this._isSorted);
   }
 
   /**
@@ -295,7 +343,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(elements, this._isSorted);
   }
 
   /**
@@ -309,39 +357,37 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
    */
   nthChild(index: number): NodeQuery {
     const { nodes } = this;
-    const isReversed = index < 0;
+    // Previous siblings are counted for an index from the first child, and next siblings for an index from the last one
+    const isPrevious = index >= 0;
 
     // The number of sibling elements that must precede the element, or follow it if the index is negative
-    const siblingCount = isReversed ? -index - 1 : index;
+    const siblingCount = isPrevious ? index : -index - 1;
     const elements = [];
 
     if (siblingCount === 0) {
       // The first or the last child has no sibling element on its side, which is the fastest to check
       for (const node of nodes) {
-        if (isElement(node) && (isReversed ? node.nextElementSibling : node.previousElementSibling) === null) {
+        if (isElement(node) && (isPrevious ? node.previousElementSibling : node.nextElementSibling) === null) {
           elements.push(node);
         }
       }
 
-      return new NodeQuery(elements);
+      return createNodeQuery(elements, this._isSorted);
     }
 
-    // The count of the last element is reused if a walk from the next element reaches it, so a run of siblings is
-    // read once instead of once per sibling. For a negative index, siblings are counted towards the last child, so
-    // nodes are read from the last one, since then a walk reaches the element that was counted before
+    // The count of the last element is reused when a walk reaches it, so a run of siblings is read once. For a negative
+    // index, siblings are counted towards the last child, so nodes are read from the last one
     let lastElement: Element | null = null;
     let lastCount = 0;
 
     for (let i = 0; i < nodes.length; ++i) {
-      const node = nodes[isReversed ? nodes.length - i - 1 : i];
+      const node = nodes[isPrevious ? i : nodes.length - i - 1];
 
       if (!isElement(node)) {
         continue;
       }
 
-      const count = isReversed
-        ? getFollowingElementCount(node, siblingCount, lastElement, lastCount)
-        : getPrecedingElementCount(node, siblingCount, lastElement, lastCount);
+      const count = getSiblingElementCount(node, isPrevious, siblingCount, lastElement, lastCount);
 
       lastElement = node;
       lastCount = count;
@@ -351,11 +397,11 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    if (isReversed) {
+    if (!isPrevious) {
       elements.reverse();
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(elements, this._isSorted);
   }
 
   /**
@@ -391,7 +437,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(elements, this._isSorted);
   }
 
   /**
@@ -406,41 +452,66 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(nodes);
+    return createNodeQuery(nodes, this._isSorted);
   }
 
   /**
    * Selects {@link nodes} and nodes of the other query, the same as the `,` in a CSS selector. Each node is returned
-   * once, even if both queries have it.
+   * once, even if both queries have it. Nodes are in document order.
+   *
+   * Nodes of trees that only the other query has go last.
    *
    * @param query The query to add nodes from.
    * @template TOtherNode The node of the other query.
    */
   union<TOtherNode extends Node>(query: NodeQuery<TOtherNode>): NodeQuery<TNode | TOtherNode> {
-    const { nodes } = this;
+    let { nodes } = this;
+    let otherNodes = query.nodes;
 
-    const otherNodes = query.nodes;
-
-    // Arrays of nodes are never changed, so an array is shared if the other one has nothing to add
-    if (otherNodes.length === 0) {
-      return new NodeQuery<TNode | TOtherNode>(nodes);
-    }
-    if (nodes.length === 0) {
-      return new NodeQuery<TNode | TOtherNode>(otherNodes);
+    if (otherNodes.length === 0 || nodes.length === 0) {
+      return (nodes.length === 0 ? query : this).sort();
     }
 
-    const unionNodes: Array<TNode | TOtherNode> = nodes.slice();
+    const root = nodes[0].getRootNode();
 
-    // A scan of a short array is faster than a lookup in a set, and the set of a long array is slow to create
-    const nodeSet = nodes.length > 16 && otherNodes.length > 16 ? new Set<Node>(nodes) : null;
-
-    for (const node of otherNodes) {
-      if (nodeSet !== null ? !nodeSet.has(node) : (nodes as readonly Node[]).indexOf(node) === -1) {
-        unionNodes.push(node);
-      }
+    // Nodes of a tree go in a row in each query, but may not after the join if there are several trees
+    if (
+      root !== nodes[nodes.length - 1].getRootNode() ||
+      root !== otherNodes[0].getRootNode() ||
+      root !== otherNodes[otherNodes.length - 1].getRootNode()
+    ) {
+      return createNodeQuery(
+        groupByTree(Array.from(new Set([...nodes, ...otherNodes]))).sort(compareDocumentOrder),
+        true
+      ) as NodeQuery<TNode | TOtherNode>;
     }
 
-    return new NodeQuery(unionNodes);
+    // Nodes of each query are sorted and merged, which is faster than a sort of all nodes
+    if (!isSortedQuery(this)) {
+      nodes = sortNodesInDocumentOrder(nodes.slice());
+    }
+    if (!isSortedQuery(query)) {
+      otherNodes = sortNodesInDocumentOrder(otherNodes.slice());
+    }
+
+    return createNodeQuery(mergeNodesInDocumentOrder(nodes, otherNodes), true) as NodeQuery<TNode | TOtherNode>;
+  }
+
+  /**
+   * Returns a query that holds {@link nodes} in document order. Use it after methods that don't sort nodes, such as
+   * {@link children}, or to start {@link ancestors} with the farthest one:
+   *
+   * ```ts
+   * // The outermost section that contains the heading
+   * $(heading).ancestors('section').sort().first();
+   * ```
+   *
+   * Nodes of different trees have no order, so trees go in the order of their first nodes.
+   */
+  sort(): NodeQuery<TNode> {
+    // A sort keeps the order of trees, so nodes of each tree are put in a row first. Arrays of nodes are never changed,
+    // so sorted nodes are shared
+    return createNodeQuery(isSortedQuery(this) ? this.nodes : sortNodesInDocumentOrder(groupByTree(this.nodes)), true);
   }
 
   /**
@@ -459,7 +530,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(nodes);
+    return createNodeQuery(nodes, this._isSorted);
   }
 
   /**
@@ -478,7 +549,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(nodes);
+    return createNodeQuery(nodes, this._isSorted);
   }
 
   /**
@@ -497,7 +568,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(nodes);
+    return createNodeQuery(nodes, this._isSorted);
   }
 
   /**
@@ -517,13 +588,14 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       }
     }
 
-    return new NodeQuery(nodes);
+    return createNodeQuery(nodes, this._isSorted);
   }
 
   /**
    * Selects parent elements of {@link nodes} that have the given local name and namespace.
    *
-   * Each element is returned once, even if it is the parent of several of {@link nodes}.
+   * Each element is returned once, even if it is the parent of several of {@link nodes}. Elements are in document
+   * order.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
@@ -539,8 +611,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     for (const node of nodes) {
       const parent = node.parentNode;
 
-      // Siblings usually go in a row, so the parent of the last node is checked before the set, and the set is read
-      // only if the parent matches, since the check is faster
+      // Siblings usually go in a row, so the parent of the last node is checked before the set
       if (
         parent !== null &&
         parent !== lastParent &&
@@ -554,14 +625,14 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       lastParent = parent;
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(sortNodesInDocumentOrder(elements), true);
   }
 
   /**
-   * Selects ancestor elements of {@link nodes} that have the given local name and namespace. Ancestors of each node
-   * are returned from the closest one to the farthest one.
+   * Selects ancestor elements of {@link nodes} that have the given local name and namespace.
    *
-   * Each element is returned once, even if it is an ancestor of several of {@link nodes}.
+   * Each element is returned once, even if it is an ancestor of several of {@link nodes}. Elements are in reverse
+   * document order, so the closest ancestor goes first. Use {@link sort} to start with the farthest one.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
@@ -570,7 +641,7 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
   ancestors(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
     const { nodes } = this;
 
-    // Ancestors that were read already, so the walk up from a node stops at an ancestor it shares with previous nodes
+    // Ancestors that were read already, where the walk up from the next node stops
     const nodeSet = createSet(nodes);
     const elements = [];
 
@@ -584,6 +655,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
 
       lastParent = node.parentNode;
 
+      const startIndex = elements.length;
+
       // The set is checked for null here, since it is measurably faster in this loop than the check in addUnique
       for (
         let ancestor = lastParent;
@@ -594,16 +667,23 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
           elements.push(ancestor);
         }
       }
+
+      // Ancestors of a single node are in order already. Otherwise, each group is put in document order, so ancestors
+      // are sorted only if groups are out of order
+      if (nodeSet !== null) {
+        reverseTail(elements, startIndex);
+      }
     }
 
-    return new NodeQuery(elements);
+    return new NodeQuery(nodeSet === null ? elements : sortNodesInDocumentOrder(elements).reverse());
   }
 
   /**
    * For each of {@link nodes}, selects the closest element with the given local name and namespace, which is the node
    * itself or its ancestor.
    *
-   * Each element is returned once, even if it is the closest one for several of {@link nodes}.
+   * Each element is returned once, even if it is the closest one for several of {@link nodes}. Elements are in document
+   * order.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
@@ -619,8 +699,8 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     for (const node of nodes) {
       const element = getClosestElement(node, namespaceURI, localName);
 
-      // Nodes that have the same closest element usually go in a row, so the last one is checked before the set. And
-      // a node that has no children isn't an ancestor, so it is the closest element only for itself
+      // Nodes with the same closest element usually go in a row, so the last one is checked before the set. A node
+      // without children is the closest element only for itself
       if (
         element !== null &&
         element !== lastElement &&
@@ -632,12 +712,12 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
       lastElement = element;
     }
 
-    return new NodeQuery(elements);
+    return createNodeQuery(sortNodesInDocumentOrder(elements), true);
   }
 
   /**
    * Selects sibling elements of {@link nodes} that have the given local name and namespace. A node isn't its own
-   * sibling, so it is selected only if another of {@link nodes} has the same parent.
+   * sibling, so it is selected only if another of {@link nodes} has the same parent. Elements are in document order.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
@@ -648,17 +728,22 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
     const elements: Element[] = [];
 
     if (nodes.length === 1) {
-      // A single node has no other node to share the parent with, so the map isn't needed
+      // A single node shares its parent with no other node, so the map isn't needed
       const node = nodes[0];
 
       if (node.parentNode !== null) {
         pushSiblingElements(node.parentNode, node, namespaceURI, localName, elements);
       }
-      return new NodeQuery(elements);
+      return createNodeQuery(elements, true);
     }
 
-    // For each parent, the only child that is among nodes, or null if there are several, so each parent is read once
-    const childMap = new Map<Node, Node | null>();
+    // The only child among nodes for each parent, or null if there are several
+    const excludedChildMap = new Map<Node, Node | null>();
+
+    let lastParent: Node | null = null;
+
+    // `true` if the last parent has several children in the map
+    let isLastParentShared = false;
 
     for (const node of nodes) {
       const parent = node.parentNode;
@@ -667,92 +752,98 @@ export class NodeQuery<TNode extends Node = Element> implements Iterable<TNode> 
         continue;
       }
 
-      const child = childMap.get(parent);
+      // Siblings usually go in a row, so the parent of the last node is checked before the map
+      if (parent === lastParent) {
+        if (!isLastParentShared) {
+          excludedChildMap.set(parent, null);
+          isLastParentShared = true;
+        }
+        continue;
+      }
+
+      lastParent = parent;
+
+      const child = excludedChildMap.get(parent);
 
       // The map is written only if the value changes, since reading it is faster
       if (child === undefined) {
-        childMap.set(parent, node);
-      } else if (child !== null) {
-        childMap.set(parent, null);
+        excludedChildMap.set(parent, node);
+        isLastParentShared = false;
+      } else {
+        if (child !== null) {
+          excludedChildMap.set(parent, null);
+        }
+        isLastParentShared = true;
       }
     }
 
-    for (const [parent, excludedChild] of childMap) {
-      pushSiblingElements(parent, excludedChild, namespaceURI, localName, elements);
-    }
+    // There are fewer parents than siblings, so parents are sorted instead
+    pushSiblingElementsInDocumentOrder(
+      sortNodesInDocumentOrder(Array.from(excludedChildMap.keys())),
+      excludedChildMap,
+      namespaceURI,
+      localName,
+      elements
+    );
 
-    return new NodeQuery(elements);
+    return createNodeQuery(elements, true);
   }
 
   /**
    * For each of {@link nodes}, selects the next sibling element if it has the given local name and namespace, the same
    * as the `+` combinator in CSS.
    *
+   * Each element is returned once, even if it is the next sibling of several of {@link nodes}. Elements aren't sorted:
+   * they go in the order of {@link nodes}.
+   *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
    * represents all namespaces.
    */
   next(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    const elements = [];
-
-    for (const node of this.nodes) {
-      const element = getNextSiblingOrSelf(node.nextSibling, ELEMENT_NODE) as Element | null;
-
-      if (element !== null && isMatchingName(element, namespaceURI, localName)) {
-        elements.push(element);
-      }
-    }
-
-    return new NodeQuery(elements);
+    return new NodeQuery(getNextOrPreviousElements(this.nodes, false, namespaceURI, localName));
   }
 
   /**
    * For each of {@link nodes}, selects the previous sibling element if it has the given local name and namespace.
+   *
+   * Each element is returned once, even if it is the previous sibling of several of {@link nodes}. Elements aren't
+   * sorted: they go in the order of {@link nodes}.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
    * represents all namespaces.
    */
   previous(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    const elements = [];
-
-    for (const node of this.nodes) {
-      const element = getPreviousSiblingOrSelf(node.previousSibling, ELEMENT_NODE) as Element | null;
-
-      if (element !== null && isMatchingName(element, namespaceURI, localName)) {
-        elements.push(element);
-      }
-    }
-
-    return new NodeQuery(elements);
+    return new NodeQuery(getNextOrPreviousElements(this.nodes, true, namespaceURI, localName));
   }
 
   /**
    * Selects sibling elements that follow {@link nodes} and have the given local name and namespace, the same as the `~`
    * combinator in CSS.
    *
-   * Each element is returned once, even if it follows several of {@link nodes}.
+   * Each element is returned once, even if it follows several of {@link nodes}. Elements are in document order.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
    * represents all namespaces.
    */
   following(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    return new NodeQuery(getSiblingElements(this.nodes, false, namespaceURI, localName));
+    return createNodeQuery(getFollowingOrPrecedingElements(this.nodes, false, namespaceURI, localName), true);
   }
 
   /**
-   * Selects sibling elements that precede {@link nodes} and have the given local name and namespace. Siblings of each
-   * node are returned from the closest one to the farthest one.
+   * Selects sibling elements that precede {@link nodes} and have the given local name and namespace.
    *
-   * Each element is returned once, even if it precedes several of {@link nodes}.
+   * Each element is returned once, even if it precedes several of {@link nodes}. Elements are in reverse document
+   * order, so the closest sibling goes first. Use {@link sort} to start with the farthest one.
    *
    * @param localName The local name of elements. The special string `*` represents all elements.
    * @param namespaceURI The namespace of elements, or `null` for elements without a namespace. The special string `*`
    * represents all namespaces.
    */
   preceding(localName = '*', namespaceURI: string | null = '*'): NodeQuery {
-    return new NodeQuery(getSiblingElements(this.nodes, true, namespaceURI, localName));
+    return new NodeQuery(getFollowingOrPrecedingElements(this.nodes, true, namespaceURI, localName));
   }
 
   /**
@@ -998,29 +1089,32 @@ const getTextContentEndIndex = (node: Node, expectedText: string, startIndex: nu
 };
 
 /**
- * Returns the next sibling of the node, or the previous one if the walk is reversed.
+ * Returns the previous sibling of the node, or the next one.
  */
-const getSibling = (node: Node, isReversed: boolean): ChildNode | null => {
-  return isReversed ? node.previousSibling : node.nextSibling;
+const getSibling = (node: Node, isPrevious: boolean): ChildNode | null => {
+  return isPrevious ? node.previousSibling : node.nextSibling;
 };
 
 /**
- * Returns sibling elements with the given namespace and local name that follow nodes, or precede them if the walk is
- * reversed.
+ * Returns sibling elements with the given namespace and local name that follow nodes in document order, or that precede
+ * them in reverse document order.
  */
-const getSiblingElements = (
+const getFollowingOrPrecedingElements = (
   nodes: readonly Node[],
-  isReversed: boolean,
+  isPrevious: boolean,
   namespaceURI: string | null,
   localName: string
 ): Element[] => {
-  // Sibling elements that were read already, so the walk from a node stops at a sibling that a walk from a previous
-  // node has read
+  // Siblings that were read already, where the walk from the next node stops
   const nodeSet = createSet(nodes);
   const elements = [];
 
+  let isSorted = true;
+
   for (const node of nodes) {
-    for (let sibling = getSibling(node, isReversed); sibling !== null; sibling = getSibling(sibling, isReversed)) {
+    const startIndex = elements.length;
+
+    for (let sibling = getSibling(node, isPrevious); sibling !== null; sibling = getSibling(sibling, isPrevious)) {
       if (!isElement(sibling)) {
         continue;
       }
@@ -1034,52 +1128,84 @@ const getSiblingElements = (
         elements.push(sibling);
       }
     }
+
+    // Siblings of a single node are in order already
+    if (nodeSet === null) {
+      continue;
+    }
+    if (isPrevious) {
+      // Each group is put in document order, so siblings are sorted only if groups are out of order
+      reverseTail(elements, startIndex);
+    } else {
+      // A check of each group is faster than the check of all siblings
+      isSorted = isSorted && isTailFollowing(elements, startIndex);
+    }
+  }
+
+  if (nodeSet === null) {
+    return elements;
+  }
+  if (isPrevious) {
+    return sortNodesInDocumentOrder(elements).reverse();
+  }
+  return isSorted ? elements : elements.sort(compareDocumentOrder);
+};
+
+/**
+ * Returns the next sibling element of each node, or the previous one, if it has the given namespace and local name.
+ * Elements go in the order of nodes.
+ */
+const getNextOrPreviousElements = (
+  nodes: readonly Node[],
+  isPrevious: boolean,
+  namespaceURI: string | null,
+  localName: string
+): Element[] => {
+  // Only a node that isn't an element can share its closest sibling element with another node, so elements are tracked
+  // from such a node on
+  let elementSet: Set<Node> | null = null;
+
+  const elements = [];
+
+  for (const node of nodes) {
+    if (elementSet === null && !isElement(node)) {
+      elementSet = new Set(elements);
+    }
+
+    const element = (
+      isPrevious
+        ? getPreviousSiblingOrSelf(node.previousSibling, ELEMENT_NODE)
+        : getNextSiblingOrSelf(node.nextSibling, ELEMENT_NODE)
+    ) as Element | null;
+
+    if (element !== null && isMatchingName(element, namespaceURI, localName) && addUnique(elementSet, element)) {
+      elements.push(element);
+    }
   }
 
   return elements;
 };
 
 /**
- * Returns the number of sibling elements that precede the element.
+ * Returns the number of sibling elements that precede the element, or that follow it.
  *
  * @param element The element whose siblings are counted.
+ * @param isPrevious `true` to count siblings that precede the element, or `false` to count siblings that follow it.
  * @param maxCount The walk stops as soon as there are more siblings. The returned count is then less than the actual
  * one, but it is still greater than the maximum, and so is the count of an element that reuses it.
  * @param lastElement The element whose count is reused if the walk reaches it, so a run of siblings is read once.
  * @param lastCount The count that was returned for the last element.
  */
-const getPrecedingElementCount = (
+const getSiblingElementCount = (
   element: Element,
+  isPrevious: boolean,
   maxCount: number,
   lastElement: Element | null,
   lastCount: number
 ): number => {
   let count = 0;
 
-  for (let sibling = element.previousSibling; sibling !== null; sibling = sibling.previousSibling) {
-    if (sibling === lastElement) {
-      return count + lastCount + 1;
-    }
-    if (isElement(sibling) && ++count > maxCount) {
-      break;
-    }
-  }
-  return count;
-};
-
-/**
- * Returns the number of sibling elements that follow the element. Does the same as {@link getPrecedingElementCount},
- * but in the other direction.
- */
-const getFollowingElementCount = (
-  element: Element,
-  maxCount: number,
-  lastElement: Element | null,
-  lastCount: number
-): number => {
-  let count = 0;
-
-  for (let sibling = element.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
+  for (let sibling = getSibling(element, isPrevious); sibling !== null; sibling = getSibling(sibling, isPrevious)) {
     if (sibling === lastElement) {
       return count + lastCount + 1;
     }
@@ -1113,6 +1239,228 @@ const hasDescendantElement = (root: Node, namespaceURI: string | null, localName
     }
   }
   return false;
+};
+
+/**
+ * Returns a negative number if the node precedes the other node in document order, or a positive number if it follows
+ * the other node, or 0 if nodes are the same.
+ *
+ * 0 is also returned for nodes of different trees, so a sort keeps the order of trees if nodes of a tree go in a row.
+ */
+const compareDocumentOrder = (node: Node, otherNode: Node): number => {
+  const position = uncheckedCompareDocumentPosition(node, otherNode);
+
+  if ((position & DOCUMENT_POSITION_FOLLOWING) !== 0) {
+    return -1;
+  }
+  if ((position & DOCUMENT_POSITION_PRECEDING) !== 0) {
+    return 1;
+  }
+  return 0;
+};
+
+/**
+ * Creates a query, and tells whether its nodes are known to be in document order.
+ */
+const createNodeQuery = <TNode extends Node>(nodes: readonly TNode[], isSorted: boolean): NodeQuery<TNode> => {
+  const query = new NodeQuery(nodes);
+
+  query['_isSorted'] = isSorted;
+
+  return query;
+};
+
+/**
+ * Returns `true` if nodes of the query are known to be in document order.
+ */
+const isSortedQuery = (query: NodeQuery<Node>): boolean => {
+  return query.nodes.length < 2 || query['_isSorted'];
+};
+
+/**
+ * Sorts nodes in document order, in place. Nodes are often sorted already, which is checked much faster than they are
+ * sorted.
+ *
+ * @param nodes Nodes where nodes of a tree go in a row.
+ */
+const sortNodesInDocumentOrder = <TNode extends Node>(nodes: TNode[]): TNode[] => {
+  for (let i = 1; i < nodes.length; ++i) {
+    if (compareDocumentOrder(nodes[i - 1], nodes[i]) > 0) {
+      return nodes.sort(compareDocumentOrder);
+    }
+  }
+  return nodes;
+};
+
+/**
+ * Returns nodes of both arrays in document order, each node once.
+ *
+ * @param nodes Nodes of a single tree in document order.
+ * @param otherNodes Nodes of the same tree in document order.
+ */
+const mergeNodesInDocumentOrder = (nodes: readonly Node[], otherNodes: readonly Node[]): Node[] => {
+  // Nodes of queries often go one after the other, and then they aren't compared one by one
+  if (compareDocumentOrder(nodes[nodes.length - 1], otherNodes[0]) < 0) {
+    return nodes.concat(otherNodes);
+  }
+  if (compareDocumentOrder(otherNodes[otherNodes.length - 1], nodes[0]) < 0) {
+    return otherNodes.concat(nodes);
+  }
+
+  const mergedNodes = [];
+
+  let i = 0;
+  let j = 0;
+
+  while (i < nodes.length && j < otherNodes.length) {
+    const node = nodes[i];
+    const otherNode = otherNodes[j];
+
+    if (node === otherNode) {
+      mergedNodes.push(node);
+      ++i;
+      ++j;
+    } else if (compareDocumentOrder(node, otherNode) < 0) {
+      mergedNodes.push(node);
+      ++i;
+    } else {
+      mergedNodes.push(otherNode);
+      ++j;
+    }
+  }
+
+  for (; i < nodes.length; ++i) {
+    mergedNodes.push(nodes[i]);
+  }
+  for (; j < otherNodes.length; ++j) {
+    mergedNodes.push(otherNodes[j]);
+  }
+
+  return mergedNodes;
+};
+
+/**
+ * Appends child elements of parents with the given namespace and local name in document order, except the excluded
+ * child of each parent.
+ *
+ * Children of a nested parent are read right after the child that contains it.
+ *
+ * @param parents Parents in document order.
+ * @param excludedChildMap The excluded child for each parent, or `null` if there's none.
+ * @param namespaceURI The namespace of elements.
+ * @param localName The local name of elements.
+ * @param elements The array to append elements to.
+ */
+const pushSiblingElementsInDocumentOrder = (
+  parents: readonly Node[],
+  excludedChildMap: Map<Node, Node | null>,
+  namespaceURI: string | null,
+  localName: string,
+  elements: Element[]
+): void => {
+  // Children that contain the next parent, whose siblings are read after children of that parent
+  const childStack: Node[] = [];
+
+  // Stale children above the stack size are overwritten instead of removed
+  let stackSize = 0;
+
+  for (let parentIndex = 0; parentIndex < parents.length;) {
+    let parent = parents[parentIndex++];
+    let excludedChild = excludedChildMap.get(parent);
+    let anchorChild = parentIndex < parents.length ? getContainingChild(parent, parents[parentIndex]) : null;
+    let child: Node | null = parent.firstChild;
+
+    while (true) {
+      if (child === null) {
+        if (stackSize === 0) {
+          break;
+        }
+
+        // The child was read already, but it can contain the next parent too
+        child = childStack[--stackSize];
+        parent = child.parentNode!;
+        excludedChild = excludedChildMap.get(parent);
+        anchorChild = parentIndex < parents.length ? getContainingChild(parent, parents[parentIndex]) : null;
+      } else if (child !== excludedChild && isElement(child) && isMatchingName(child, namespaceURI, localName)) {
+        elements.push(child);
+      }
+
+      if (child !== anchorChild) {
+        child = child.nextSibling;
+        continue;
+      }
+
+      childStack[stackSize++] = child;
+
+      parent = parents[parentIndex++];
+      excludedChild = excludedChildMap.get(parent);
+      anchorChild = parentIndex < parents.length ? getContainingChild(parent, parents[parentIndex]) : null;
+      child = parent.firstChild;
+    }
+  }
+};
+
+/**
+ * Returns the child of the parent that contains the node or is the node itself, or `null` if the parent doesn't
+ * contain the node.
+ */
+const getContainingChild = (parent: Node, node: Node): Node | null => {
+  // Parents are usually siblings, and a node doesn't contain its sibling
+  if (node.parentNode === parent.parentNode) {
+    return null;
+  }
+
+  for (let ancestor = node; ancestor.parentNode !== null; ancestor = ancestor.parentNode) {
+    if (ancestor.parentNode === parent) {
+      return ancestor;
+    }
+  }
+  return null;
+};
+
+/**
+ * Returns `true` if elements appended from the start index follow the element before them, or if there are none.
+ * Elements appended in sorted groups are all sorted if this holds for each group.
+ */
+const isTailFollowing = (elements: readonly Node[], startIndex: number): boolean => {
+  return (
+    startIndex === 0 ||
+    startIndex === elements.length ||
+    compareDocumentOrder(elements[startIndex - 1], elements[startIndex]) < 0
+  );
+};
+
+/**
+ * Reverses elements from the start index to the end of the array, in place.
+ */
+const reverseTail = (elements: Element[], startIndex: number): void => {
+  for (let i = startIndex, j = elements.length - 1; i < j; ++i, --j) {
+    const element = elements[i];
+
+    elements[i] = elements[j];
+    elements[j] = element;
+  }
+};
+
+/**
+ * Returns nodes where nodes of a tree go in a row. Trees go in the order of their first nodes, and nodes of a tree
+ * keep their order.
+ */
+const groupByTree = <TNode extends Node>(nodes: readonly TNode[]): TNode[] => {
+  const treeNodesMap = new Map<Node, TNode[]>();
+
+  for (const node of nodes) {
+    const root = node.getRootNode();
+    const treeNodes = treeNodesMap.get(root);
+
+    if (treeNodes === undefined) {
+      treeNodesMap.set(root, [node]);
+    } else {
+      treeNodes.push(node);
+    }
+  }
+
+  return Array.from(treeNodesMap.values()).flat();
 };
 
 /**

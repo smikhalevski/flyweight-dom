@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { ChildNode, Document, DocumentFragment, Element, Node, ParentNode, Text } from '../main/index.ts';
 import { EmptyNodeList, ChildNodeList } from '../main/NodeList.ts';
 
@@ -144,4 +144,73 @@ test('returns the prefix that is bound to the namespace at the node', () => {
   new Element('aaa', { 'xmlns:xxx': 'urn:111' }).append(text);
 
   expect(text.lookupPrefix('urn:111')).toBe('xxx');
+});
+
+describe('Node.getRootNode', () => {
+  test('returns the root of the tree', () => {
+    const text = new Text('xxx');
+    const root = new Element('aaa').append(new Element('bbb').append(text));
+
+    expect(text.getRootNode()).toBe(root);
+  });
+
+  test('returns the node itself if it has no parent', () => {
+    const node = new Element('aaa');
+
+    expect(node.getRootNode()).toBe(node);
+  });
+});
+
+describe('Node.compareDocumentPosition', () => {
+  test('returns 0 for the node itself', () => {
+    const node = new Element('aaa');
+
+    expect(node.compareDocumentPosition(node)).toBe(0);
+  });
+
+  test('tells that a sibling precedes or follows the node', () => {
+    const element1 = new Element('bbb');
+    const element2 = new Element('ccc');
+
+    new Element('aaa').append(element1, new Text('xxx'), element2);
+
+    expect(element1.compareDocumentPosition(element2)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(element2.compareDocumentPosition(element1)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+  });
+
+  test('tells that a descendant is contained by the node, and an ancestor contains it', () => {
+    const text = new Text('xxx');
+    const root = new Element('aaa').append(new Element('bbb').append(text));
+
+    expect(root.compareDocumentPosition(text)).toBe(
+      Node.DOCUMENT_POSITION_CONTAINED_BY | Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    expect(text.compareDocumentPosition(root)).toBe(Node.DOCUMENT_POSITION_CONTAINS | Node.DOCUMENT_POSITION_PRECEDING);
+  });
+
+  test('compares nodes at different depths in different subtrees', () => {
+    const element1 = new Element('ccc');
+    const element2 = new Element('ddd');
+
+    new Element('aaa').append(new Element('bbb').append(element1), element2);
+
+    expect(element1.compareDocumentPosition(element2)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(element2.compareDocumentPosition(element1)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+  });
+
+  test('tells the same order of nodes of different trees each time', () => {
+    const element1 = new Element('bbb');
+    const element2 = new Element('ddd');
+    const root1 = new Element('aaa').append(element1);
+    const root2 = new Element('ccc').append(element2);
+    const position = element1.compareDocumentPosition(element2);
+
+    expect(position & ~(Node.DOCUMENT_POSITION_PRECEDING | Node.DOCUMENT_POSITION_FOLLOWING)).toBe(
+      Node.DOCUMENT_POSITION_DISCONNECTED | Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+    );
+    expect(root1.compareDocumentPosition(root2)).toBe(position);
+    expect(element2.compareDocumentPosition(element1)).toBe(
+      position ^ (Node.DOCUMENT_POSITION_PRECEDING | Node.DOCUMENT_POSITION_FOLLOWING)
+    );
+  });
 });

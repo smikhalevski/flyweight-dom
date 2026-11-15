@@ -73,11 +73,18 @@ list.childNodes.length;
 // ⮕ 2
 ```
 
-Nodes can be cloned and compared:
+Nodes can be cloned and compared, and they tell where they are in the tree:
 
 ```ts
 list.cloneNode(true).isEqualNode(list);
 // ⮕ true
+
+// The first child goes after the list in document order
+(list.compareDocumentPosition(list.firstChild!) & Element.DOCUMENT_POSITION_FOLLOWING) !== 0;
+// ⮕ true
+
+list.firstChild!.getRootNode();
+// ⮕ list
 ```
 
 # Attributes
@@ -109,10 +116,16 @@ element.getAttribute('class');
 
 # Lookups
 
+<!--prettier-ignore-->
 ```ts
 import { h } from 'flyweight-dom/dsl';
 
-const document = h.document(h('ul', h('li', { id: 'first', class: 'item' }), h('li', { class: 'item' })));
+const document = h.document(
+  h('ul',
+    h('li', { id: 'first', class: 'item' }),
+    h('li', { class: 'item' })
+  )
+);
 
 document.getElementById('first');
 // ⮕ The first <li> element
@@ -137,6 +150,14 @@ const $items = $(document).descendants('ul').children('li');
 
 $items.hasClass('done').nodes.length;
 // ⮕ 2
+```
+
+A query can also start from an array or another iterable of nodes. Nodes are copied when the query is created, and each
+node is held once:
+
+```ts
+// The lists that contain the items
+$(document.getElementsByClassName('item')).parent('ul');
 ```
 
 ## Selecting elements
@@ -170,7 +191,19 @@ $(document).descendants('*', SVG_NAMESPACE);
 $(document).descendants('h2').closest('section');
 ```
 
-Each element is selected once, even if several nodes lead to it.
+Each element is selected once, even if several nodes lead to it. Elements are ordered the same way as in jQuery:
+`children`, `next` and `previous` keep the order of nodes that they were selected from, `ancestors` and `preceding`
+start with the closest element, and other methods return elements in document order. Use
+[`sort`](https://smikhalevski.github.io/flyweight-dom/classes/flyweight-dom_query.NodeQuery.html#sort) to put nodes in
+document order:
+
+```ts
+// The closest <section> that contains the heading
+$(heading).ancestors('section').first();
+
+// The outermost <section> that contains the heading
+$(heading).ancestors('section').sort().first();
+```
 
 ## Filtering
 
@@ -233,7 +266,7 @@ $links.length;
 
 // Queries are iterable
 for (const link of $links) {
-  // Process the link
+  // Process the link element
 }
 
 // The attribute of the first node
@@ -342,10 +375,14 @@ element.attributes;
 Use [`h`](https://smikhalevski.github.io/flyweight-dom/variables/flyweight-dom_dsl.h.html) to create elements.
 Attributes are optional:
 
+<!--prettier-ignore-->
 ```ts
 import { h } from 'flyweight-dom/dsl';
 
-const element = h('div', { class: 'red' }, 'Hello, ', h('strong', 'world!'));
+const element = h('div', { class: 'red' },
+  'Hello, ',
+  h('strong', 'world!')
+);
 
 element.className;
 // ⮕ 'red'
@@ -363,10 +400,20 @@ h('ul', isEmpty && h('li', 'Empty'));
 
 Other nodes are created by methods of `h`:
 
+<!--prettier-ignore-->
 ```ts
-h.document(h.doctype('html'), h('html', h.comment('Hello')));
+h.document(
+  h.doctype('html'),
+  h('html',
+    h.comment('Hello')
+  )
+);
 
-h.fragment(h('p'), h.cdata('Hello'), h.processingInstruction('xml', 'version="1.0"'));
+h.fragment(
+  h('p'),
+  h.cdata('Hello'),
+  h.processingInstruction('xml', 'version="1.0"')
+);
 ```
 
 Create elements that have a namespace:

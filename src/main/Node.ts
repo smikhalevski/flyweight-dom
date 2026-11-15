@@ -4,8 +4,13 @@ import { lookupNamespaceURI } from './lookupNamespaceURI.ts';
 import { lookupPrefix } from './lookupPrefix.ts';
 import { EmptyNodeList, type ChildrenCache, type NodeList } from './NodeList.ts';
 import type { ParentNode } from './ParentNode.ts';
+import { uncheckedCompareDocumentPosition } from './uncheckedCompareDocumentPosition.ts';
 import { uncheckedContains } from './uncheckedContains.ts';
 import {
+  DOCUMENT_POSITION_DISCONNECTED,
+  DOCUMENT_POSITION_FOLLOWING,
+  DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC,
+  DOCUMENT_POSITION_PRECEDING,
   isElement as importedIsElement,
   isEqualChildNodes as importedIsEqualChildNodes,
   isEqualConstructor as importedIsEqualConstructor,
@@ -31,6 +36,13 @@ export class Node {
   static readonly DOCUMENT_NODE: number = 9;
   static readonly DOCUMENT_TYPE_NODE: number = 10;
   static readonly DOCUMENT_FRAGMENT_NODE: number = 11;
+
+  static readonly DOCUMENT_POSITION_DISCONNECTED: number = 1 << 0;
+  static readonly DOCUMENT_POSITION_PRECEDING: number = 1 << 1;
+  static readonly DOCUMENT_POSITION_FOLLOWING: number = 1 << 2;
+  static readonly DOCUMENT_POSITION_CONTAINS: number = 1 << 3;
+  static readonly DOCUMENT_POSITION_CONTAINED_BY: number = 1 << 4;
+  static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: number = 1 << 5;
 
   /**
    * @see [Node.nodeType](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType) on MDN
@@ -193,6 +205,44 @@ export class Node {
   }
 
   /**
+   * Returns the root of the tree that the node is in, which is the node itself if it has no parent.
+   *
+   * @see [Node.getRootNode](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode) on MDN
+   */
+  getRootNode(): Node {
+    let node: Node = this;
+
+    while (node.parentNode !== null) {
+      node = node.parentNode;
+    }
+    return node;
+  }
+
+  /**
+   * Returns bits that tell the position of the other node relative to this node: whether it precedes or follows this
+   * node, and whether it contains this node or is contained by it.
+   *
+   * Nodes of different trees have no position, so {@link DOCUMENT_POSITION_DISCONNECTED} is returned along with a
+   * preceding or following bit that is the same for all nodes of both trees, so nodes can be sorted.
+   *
+   * @param otherNode The node to compare with.
+   * @see [Node.compareDocumentPosition](https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition) on MDN
+   */
+  compareDocumentPosition(otherNode: Node): number {
+    const position = uncheckedCompareDocumentPosition(this, otherNode);
+
+    if (position !== DOCUMENT_POSITION_DISCONNECTED) {
+      return position;
+    }
+
+    return (
+      DOCUMENT_POSITION_DISCONNECTED |
+      DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC |
+      (getTreeIndex(otherNode) < getTreeIndex(this) ? DOCUMENT_POSITION_PRECEDING : DOCUMENT_POSITION_FOLLOWING)
+    );
+  }
+
+  /**
    * @see [Node.removeChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/removeChild) on MDN
    */
   removeChild<T extends Node>(child: T): T {
@@ -254,6 +304,34 @@ export class Node {
 Object.defineProperty(Node.prototype, '_isParentNode', { value: false });
 
 retainHiddenClasses(new Node());
+
+/**
+ * Indices of roots of trees in the order in which nodes of trees were compared for the first time. Trees have no order
+ * of their own, but nodes of different trees must be compared the same way each time, see
+ * {@link Node.compareDocumentPosition}. The map is weak, so it doesn't keep roots in memory.
+ */
+const treeIndexMap = new WeakMap<Node, number>();
+
+/**
+ * The number of trees in {@link treeIndexMap}, since a weak map doesn't count its entries.
+ */
+let treeCount = 0;
+
+/**
+ * Returns the index of the tree that the node is in, see {@link treeIndexMap}.
+ */
+const getTreeIndex = (node: Node): number => {
+  const root = node.getRootNode();
+
+  let index = treeIndexMap.get(root);
+
+  if (index === undefined) {
+    index = treeCount++;
+    treeIndexMap.set(root, index);
+  }
+
+  return index;
+};
 
 /**
  * {@link Node.childNodes} of all nodes that can't have children. The list has no state, so all nodes share it, and it

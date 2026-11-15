@@ -13,6 +13,13 @@ export const DOCUMENT_NODE = 9;
 export const DOCUMENT_TYPE_NODE = 10;
 export const DOCUMENT_FRAGMENT_NODE = 11;
 
+export const DOCUMENT_POSITION_DISCONNECTED = 1 << 0;
+export const DOCUMENT_POSITION_PRECEDING = 1 << 1;
+export const DOCUMENT_POSITION_FOLLOWING = 1 << 2;
+export const DOCUMENT_POSITION_CONTAINS = 1 << 3;
+export const DOCUMENT_POSITION_CONTAINED_BY = 1 << 4;
+export const DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 1 << 5;
+
 /**
  * The namespace that the `xml` prefix is always bound to.
  *
